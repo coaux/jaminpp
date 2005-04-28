@@ -3,7 +3,8 @@
 INCLUDES = \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
-	@PACKAGE_CFLAGS@ @JAMIN_CFLAGS@
+	@PACKAGE_CFLAGS@ \
+	@AM_CFLAGS@
 
 # use a convenience library to build non-optimized sources.
 noinst_LIBRARIES	= libnopt.a

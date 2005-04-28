@@ -1,0 +1,8 @@
+JAM for Debian
+--------------
+
+JAM is beta quality at the moment. Be aware that the user interface and
+the file format of the scene file may change fundamentally until the
+first stable release.
+
+ -- Robert Jordens <jordens@debian.org> Wed, 10 Sep 2003 12:24:07 +0200
