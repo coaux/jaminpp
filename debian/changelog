@@ -1,3 +1,9 @@
+jamin (0.95.0-3) unstable; urgency=low
+
+  * rebuild against jack 0.100.0 for unstable
+
+ -- Robert Jordens <jordens@debian.org>  Sat,  2 Jul 2005 14:47:32 +0200
+
 jamin (0.95.0-2) experimental; urgency=low
 
   * rebuild against jack 0.100.0
