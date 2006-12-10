@@ -1,3 +1,11 @@
+jamin (0.95.0-4) unstable; urgency=low
+
+  * Porter NMU.
+  * Don't depends on libasound2-dev on non-linux architectures. closes: 
+    #327647.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 10 Dec 2006 21:24:20 +0100
+
 jamin (0.95.0-3) unstable; urgency=low
 
   * rebuild against jack 0.100.0 for unstable
