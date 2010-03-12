@@ -1,3 +1,10 @@
+jamin (0.97.14~cvs~81203-2) unstable; urgency=low
+
+  * Update feature list in long description to match website.
+    Closes: bug#412091, thanks to Mike O'Connor.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Fri, 12 Mar 2010 19:32:59 +0100
+
 jamin (0.97.14~cvs~81203-1) unstable; urgency=low
 
   * Friendly takeover: Maintain in Debian Multimedia Team, with myself
