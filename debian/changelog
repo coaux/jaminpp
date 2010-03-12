@@ -23,15 +23,20 @@ jamin (0.97.14~cvs~81203-1) unstable; urgency=low
   * Build-depend on libjack-dev (not libjack0.100.0-dev). Closes:
     bug#527420, thanks to Felipe Sateler.
   * Build-depend on liblo-dev (not liblo0-dev).
-  * Build-depend unversioned on swh-plugins (needed version satisified
-    in oldstable.
+  * Build-depend on intltool, needed for our autotools bootstrapping.
+  * Build-depend unversioned on swh-plugins (satisified in oldstable).
+  * Make binary dependencies unversioned (satisified in oldstable).
+  * Recommend (not depend on) swh-plugins, and fallback to virtual
+    ladspa-plugin.
   * Add proper licensing header to rules file.
   * Rewrite copyright file as draft DEP5 rev. 135 format. Closes:
     bug#412110, thanks to Mike O'Connor.
   * Bump Standards-Version to 3.8.4.
   * Drop no longer relevant README.Debian.
+  * Packaging maintained in Git: Add Vcs-* stanzas to control file.
+  * Add git-buildpackage config, enabling tag signing and pristine-tar.
 
- -- Jonas Smedegaard <dr@jones.dk>  Fri, 12 Mar 2010 12:57:47 +0100
+ -- Jonas Smedegaard <dr@jones.dk>  Fri, 12 Mar 2010 13:06:51 +0100
 
 jamin (0.95.0-4) unstable; urgency=low
 

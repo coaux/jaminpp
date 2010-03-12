@@ -7,6 +7,7 @@ Build-Depends: cdbs, autotools-dev, libtool, automake1.11, autoconf, debhelper (
  docbook-to-man,
  fftw3-dev,
  indent,
+ intltool,
  ladspa-sdk,
  libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386],
  libgtk2.0-dev,
@@ -16,10 +17,13 @@ Build-Depends: cdbs, autotools-dev, libtool, automake1.11, autoconf, debhelper (
  libxml-parser-perl,
  swh-plugins
 Standards-Version: 3.8.4
+Vcs-Git: git://git.debian.org/git/pkg-multimedia/jamin.git
+Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/jamin.git;a=summary
 
 Package: jamin
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, swh-plugins (>= 0.4.6), jackd (>= 0.50.0)
+Depends: ${shlibs:Depends}, ${misc:Depends}, jackd
+Recommends: swh-plugins | ladspa-plugin
 Description: Audio mastering from a mixed down multitrack source with JACK
  JAM is a tool for producing audio masters from a mixed down multitrack source.
  It runs in the JACK Audio Connection Kit, and uses LADSPA for its backend DSP
