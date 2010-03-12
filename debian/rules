@@ -14,11 +14,6 @@ DEB_AUTO_UPDATE_AUTOHEADER = 2.65
 DEB_AUTO_UPDATE_ACLOCAL = 1.11
 DEB_AUTO_UPDATE_AUTOMAKE = 1.11
 
-include /usr/share/cdbs/1/class/makefile.mk
-DEB_UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*//')
-# strip of a optionally added cvs patch (format: upstream+cvs-debian)
-DEB_UPSTREAM_TARBALL_VERSION := $(shell echo $(DEB_UPSTREAM_VERSION) | sed 's/+[^+]*//')
-# tarball has to be first because of #205396
 include /usr/share/cdbs/1/class/autotools.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 
