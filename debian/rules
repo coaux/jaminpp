@@ -1,12 +1,21 @@
 #!/usr/bin/make -f
-# rules
+# -*- mode: makefile; coding: utf-8 -*-
+# Copyright © 2003-2005 Robert Jordens <rjo@gmx.de>
+# Copyright © 2010 Jonas Smedegaard <dr@jones.dk>
+# Description: Main Debian packaging script for JAMin
 #
-# Robert Jordens <rjo@gmx.de>
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2, or (at
+# your option) any later version.
 #
-# This software may be used and distributed according to the terms
-# of the GNU General Public License, incorporated herein by reference.
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-# $Id: rules 121 2003-09-08 09:27:20Z rj $
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 DEB_AUTO_UPDATE_LIBTOOL = pre
 DEB_AUTO_UPDATE_AUTOCONF = 2.65
