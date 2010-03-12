@@ -1,29 +1,37 @@
-jamin (0.97.14~cvs~81203-1) UNRELEASED; urgency=low
+jamin (0.97.14~cvs~81203-1) unstable; urgency=low
 
   * Friendly takeover: Maintain in Debian Multimedia Team, with myself
     as Uploader. Thanks for your contributions, Robert.
   * New upstream development snapshot.
   * Use dpkg source format "3.0 (quilt)".
-  * Build-depend on liblo-dev (not liblo0-dev).
   * Revert packaging cruft.
   * Isolate patches:
     + 1001: use AM_FLAGS for CFLAGS.
     + 1002: compile with fPIC against renamed jamincont_1912.c.
     Disable both patches (but keep in source).
+  * Add patch 1003 to add dynamic linking. Hopefully closes: bug#554928,
+    thanks to Peter Fritzsche.
   * Enable CDBS autoreconf.
   * Enable CDBS conditional control file updating.
   * Enable CDBS copyright check.
-  * Rewrite watch file.
+  * Rewrite watch file. Closes: bug#449805, thanks to Raphael Geissert.
   * Update section name in menu file. Quote strings.
   * Drop superfluous dirs and docs files.
   * Bump debhelper compat level to 6. Tighten build-dependency
     accordingly.
   * Drop superfluous build-dependency on perl-base.
+  * Build-depend on libjack-dev (not libjack0.100.0-dev). Closes:
+    bug#527420, thanks to Felipe Sateler.
+  * Build-depend on liblo-dev (not liblo0-dev).
+  * Build-depend unversioned on swh-plugins (needed version satisified
+    in oldstable.
   * Add proper licensing header to rules file.
-  * Rewrite copyright file as draft DEP5 rev. 135 format.
+  * Rewrite copyright file as draft DEP5 rev. 135 format. Closes:
+    bug#412110, thanks to Mike O'Connor.
   * Bump Standards-Version to 3.8.4.
+  * Drop no longer relevant README.Debian.
 
- -- Jonas Smedegaard <dr@jones.dk>  Fri, 12 Mar 2010 12:21:16 +0100
+ -- Jonas Smedegaard <dr@jones.dk>  Fri, 12 Mar 2010 12:57:47 +0100
 
 jamin (0.95.0-4) unstable; urgency=low
 
