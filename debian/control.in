@@ -30,17 +30,13 @@ Description: Audio mastering from a mixed down multitrack source with JACK
  work, specifically the swh plugins created by Steve Harris, JAM's main author.
  .
  Features:
-  * Linear filters (though this seems to be going out of fashion, oh well)
-  * JACK i/o
-  * 30band graphic EQ
-  * 1023band graphic EQ
+  * Linear filters
+  * JACK I/O
+  * 30 band graphic EQ
+  * 1023 band hand drawn EQ with parametric controls
   * Spectrum analyser
-  * 3band peak compressor
+  * 3 band peak compressor
   * Lookahead brickwall limiter
- .
- Planned features (in rough order of difficulty):
   * Multiband stereo processing
-  * Parametric EQ
-  * Loudness maximiser
   * Presets and scenes
-
+  * Loudness maximiser
