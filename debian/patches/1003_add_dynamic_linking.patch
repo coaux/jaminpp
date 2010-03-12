@@ -1,0 +1,13 @@
+diff --git a/configure.in b/configure.in
+index 29a0e50..b5183f1 100644
+--- a/configure.in
++++ b/configure.in
+@@ -109,7 +109,7 @@ if test "${libdir}" = '${exec_prefix}/lib'; then
+   libdir='${exec_prefix}/'${libnn}
+ fi
+ 
+-JAMIN_LIBS="$FFTW_LIBS $XML_LIBS $JACK_LIBS $OSC_LIBS"
++JAMIN_LIBS="$FFTW_LIBS $XML_LIBS $JACK_LIBS $OSC_LIBS -ldl"
+ AC_SUBST(JAMIN_LIBS)
+ JAMIN_CFLAGS="-g $FFTW_CFLAGS $JACK_CFAGS $XML_CFLAGS $OSC_CFLAGS"
+ AC_SUBST(JAMIN_CFLAGS)
