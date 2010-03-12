@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: state.c,v 1.58 2004/11/02 05:40:16 joq Exp $
+ *  $Id: state.c,v 1.73 2008/02/04 14:23:34 esaracco Exp $
  */
 
 #include <stdio.h>
@@ -28,8 +28,10 @@
 
 #include "config.h"
 #include "main.h"
+#include "callbacks.h"
 #include "geq.h"
 #include "spectrum.h"
+#include "intrim.h"
 #include "state.h"
 #include "io.h"
 #include "process.h"
@@ -37,9 +39,11 @@
 #include "hdeq.h"
 #include "compressor-ui.h"
 #include "help.h"
+#include "preferences.h"
 
 /* A scene value to indicate that loading failed */
 #define LOAD_ERROR -2
+
 
 /* The smallest value that counts as a change, should be approximately
  * epsilon+delta */
@@ -63,6 +67,7 @@ static GList         *undo_pos = NULL;
 static int suppress_feedback = 0;
 static int saved_scene;
 static float crossfade_time = 1.0;
+static gboolean override_limiter_default = FALSE;
 
 static void s_set_events(int id, float value);
 void s_update_title();
@@ -71,9 +76,9 @@ void s_save_global_int(xmlDocPtr doc, char *symbol, int value);
 void s_save_global_float(xmlDocPtr doc, char *symbol, float value);
 void s_save_global_gang(xmlDocPtr doc, char *p, int band, gboolean value);
 
-static const gchar *filename = NULL;
+gchar *session_filename = NULL;
 
-/* global session parmaeters read from the XML file */
+/* global session parameters read from the XML file */
 
 typedef struct {
     int scene;
@@ -82,12 +87,24 @@ typedef struct {
     float lgain;
     float hgain;
     float ct;
+    float inwl;
+    float outwl;
+    int eq_bypass;
+    int comp_bypass[3];
+    int limiter_bypass;
+    gboolean out_meter_peak_pref;
+    gboolean rms_meter_peak_pref;
+    int rms_time_slice;
+    int limiter_plugin;
+    float xo_delay_time[XO_BANDS - 1];
+    int xo_delay_state[XO_BANDS - 1];
     int gang_at[XO_BANDS];
     int gang_re[XO_BANDS];
     int gang_th[XO_BANDS];
     int gang_ra[XO_BANDS];
     int gang_kn[XO_BANDS];
     int gang_ma[XO_BANDS];
+    int iir_xover;
 } xml_global_params;
 
 void state_init()
@@ -376,14 +393,14 @@ void s_redo()
 
     restore = FALSE;
     if (undo_pos) {
-	if (undo_pos->next) {
-	    undo_pos = g_list_next(undo_pos);
-            restore = TRUE;
-	}
-    } else {
-	undo_pos = history;
-	undo_pos = g_list_next(undo_pos);
+      if (undo_pos->next) {
+        undo_pos = g_list_next(undo_pos);
         restore = TRUE;
+      }
+    } else if (history->next) {
+      undo_pos = history;
+      undo_pos = g_list_next(undo_pos);
+      restore = TRUE;
     }
 
     if (restore)
@@ -466,12 +483,25 @@ void s_set_description(int id, const char *desc)
 
 void s_save_session_from_ui (GtkWidget *w, gpointer user_data)
 {
+#if GTK_VERSION_GE(2, 4)
+
+    gchar *fname = NULL;
+    GtkFileChooser *file_selector = (GtkFileChooser *) user_data;
+
+    fname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (file_selector));
+    s_save_session (fname);
+    g_free (fname);
+
+#else
+
     GtkFileSelection *file_selector = (GtkFileSelection *) user_data;
 
     s_save_session(gtk_file_selection_get_filename (GTK_FILE_SELECTION (file_selector)));
+
+#endif
 }
     
-void s_save_session (const char *fname)
+void s_save_session (const gchar *fname)
 {
     xmlDocPtr doc;
     xmlNodePtr rootnode, node, sc_node;
@@ -484,11 +514,11 @@ void s_save_session (const char *fname)
      * previous one */
 
     if (fname) {
-	filename = fname;
+        s_set_session_filename (fname);
 	s_update_title();
     }
-    if (!filename) {
-	errstr = g_strdup_printf("No filename found at %s:%d, not saving\n",
+    if (!s_have_session_filename ()) {
+	errstr = g_strdup_printf("No session filename found at %s:%d, not saving\n",
                                  __FILE__, __LINE__);
 	message (GTK_MESSAGE_WARNING, errstr);
 	free(errstr);
@@ -511,11 +541,33 @@ void s_save_session (const char *fname)
     s_save_global_int(doc, "mode", process_get_spec_mode());
     s_save_global_int(doc, "freq", get_spectrum_freq());
     s_save_global_float(doc, "ct", crossfade_time);
+    s_save_global_float(doc, "inwl", intrim_inmeter_get_warn());
+    s_save_global_float(doc, "outwl", intrim_outmeter_get_warn());
     s_save_global_float(doc, "lgain", hdeq_get_lower_gain());
     s_save_global_float(doc, "hgain", hdeq_get_upper_gain());
 
+    s_save_global_int(doc, "eq bypass", process_get_bypass_state (EQ_BYPASS));
+    s_save_global_int(doc, "comp bypass0", process_get_bypass_state (LOW_COMP_BYPASS));
+    s_save_global_int(doc, "comp bypass1", process_get_bypass_state (MID_COMP_BYPASS));
+    s_save_global_int(doc, "comp bypass2", process_get_bypass_state (HIGH_COMP_BYPASS));
+    s_save_global_int(doc, "limiter bypass", process_get_bypass_state (LIMITER_BYPASS));
 
-    /* record the current gang state of the compressor controls */
+    s_save_global_int(doc, "output meter peak pref", (int) intrim_get_out_meter_peak_pref ());
+    s_save_global_int(doc, "rms meter peak pref", (int) intrim_get_rms_meter_peak_pref ());
+
+    s_save_global_int(doc, "rms time slice", process_get_rms_time_slice ());
+
+    s_save_global_int(doc, "limiter plugin", process_get_limiter_plugin ());
+
+
+    s_save_global_float(doc, "low delay time", process_get_xo_delay_time(XO_LOW));
+    s_save_global_int(doc, "low delay state", process_get_xo_delay_state (XO_LOW));
+    s_save_global_float(doc, "mid delay time", process_get_xo_delay_time(XO_MID));
+    s_save_global_int(doc, "mid delay state", process_get_xo_delay_state (XO_MID));
+
+    s_save_global_int (doc, "crossover type", process_get_crossover_type ());
+
+    /* record the current gang state of the compressor controls  */
 
     for (i = 0 ; i < XO_BANDS ; i++) {
         s_save_global_gang(doc, "at", i, comp_at_ganged(i));
@@ -577,7 +629,7 @@ void s_save_session (const char *fname)
 	    xmlAddChild(sc_node, node);
 	}
     }
-    xmlSaveFile(filename, doc);
+    xmlSaveFile((const char *) s_get_session_filename (), doc);
     xmlFreeDoc(doc);
 }
 
@@ -592,35 +644,51 @@ static void s_error(void *user_data, const char *msg, ...);
 
 void s_load_session_from_ui (GtkWidget *w, gpointer user_data)
 {
+#if GTK_VERSION_GE(2, 4)
+
+    gchar *fname = NULL;
+    GtkFileChooser *file_selector = (GtkFileChooser *) user_data;
+
+    fname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (file_selector));
+    s_load_session (fname);
+    g_free (fname);
+
+#else
+
     GtkFileSelection *file_selector = (GtkFileSelection *) user_data;
 
     s_load_session(gtk_file_selection_get_filename (GTK_FILE_SELECTION
                                                 (file_selector)));
+
+#endif
 }
     
-void s_load_session (const char *fname)
+void s_load_session (const gchar *fname)
 {
     xmlSAXHandlerPtr handler;
     int scene = -1;
     int fd;
     int i;
     xml_global_params gp;
+    gchar *session_filename;
 
     saved_scene = -1;
     unset_scene_buttons ();
 
     if (fname) {
-	filename = fname;
+	s_set_session_filename (fname);
     }
-    if (filename == NULL) {
-	filename = default_session;
+    if (!s_have_session_filename ()) {
+	s_set_session_filename (default_session);
     }
 
+    session_filename = s_get_session_filename ();
+
     /* Check to see if file is readable */
-    if ((fd = open(filename, O_RDONLY)) >= 0) {
+    if ((fd = open((const char *) session_filename, O_RDONLY)) >= 0) {
 	close(fd);
     } else {
-	errstr = g_strdup_printf("Error opening '%s'", filename);
+	errstr = g_strdup_printf("Error opening '%s'", session_filename);
 	message (GTK_MESSAGE_WARNING, errstr);
         perror(errstr);
 	free(errstr);
@@ -637,14 +705,28 @@ void s_load_session (const char *fname)
     handler->warning = s_warning;
     handler->error = s_error;
 
-    /* set the gp struct to some sensible defualts incase values aren't set in
+    /* set the gp struct to some sensible defaults in case values aren't set in
      * the XML file */
     gp.scene = scene;
     gp.mode = SPEC_POST_EQ;
     gp.freq = 10;
     gp.lgain = -12.0;
     gp.hgain = 12.0;
+    gp.inwl = -6.0;
+    gp.outwl = -6.0;
     gp.ct = 1.0;
+    gp.eq_bypass = 0;
+    gp.comp_bypass[0] = gp.comp_bypass[1] = gp.comp_bypass[2] = 0;
+    gp.limiter_bypass = 0;
+    gp.out_meter_peak_pref = TRUE;
+    gp.rms_meter_peak_pref = TRUE;
+    gp.rms_time_slice = 50;
+    gp.limiter_plugin = FAST;
+    gp.xo_delay_time[XO_LOW] = 2.0;
+    gp.xo_delay_state[XO_LOW] = 0;
+    gp.xo_delay_time[XO_MID] = 0.5;
+    gp.xo_delay_state[XO_MID] = 0;
+    gp.iir_xover = FFT;
     for (i = 0 ; i < XO_BANDS ; i++) {
         gp.gang_at[i] = FALSE;
         gp.gang_re[i] = FALSE;
@@ -654,19 +736,20 @@ void s_load_session (const char *fname)
         gp.gang_ma[i] = FALSE;
     }
 
+
     /* run the SAX parser */    
     scene_init();
-    xmlSAXUserParseFile(handler, &gp, filename);
+    xmlSAXUserParseFile(handler, &gp, (const char *) session_filename);
 
     if (gp.scene == LOAD_ERROR) {
-	errstr = g_strdup_printf("Loading file '%s' failed", filename);
+	errstr = g_strdup_printf("Loading file '%s' failed", session_filename);
 	message (GTK_MESSAGE_WARNING, errstr);
         perror(errstr);
 	free(errstr);
 	return;
     }
 
-    s_history_add(g_strdup_printf("Load %s", filename));
+    s_history_add(g_strdup_printf("Load %s", session_filename));
     last_changed = S_LOAD;
     free(handler);
 
@@ -680,7 +763,39 @@ void s_load_session (const char *fname)
     hdeq_set_lower_gain (gp.lgain);
     geq_set_range (gp.lgain, geq_get_adjustment(0)->upper);
     s_set_crossfade_time (gp.ct);
+    intrim_inmeter_set_warn (gp.inwl);
+    intrim_outmeter_set_warn (gp.outwl);
 
+
+    for (i = 0 ; i < XO_NBANDS ; i++)
+      {
+        if (gp.comp_bypass[i] != 2)
+          {
+            callbacks_set_comp_bypass_button_state (i, FALSE);
+          }
+        else
+          {
+            callbacks_set_comp_bypass_button_state (i, TRUE);
+          }
+      }
+
+    callbacks_set_eq_bypass_button_state (gp.eq_bypass);
+    callbacks_set_limiter_bypass_button_state (gp.limiter_bypass);
+
+    process_set_xo_delay_time (XO_LOW, gp.xo_delay_time[XO_LOW]);
+    process_set_xo_delay_time (XO_MID, gp.xo_delay_time[XO_MID]);
+    process_set_xo_delay_state (XO_LOW, gp.xo_delay_state[XO_LOW]);
+    process_set_xo_delay_state (XO_MID, gp.xo_delay_state[XO_MID]);
+
+    callbacks_set_low_delay_button_state (gp.xo_delay_state[XO_LOW]);
+    callbacks_set_mid_delay_button_state (gp.xo_delay_state[XO_MID]);
+
+    intrim_set_out_meter_peak_pref (gp.out_meter_peak_pref);
+    intrim_set_rms_meter_peak_pref (gp.rms_meter_peak_pref);
+
+    process_set_rms_time_slice (gp.rms_time_slice);
+
+    process_set_crossover_type (gp.iir_xover);
 
     /*  This is the active scene.  */
 
@@ -694,7 +809,7 @@ void s_load_session (const char *fname)
       }
 
     if (!fname) {
-	filename = NULL;
+	s_set_session_filename (NULL);
     }
 
 
@@ -711,10 +826,18 @@ void s_load_session (const char *fname)
     }
 
 
+    /*  If we set the limiter plugin on the command line don't set
+        it from the defaults.  */
+
+    if (!override_limiter_default) process_set_limiter_plugin (gp.limiter_plugin);
+    override_limiter_default = FALSE;
+
+
     hdeq_set_xover ();
     set_EQ_curve_values (0, 0.0);
 
     s_clear_history();
+    pref_set_all_values ();
 }
 
 void s_startElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
@@ -789,6 +912,39 @@ void s_startElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 	    gp->hgain = atof(value);
 	} else if (!strcmp(symbol, "ct")) {
 	    gp->ct = atof(value);
+	} else if (!strcmp(symbol, "inwl")) {
+	    gp->inwl = atof(value);
+	} else if (!strcmp(symbol, "outwl")) {
+	    gp->outwl = atof(value);
+	} else if (!strcmp(symbol, "eq bypass")) {
+	    gp->eq_bypass = atof(value);
+	} else if (!strcmp(symbol, "comp bypass0")) {
+	    gp->comp_bypass[0] = atoi(value);
+	} else if (!strcmp(symbol, "comp bypass1")) {
+	    gp->comp_bypass[1] = atoi(value);
+	} else if (!strcmp(symbol, "comp bypass2")) {
+	    gp->comp_bypass[2] = atoi(value);
+	} else if (!strcmp(symbol, "limiter bypass")) {
+	    gp->limiter_bypass = atoi(value);
+	} else if (!strcmp(symbol, "output meter peak pref")) {
+          gp->out_meter_peak_pref = (gboolean) atoi(value);
+	} else if (!strcmp(symbol, "rms meter peak pref")) {
+          gp->rms_meter_peak_pref = (gboolean) atoi(value);
+	} else if (!strcmp(symbol, "rms time slice")) {
+          gp->rms_time_slice = atoi(value);
+	} else if (!strcmp(symbol, "limiter plugin")) {
+          gp->limiter_plugin = atoi(value);
+	} else if (!strcmp(symbol, "low delay time")) {
+          gp->xo_delay_time[XO_LOW] = atof(value);
+	} else if (!strcmp(symbol, "mid delay time")) {
+          gp->xo_delay_time[XO_MID] = atof(value);
+	} else if (!strcmp(symbol, "low delay state")) {
+          gp->xo_delay_state[XO_LOW] = atoi(value);
+	} else if (!strcmp(symbol, "mid delay state")) {
+          gp->xo_delay_state[XO_MID] = atoi(value);
+	} else if (!strcmp(symbol, "crossover type")) {
+          gp->iir_xover = atoi(value);
+	} else if (!strcmp(symbol, "mid delay state")) {
 	} else if ((const char *)strstr(symbol, "gang_") == symbol) {
 	    int ind = index ? atoi(index) : -1;
 	    int val = atoi(value);
@@ -940,36 +1096,43 @@ void s_crossfade_ui()
     suppress_feedback--;
 }
 
-int s_have_filename()
+int s_have_session_filename()
 {
-    return (filename != NULL);
+    return (session_filename != NULL);
 }
 
-char *s_get_filename()
+gchar *s_get_session_filename()
 {
-    return ((char *) filename);
+    return ((gchar *) session_filename);
 }
 
 void s_update_title()
 {
     char *title; 
     char *base;
-    char *tmp;
+    gchar *tmp;
 
     /* name for title bar */
     char *title_name = (client_name? client_name: PACKAGE);
 
-    tmp = strdup(filename);
-    base = basename(tmp);
-    title = g_strdup_printf("%s - %s - " VERSION, title_name, base);
-    free(tmp);
+    tmp = g_strdup (s_get_session_filename ());
+    base = basename (tmp);
+    title = g_strdup_printf ("%s - %s - " VERSION, title_name, base);
+    g_free (tmp);
     gtk_window_set_title ((GtkWindow *) main_window, title);
-    free(title);
+    g_free (title);
 }
 
-void s_set_filename(const char *fname)
+void s_set_session_filename(const gchar *fname)
 {
-    filename = fname;
+    if (session_filename != NULL)
+      g_free (session_filename);
+
+    if (fname != NULL) {
+      session_filename = g_strdup (fname);
+    } else {
+      session_filename = NULL;
+    }
 }
 
 void s_set_crossfade_time(float ct)
@@ -1030,5 +1193,14 @@ void s_save_global_gang(xmlDocPtr doc, char *p, int band, gboolean value)
     node = xmlNewText("\n");
     xmlAddChild(root, node);
 }
+
+
+/*  Set a boolean if we put the limiter in on the command line.  */
+
+void s_set_override_limiter_default ()
+{
+  override_limiter_default = TRUE;
+}
+
 
 /* vi:set ts=8 sts=4 sw=4: */

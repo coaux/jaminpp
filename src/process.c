@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: process.c,v 1.65 2004/10/28 08:20:33 theno23 Exp $
+ *  $Id: process.c,v 1.79 2008/12/03 03:22:03 kotau Exp $
  */
 
 #include <math.h>
@@ -26,12 +26,15 @@
 #include "process.h"
 #include "compressor.h"
 #include "limiter.h"
+#include "limiter-ui.h"
 #include "geq.h"
 #include "scenes.h"
 #include "intrim.h"
 #include "io.h"
 #include "db.h"
 #include "denormal-kill.h"
+#include "rms.h"
+
 
 #define BIQUAD_TYPE double
 #include "biquad.h"
@@ -41,23 +44,51 @@
 #define LERP(f,a,b) ((a) + (f) * ((b) - (a)))
 
 #define IS_DENORMAL(fv) (((*(unsigned int*)&(fv))&0x7f800000)!=0)
-
 typedef FFTW_TYPE fft_data;
 
 static int xo_band_action[XO_NBANDS] = {ACTIVE, ACTIVE, ACTIVE};
 static int xo_band_action_pending[XO_NBANDS] = {ACTIVE, ACTIVE, ACTIVE};
 
 /* These values need to be controlled by the UI, somehow */
-float xover_fa = 207.0f;
-float xover_fb = 2048.0f;
+float xover_fa = 150.0f;
+float xover_fb = 1200.0f;
 comp_settings compressors[XO_NBANDS];
-lim_settings limiter;
+lim_settings limiter[2];
+int limiter_plugin = FAST;
 float eq_coefs[BINS]; /* Linear gain of each FFT bin */
 float lim_peak[2];
 
 static int iir_xover = 0;
+static unsigned int delay_mask;
 
-float in_peak[NCHANNELS], out_peak[NCHANNELS];
+
+/*  Low and mid band delays.  Note that there is no high band delay
+    (it makes no sense) but there is a slot for it ('cause it was 
+    easier to deal with ;-)  */
+
+static float *delay_buf[NCHANNELS][XO_NBANDS];
+
+
+/*  save_delay saves the actual time setting from preferences.  */
+
+static float save_delay[XO_NBANDS] = {0.0, 0.0, 0.0};
+
+
+/*  If delay is set to 0 then the band delay push button is off but 
+    we will stuff the actual delay (in samples) in here when we want
+    to delay).  */
+
+static int delay[XO_NBANDS] = {0, 0, 0};
+
+
+/*  Set this if we want to set the actual delays on the next pass through.  */
+
+static int delay_pending[XO_NBANDS] = {0, 0, 0};
+
+
+float in_peak[NCHANNELS], out_peak[NCHANNELS], rms_peak[NCHANNELS];
+static rms *r[2] = {NULL, NULL};
+static gboolean rms_ready = FALSE;
 
 static float band_f[BANDS];
 static float gain_fix[BANDS];
@@ -77,6 +108,9 @@ static float sw_s_gain[XO_NBANDS];
 static float sb_l_gain[XO_NBANDS];
 static float sb_r_gain[XO_NBANDS];
 static float limiter_gain = 1.0f;
+static int limiter_plugin_pending = FAST;
+static int limiter_plugin_change_pending = FALSE;
+static float logscale_pending = -1.0;
 
 static float ws_boost_wet = 0.0f;
 static float ws_boost_a = 1.0f;
@@ -88,14 +122,17 @@ static float *latcorbuf_postcomp[NCHANNELS];
 
 static int spectrum_mode = SPEC_POST_EQ;
 
-volatile int global_bypass = 0;		/* updated from GUI thread */
+static int global_bypass = FALSE;
 static int eq_bypass_pending = FALSE;
 static int eq_bypass = FALSE;
-static int limiter_bypass_pending = FALSE;
 static int limiter_bypass = FALSE;
+static int limiter_bypass_pending = FALSE;
+static int rms_time_slice;
+
+volatile int global_gui = 0;		/* updated from GUI thread */
 
 /* Data for plugins */
-plugin *comp_plugin, *lim_plugin;
+plugin *comp_plugin, *lim_plugin[2];
 
 /* FFTW data */
 fftwf_plan plan_rc = NULL, plan_cr = NULL;
@@ -125,7 +162,9 @@ void process_init(float fs)
     float centre = 25.0f;
     unsigned int i, j, band;
 
+
     sample_rate = fs;
+
 
     for (i = 0; i < BANDS; i++) {
 	band_f[i] = centre;
@@ -179,7 +218,7 @@ void process_init(float fs)
     for (i = 0; i < BINS; i++) {
        window[i] = -0.5f * cosf(2.0f * M_PI * (float) i /
                                 (float) BINS) + 0.5f;
-/* root rasied cosine window - aparently sounds worse ...
+/* root raised cosine window - aparently sounds worse ...
 	window[i] = sqrtf(0.5f + -0.5 * cosf(2.0f * M_PI * (float) i /
 			  (float) BINS));
 */
@@ -187,11 +226,29 @@ void process_init(float fs)
 
     plugin_init();
     comp_plugin = plugin_load("sc4_1882.so");
-    lim_plugin = plugin_load("fast_lookahead_limiter_1913.so");
-    if (comp_plugin == NULL || lim_plugin == NULL)  {
-           fprintf(stderr, "Required plugin missing.\n");
+    if (comp_plugin == NULL)  {
+           fprintf(stderr, "Required plugin sc4_1882.so missing.\n");
+           fprintf(stderr, "Please load the SWH plugins.\n");
            exit(1);
     }
+
+
+    /*  Decide which limiter to use.  Steve Harris' fast_lookahead_limiter or
+        Sampo Savolainen's foo_limiter.  */
+
+    lim_plugin[FAST] = plugin_load("fast_lookahead_limiter_1913.so");
+    lim_plugin[FOO] = plugin_load("foo_limiter.so");
+
+    if (lim_plugin[limiter_plugin] == NULL) {
+      limiter_plugin ^= 1;
+
+      if (lim_plugin[limiter_plugin] == NULL) {
+          fprintf(stderr, "Required plugin fast_lookahead_limiter_1913.so and/or foo_limiter.so missing.\n");
+          fprintf(stderr, "Please load the SWH plugins and/or Sampo Savolainen's foo_limiter plugin.\n");
+          exit(1);
+        }
+    }
+
 
     /* This compressor is specifically stereo, so there are always two
      * channels. */
@@ -201,10 +258,29 @@ void process_init(float fs)
 	compressors[band].handle = plugin_instantiate(comp_plugin, fs);
 	comp_connect(comp_plugin, &compressors[band],
 		     out_tmp[CHANNEL_L][band], out_tmp[CHANNEL_R][band]);
+        delay_buf[CHANNEL_L][band] = calloc(dsp_block_size * 4, sizeof(float));
+        delay_buf[CHANNEL_R][band] = calloc(dsp_block_size * 4, sizeof(float));
     }
 
-    limiter.handle = plugin_instantiate(lim_plugin, fs);
-    lim_connect(lim_plugin, &limiter, NULL, NULL);
+
+    /*  Multiply by four so we'll have enough to cover 2 ms at 192KHz.  */
+
+    delay_mask = (dsp_block_size * 4) - 1;
+
+
+    if (lim_plugin[FAST] != NULL)
+      {
+        limiter[FAST].handle = plugin_instantiate(lim_plugin[FAST], fs);
+        lim_connect(lim_plugin[FAST], &limiter[FAST], NULL, NULL);
+      }
+
+    if (lim_plugin[FOO] != NULL)
+      {
+        limiter[FOO].handle = plugin_instantiate(lim_plugin[FOO], fs);
+        lim_connect(lim_plugin[FOO], &limiter[FOO], NULL, NULL);
+      }
+
+
 
     /* Allocate at least 1 second of latency correction buffer */
     for (latcorbuf_len = 256; latcorbuf_len < fs * 1.0f; latcorbuf_len *= 2);
@@ -214,7 +290,7 @@ void process_init(float fs)
 	latcorbuf_postcomp[i] = calloc(latcorbuf_len, sizeof(float));
     }
 
-    /* Clear the corssover filters state */
+    /* Clear the crossover filters state */
     memset(xo_filt, 0, sizeof(xo_filt));
 }
 
@@ -381,14 +457,15 @@ int process_signal(jack_nframes_t nframes,
 {
     unsigned int pos, port, band;
     const unsigned int latency = BINS - dsp_block_size;
-    static unsigned int in_ptr = 0;
+    static unsigned int in_ptr = 0, dpos[2] = {0, 0};
     static unsigned int n_calc_pt = BINS - (BINS / OVER_SAMP);
 
+
     /* The limiters i/o ports potentially change with every call */
-    plugin_connect_port(lim_plugin, limiter.handle, LIM_IN_1, out[CHANNEL_L]);
-    plugin_connect_port(lim_plugin, limiter.handle, LIM_IN_2, out[CHANNEL_R]);
-    plugin_connect_port(lim_plugin, limiter.handle, LIM_OUT_1, out[CHANNEL_L]);
-    plugin_connect_port(lim_plugin, limiter.handle, LIM_OUT_2, out[CHANNEL_R]);
+    plugin_connect_port(lim_plugin[limiter_plugin], limiter[limiter_plugin].handle, LIM_IN_1, out[CHANNEL_L]);
+    plugin_connect_port(lim_plugin[limiter_plugin], limiter[limiter_plugin].handle, LIM_IN_2, out[CHANNEL_R]);
+    plugin_connect_port(lim_plugin[limiter_plugin], limiter[limiter_plugin].handle, LIM_OUT_1, out[CHANNEL_L]);
+    plugin_connect_port(lim_plugin[limiter_plugin], limiter[limiter_plugin].handle, LIM_OUT_2, out[CHANNEL_R]);
 
     /* Crossfade parameter values from current to target */
     s_crossfade(nframes);
@@ -417,7 +494,7 @@ int process_signal(jack_nframes_t nframes,
     }
 
     for (pos = 0; pos < nframes; pos++) {
-	const unsigned int op = (in_ptr - latency) & BUF_MASK;
+	const unsigned int op = (in_ptr - (global_bypass ? latency : 0)) & BUF_MASK;
 	float amp;
 
 	for (port = 0; port < nchannels; port++) {
@@ -492,7 +569,7 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 	}
     }
 
-    /* Handle solo and mute for the IIR crossove case */
+    /* Handle solo and mute for the IIR crossover case */
     if (iir_xover) {
 	for (port = 0; port < nchannels; port++) {
 	    for (band = XO_LOW; band < XO_NBANDS; band++) {
@@ -519,13 +596,28 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 
     for (port = 0; port < nchannels; port++) {
 	for (pos = 0; pos < nframes; pos++) {
+
+          /*  Original (no delay) code.
 	    out[port][pos] =
 		out_tmp[port][XO_LOW][pos] + out_tmp[port][XO_MID][pos] +
 		out_tmp[port][XO_HIGH][pos];
-		/* Keep buffer of compressor outputs incase we need it for
-		 * limiter bypass */
-		latcorbuf_postcomp[port][(latcorbuf_pos + pos) &
-		    (latcorbuf_len - 1)] = out[port][pos];
+          */
+
+
+          delay_buf[port][XO_LOW][dpos[port] & delay_mask] = out_tmp[port][XO_LOW][pos];
+          delay_buf[port][XO_MID][dpos[port] & delay_mask] = out_tmp[port][XO_MID][pos];
+          delay_buf[port][XO_HIGH][dpos[port] & delay_mask] = out_tmp[port][XO_HIGH][pos];
+
+          out[port][pos] = delay_buf[port][XO_LOW][(dpos[port] - delay[XO_LOW]) & delay_mask] +
+            delay_buf[port][XO_MID][(dpos[port] - delay[XO_MID]) & delay_mask] +
+            delay_buf[port][XO_HIGH][(dpos[port] - delay[XO_HIGH]) & delay_mask];
+
+          dpos[port]++;
+
+
+          /* Keep buffer of compressor outputs incase we need it for
+           * limiter bypass */
+          latcorbuf_postcomp[port][(latcorbuf_pos + pos) & (latcorbuf_len - 1)] = out[port][pos];
 	}
     }
 
@@ -547,16 +639,15 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 	const float a = ws_boost_a * 0.3;
 	const float gain_corr = 1.0 / LERP(ws_boost_wet, 1.0,
 				a > M_PI*0.5 ? 1.0 : sinf(1.0 * a));
-
 	for (pos = 0; pos < nframes; pos++) {
 	    const float x = out[port][pos] * out_gain;
 	    out[port][pos] = LERP(ws_boost_wet, x, sinf(x * a)) * gain_corr;
 	}
     }
 
-    plugin_run(lim_plugin, limiter.handle, nframes);
+    plugin_run(lim_plugin[limiter_plugin], limiter[limiter_plugin].handle, nframes);
 
-    /* Keep a buffer of old input data, incase we need it for bypass */
+    /* Keep a buffer of old input data, in case we need it for bypass */
     for (port = 0; port < nchannels; port++) {
 	for (pos = 0; pos < nframes; pos++) {
 	    latcorbuf[port][(latcorbuf_pos + pos) & (latcorbuf_len - 1)] =
@@ -564,10 +655,10 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 	}
     }
 
-    /* If bypass is on override all the stuff done by the crossover section,
-     * limiter and so on */
+    /* If bypass is on, override all the stuff done by the crossover section,
+     * limiter, and so on */
     if (limiter_bypass) {
-	const unsigned int limiter_latency = (unsigned int)limiter.latency;
+	const unsigned int limiter_latency = (unsigned int)limiter[limiter_plugin].latency;
 
 	for (port = 0; port < nchannels; port++) {
 	    for (pos = 0; pos < nframes; pos++) {
@@ -577,7 +668,7 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 	}
     }
     if (global_bypass) {
-	const unsigned int limiter_latency = (unsigned int)limiter.latency;
+	const unsigned int limiter_latency = (unsigned int)limiter[limiter_plugin].latency;
 
 	for (port = 0; port < nchannels; port++) {
 	    for (pos = 0; pos < nframes; pos++) {
@@ -601,11 +692,46 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 	}
     }
 
+
+    /*  Don't try to play with the RMS meters until we've initialized the buffers.  */
+
+    if (rms_ready)
+      {
+        for (port = 0 ; port < nchannels ; port++)
+          {
+            rms_peak[port] = rms_run_buffer (r[port], out[port], nframes);
+          }
+      }
+
+
     /* We've got the the end of the processing, so update the actions */
 
     for (band = 0; band < XO_NBANDS; band++) {
 	xo_band_action[band] = xo_band_action_pending[band];
     }
+
+
+    /*  As above, update the limiter.  */
+
+    if (limiter_plugin_change_pending)
+      {
+        limiter_plugin = limiter_plugin_pending;
+
+        limiter_plugin_change_pending = FALSE;
+      }
+
+
+    if (logscale_pending >= 0.0) 
+      {
+        limiter[limiter_plugin].logscale = logscale_pending;
+        logscale_pending = -1.0;
+      }
+
+
+    /*  Always set these since we turn off delay by setting to 0.  */
+
+    delay[XO_LOW] = delay_pending[XO_LOW];
+    delay[XO_MID] = delay_pending[XO_MID];
 
     return 0;
 }
@@ -637,6 +763,58 @@ void process_set_spec_mode(int mode)
 int process_get_spec_mode()
 {
   return (spectrum_mode);
+}
+
+void process_set_limiter_plugin(int id)
+{
+  int pid = limiter_plugin;
+
+  limiter_plugin_pending = id;
+
+
+  if (lim_plugin[id] == NULL) return;
+
+
+  /*  Copy the previous settings to the current plugin.  */
+
+  limiter[id].ingain = limiter[pid].ingain;
+  limiter[id].limit = limiter[pid].limit;
+  limiter[id].release = limiter[pid].release;
+  limiter[id].attenuation = limiter[pid].attenuation;
+  limiter[id].latency = limiter[pid].latency;
+  limiter[id].logscale = limiter[pid].logscale;
+
+
+  limiter_plugin_change_pending = TRUE;
+
+
+  /*  Turn the logscale on or off depending on whether we're using FAST or FOO.  */
+
+  if (limiter_plugin_pending == FOO)
+    {
+      limiter_logscale_set_state (TRUE);
+    }
+  else
+    {
+      limiter_logscale_set_state (FALSE);
+    }
+
+  limiter_set_label (limiter_plugin_pending);
+}
+
+int process_get_limiter_plugin()
+{
+  /*  This is a startup fixer.  If we specified the plugin on the command line
+      we want to return pending until these two are the same.  */
+
+  if (limiter_plugin_pending != limiter_plugin)
+    {
+      return (limiter_plugin_pending);
+    }
+  else
+    {
+      return (limiter_plugin);
+    }
 }
 
 void process_set_stereo_width(int xo_band, float width)
@@ -671,11 +849,6 @@ void run_width(int xo_band, float *left, float *right, int nframes)
 	left[pos] = (mid + side) * sb_l_gain[xo_band];
 	right[pos] = (mid - side) * sb_r_gain[xo_band];
     }
-}
-
-void process_set_limiter_input_gain(float gain)
-{
-        limiter_gain = gain;
 }
 
 void process_set_ws_boost(float val)
@@ -734,6 +907,131 @@ float process_get_low2mid_xover ()
 float process_get_mid2high_xover ()
 {
     return (xover_fb);
+}
+
+void process_get_bypass_states (int *eq, int *comp, int *limit, int *global)
+{
+  int i;
+
+  *global = global_bypass;
+  *eq = eq_bypass;
+
+  for (i = 0 ; i < XO_NBANDS ; i++) comp[i] = xo_band_action[i];
+
+  *limit = limiter_bypass;
+  *global = global_bypass;
+}
+
+int process_get_bypass_state (int bypass_type)
+{
+  switch (bypass_type)
+    {
+    case EQ_BYPASS:
+      return (eq_bypass);
+      break;
+
+    case LOW_COMP_BYPASS:
+      return (xo_band_action[0]);
+      break;
+
+    case MID_COMP_BYPASS:
+      return (xo_band_action[1]);
+      break;
+
+    case HIGH_COMP_BYPASS:
+      return (xo_band_action[2]);
+      break;
+
+    case LIMITER_BYPASS:
+      return (limiter_bypass);
+      break;
+
+    case GLOBAL_BYPASS:
+      return (global_bypass);
+      break;
+
+    default:
+      return (-1);
+      break;
+    }
+}
+
+float process_get_sample_rate ()
+{
+  return (sample_rate);
+}
+
+int process_get_rms_time_slice ()
+{
+  return (rms_time_slice);
+}
+
+void process_set_rms_time_slice (int milliseconds)
+{
+  rms_time_slice = milliseconds;
+
+
+  if (r[0]) rms_free (r[0]);
+  if (r[1]) rms_free (r[1]);
+
+  float ts = (float) rms_time_slice / 1000.0;
+
+  r[0] = rms_new (sample_rate, ts);
+  r[1] = rms_new (sample_rate, ts);
+
+
+  rms_ready = TRUE;
+}
+
+void process_set_global_bypass (int state)
+{
+  global_bypass = state;
+}
+
+
+int process_limiter_plugins_available ()
+{
+  if (lim_plugin[FAST] == NULL || lim_plugin[FOO] == NULL) return (1);
+  return (2);
+}
+
+
+/*  This actually returns the number of samples for the delay but 
+    it really doesn't matter.  Anyway, we might want to use that 
+    sometime in the future.  */
+
+int process_get_xo_delay_state (int band)
+{
+  return (delay[band]);
+}
+
+void process_set_xo_delay_state (int band, int state)
+{
+  if (state)
+    {
+      delay_pending[band] = NINT ((sample_rate / 1000.0) * save_delay[band]);
+    }
+  else
+    {
+      delay_pending[band] = 0;
+    }
+}
+
+float process_get_xo_delay_time (int band)
+{
+  return (save_delay[band]);
+}
+
+void process_set_xo_delay_time (int band, float ms)
+{
+  save_delay[band] = ms;
+}
+
+void process_set_limiter_logscale (float value)
+{
+  logscale_pending = value;
+
+  set_scene_warning_button ();
 }
 
 /* vi:set ts=8 sts=4 sw=4: */

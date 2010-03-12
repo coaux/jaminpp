@@ -11,17 +11,13 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: limiter-ui.h,v 1.5 2007/07/01 15:33:18 jdepner Exp $
+ *  $Id: presets-ui.h,v 1.1 2008/12/03 03:22:03 kotau Exp $
  */
 
-#ifndef LIMITER_UI_H
-#define LIMITER_UI_H
+#ifndef EASY_UI_H
+#define EASY_UI_H
 
-void bind_limiter();
-void limiter_meters_update();
-void limiter_inmeter_reset_peak ();
-void limiter_outmeter_reset_peak ();
-void limiter_set_label (int limiter_plugin);
-void limiter_logscale_set_state (gboolean state);
+void presets_ui_update();
+
 
 #endif

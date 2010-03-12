@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: callbacks_help.h,v 1.39 2005/02/06 23:31:09 jdepner Exp $
+ *  $Id: callbacks_help.h,v 1.46 2007/06/29 17:17:58 jdepner Exp $
  */
 
 #include "support.h"
@@ -73,23 +73,50 @@ char help_help[] = {N_(
 allow you to save the scenes and settings for a session to a .jam file.  \
 By default these are saved in the $HOME/.jamin directory but may be saved \
 anywhere.\n\
-    The Edit menu has undo and redo options for changes to the settings.\n\
-    The Ports menu allows you to set the input and output ports for JAMin.\n\
-    The Options menu has EQ Options and Preferences entries.  The EQ \
-Options dialog allows you to set the minimum and maximum gain level in dB \
-for both the HDEQ and GEQ.  You can also set the source of the spectrum for \
-both the HDEQ and spectrum windows.  Spectrum update frequency can be set \
-here as well.  Up to 10 per second (default) and down to 0 (disabled).\n\
-    Colors may be changed in the Options->Preferences dialog.  These colors \
-are saved in the file $HOME/.jamin-defaults.  This is done whenever you \
-exit from JAMin.  You can actually edit this file and change the colors by \
-hand.  They are just RGB values in the 0-65535 range but it's much easier to \
-use the GUI ;-).  You may also set the crossfade time and crossover type in \
-this dialog (see the man page for more information on crossfade time and \
-crossover type).\n\
+    The Edit menu has undo and redo options for changes to the settings.  \
+It also has the Preferences entry to bring up the Preferences dialog.  \
+The Preferences dialog allows you to change the default values for many \
+of JAMin's settings.  More detailed help is available in the Preferences \
+dialog.\n\
+    The Ports menu allows you to set the input and output ports for JAMin.\n\n\
     For help on the rest of the GUI, context specific help can be obtained \
 by moving the mouse pointer into one of the tool areas (compressor, EQ, \
 limiter, input, etc) and pressing <Shift><F1>.\n")
+};
+
+
+
+char preferences_help[] = {N_(
+"    This dialog allows you to change many of JAMin's default settings.\n\n\
+    Graphic EQ : Set the minimum and maximum levels for the hand-drawn EQ \
+(HDEQ) and the graphic EQ (GEQ).\n\n\
+    Crossfade : Set the length of the crossfade time when changing between \
+scenes or using the undo/redo functions.\n\n\
+    Warning Level : Set the input and output meter warning level.\n\n\
+    Spectrum : Set the source for the spectrum displays in the HDEQ and the \
+Spectrum tab.  Also, set the spectrum update frequency for both of these \
+tabs.\n\n\
+    Crossover Type : Choose the type of crossover.  Fast Fourier Transform (FFT) \
+or Infinite Impulse Response (IIR).  IIR should only be used for testing as \
+your results will be substantially inferior to the FFT crossover.\n\n\
+    RMS Sample Size : Set the time slice size to be used for the RMS meter \
+displays.  The number of samples will change as you modify the time.\n\n\
+    Band Delays : Set delays for the low and mid bands.  The maximum delay \
+for the low band is 2 milliseconds and the maximum delay for the mid band is \
+0.5 milliseconds.  These delays are used for compensating for for the different \
+low and mid frequency drivers in a speaker system.  This is sometimes nice for \
+mastering.  The delays will not bgo into effect unless the Delay buttons under \
+the low and mid band compressor control areas are selected.\n\n\
+    Colors : Set the colors for most of JAMin's displays.  These colors \
+are saved in the file $HOME/.jamin/jamin-defaults.  This is done whenever you \
+exit from JAMin.  You can actually edit this file and change the colors by \
+hand.  They are just RGB values in the 0-65535 range but it's much easier to \
+use the GUI ;-).\n\n\
+    Limiter : Select either Steve Harris' fast-lookahead-limiter plugin or \
+Sampo Savolainen's foo-limiter.  Note that there may be artifacts if you push \
+the foo-limiter too hard.\n\n\
+    Output Meter Numeric Display : Set whether the output meter numeric displays \
+for output and RMS display peak values or the current level values.\n")
 };
 
 
@@ -97,17 +124,29 @@ char hdeq_help[] = {N_(
 "    The hand drawn EQ (HDEQ) allows the user to draw the EQ curve using the \
 mouse.  The curve is then splined to fill 1024 EQ bands.  There are a number \
 of other options available in the HDEQ.  There are user defined notches that \
-act as a parametric EQ.  There are also crossover controls that will allow \
+act as parametric EQ controls.  There are also crossover controls that will allow \
 the user to change the compressor crossover points.  The following is a quick \
 guide to using the HDEQ:\n\n\
     In the background window - left click and release to begin drawing the \
 curve.  Left click again to end the curve.  You can define any portion of the \
-curve, you don't have to define the entire curve.  Drawing can be done from \
+curve, you don 't have to define the entire curve.  Drawing can be done from \
 left to right or right to left.  If you try to reverse direction while \
-drawing the data in the reverse direction will be ignored.  You can discard \
-the curve that you are drawing by clicking the middle or right buttons.  \
-Clicking the right mouse button in the HDEQ when not drawing a curve will \
-reset all EQ and notch values to their original (flat) settings.\n\n\
+drawing, the data in the reverse direction will be ignored.  You can discard \
+the curve that you are drawing by clicking the middle button or by clicking the \
+right button and selecting Cancel from the popup menu that appears.  \
+Clicking the right mouse button in the HDEQ will pop up a menu with four \
+entries:\n\n\
+    Reset HDEQ curve\n\
+    Release parametric EQ controls\n\
+    Help\n\
+    Cancel\n\n\
+The first entry will reset the entire EQ curve to its original \
+(flat) setting.  The second entry will leave the EQ curve as is but will release \
+the three normal (non-shelving) parametric EQ controls to be used again (this \
+effectively gives you an unlimited number of parametric EQ controls).  The third \
+entry (Help) will display this help information.  The fourth entry (Cancel) will \
+discard any hand drawn EQ line that you are in the process of drawing.  If you \
+are not drawing a line it does nothing.\n\n\
     Over the crossover bar handles - left click and hold to drag the \
 crossover bars.\n\n\
     Over the notch handles - left click and hold to drag the notch center or \
@@ -222,8 +261,14 @@ mouse button on the boost control will reset the value to 0.0.\n")
 char output_help[] = {N_(
 "    The output control allows you to decrease the output level.  The upper \
 level is 0dB.  Clicking the right mouse button on the output control will \
-reset the value to 0.0.  Clicking the right mouse button on the meter will \
-reset the peak indicator to the current level.\n")
+reset the value to 0.0.  Clicking the right mouse button anywhere on the meters \
+will reset the peak indicators for both the normal and RMS meters to their \
+current level.  The level indicator boxes above the meters display either \
+peak value or the current value for the main output meters and the RMS \
+level meters.  Which value is displayed can be selected in the Preferences \
+dialog that is accessible from the Edit->Preferences menu entry.  You can reset \
+the meter peak inicators (and values if that is what is displayed) by clicking \
+in the individual level indicator boxes.\n")
 };
 
 
@@ -233,17 +278,6 @@ level in dB for both the HDEQ and GEQ.  You can also set the source of the \
 spectrum for both the HDEQ and spectrum windows.  Spectrum update frequency \
 can be set here as well.  Up to 10 per second (default) and down to 0 \
 (disabled).\n")
-};
-
-
-char preferences_help[] = {N_(
-"    Colors may be changed in the Options->Preferences dialog.  These colors \
-are saved in the file $HOME/.jamin-defaults.  This is done whenever you \
-exit from JAMin.  You can actually edit this file and change the colors by \
-hand.  They are just RGB values in the 0-65535 range but it's much easier to \
-use the GUI ;-).  You may also set the crossfade time and crossover type in \
-this dialog (see the man page for more information on crossfade time and \
-crossover type).\n")
 };
 
 
@@ -265,8 +299,9 @@ reverse buttonsa will move the transport forward or back by five seconds.\n")
 
 
 char bypass_help[] = {N_(
-"    This button will bypass all of JAMin's functions.  The keyboard \
-accelerator for this button is the 'b' key.\n")
+"    This check box allows you to bypass all of JAMin's processing so that \
+you can quickly listen to the difference between the processed and unprocessed \
+sound.  The keyboard accelerator for this button is the 'b' key.\n")
 };
 
 
@@ -320,10 +355,16 @@ the other controls.\n")
 };
 
 
+char limiter_plugin_warning[] = {N_(
+"    Changes to the limiter plugin will not go into effect until JAMin is \
+restarted.\n")
+};
+
+
 char keys_help[] = {N_(
 "    Keyboard accelerators are available for many of the functions in \
 JAMin:\n\n\
-\tb\t\t\t-\tBypass\n\
+\tb\t\t\t-\tGlobal bypass\n\
 \tSpace\t\t-\tToggle play and pause\n\
 \tHome\t\t-\tPosition transport to beginning\n\
 \t<\t\t\t-\tMove transport backwards 5 sec.\n\

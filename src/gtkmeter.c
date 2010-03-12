@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: gtkmeter.c,v 1.10 2005/01/22 17:10:55 theno23 Exp $
+ *  $Id: gtkmeter.c,v 1.12 2007/05/12 16:28:35 jdepner Exp $
  */
 
 #include <math.h>
@@ -315,8 +315,10 @@ gtk_meter_expose (GtkWidget      *widget,
   if (val > meter->peak) {
     if (val > meter->iec_upper) {
       meter->peak = meter->iec_upper;
+      meter->peak_db = meter->adjustment->value;
     } else {
       meter->peak = val;
+      meter->peak_db = meter->adjustment->value;
     }
   }
 
@@ -422,7 +424,7 @@ gtk_meter_update (GtkMeter *meter)
       //		         "value_changed");
     }
 
-  gtk_widget_draw(GTK_WIDGET(meter), NULL);
+  gtk_widget_queue_draw(GTK_WIDGET(meter));
 }
 
 static void
@@ -503,6 +505,11 @@ void gtk_meter_reset_peak(GtkMeter *meter)
     meter->peak = 0.0f;
 }
 
+float gtk_meter_get_peak(GtkMeter *meter)
+{
+  return (meter->peak_db);
+}
+
 void gtk_meter_set_warn_point(GtkMeter *meter, gfloat pt)
 {
     meter->warning_level = pt;
@@ -515,7 +522,7 @@ void gtk_meter_set_warn_point(GtkMeter *meter, gfloat pt)
 		(meter->iec_upper - meter->iec_lower);
     }
 
-    gtk_widget_draw(GTK_WIDGET(meter), NULL);
+    gtk_widget_queue_draw(GTK_WIDGET(meter));
 }
 
 void gtk_meter_set_color (int color_id)

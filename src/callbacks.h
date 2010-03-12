@@ -59,10 +59,6 @@ on_EQ_curve_event_box_button_release_event
                                         gpointer         user_data);
 
 void
-on_bypass_button_toggled               (GtkToggleButton *togglebutton,
-                                        gpointer         user_data);
-
-void
 on_comp_kn_1_value_changed             (GtkRange        *range,
                                         gpointer         user_data);
 
@@ -627,11 +623,6 @@ on_transport_controls_eventbox_enter_notify_event
                                         gpointer         user_data);
 
 gboolean
-on_bypass_button_enter_notify_event    (GtkWidget       *widget,
-                                        GdkEventCrossing *event,
-                                        gpointer         user_data);
-
-gboolean
 on_scenes_eventbox_enter_notify_event  (GtkWidget       *widget,
                                         GdkEventCrossing *event,
                                         gpointer         user_data);
@@ -978,10 +969,6 @@ on_low_active_toggled                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
 void
-on_low_bypass_toggled                  (GtkToggleButton *togglebutton,
-                                        gpointer         user_data);
-
-void
 on_low_mute_toggled                    (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
@@ -990,19 +977,11 @@ on_mid_active_toggled                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
 void
-on_mid_bypass_toggled                  (GtkToggleButton *togglebutton,
-                                        gpointer         user_data);
-
-void
 on_mid_mute_toggled                    (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
 void
 on_high_active_toggled                 (GtkToggleButton *togglebutton,
-                                        gpointer         user_data);
-
-void
-on_high_bypass_toggled                 (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
 void
@@ -1092,62 +1071,6 @@ on_scene_name_ok_clicked               (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_low_band_compressor_color_activate  (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_mid_band_compressor_color_activate  (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_high_band_compressor_color_activate (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_ganged_controls_color_activate      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_parametric_handles_color_activate   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_hdeq_curve_color_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_hdeq_grid_color_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_hdeq_background_color_activate      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_text_color_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_meter_normal_color_activate         (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_meter_warning_color_activate        (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_meter_over_color_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_meter_peak_color_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_reset_all_colors1_activate          (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
 on_ft_bias_a_value_changed             (GtkRange        *range,
                                         gpointer         user_data);
 
@@ -1205,21 +1128,6 @@ void
 on_CrossfadeTimeSpin_value_changed     (GtkSpinButton   *spinbutton,
                                         gpointer         user_data);
 
-void
-on_pre_eq_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_post_eq_activate                    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_post_compressor_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_output2_activate                    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
 
 void
 on_UpdateFrequencySpin_value_changed   (GtkSpinButton   *spinbutton,
@@ -1268,3 +1176,204 @@ on_lim_out_meter_eventbox_button_press_event
                                         (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data);
+
+void
+on_warningLevelSpinButton_value_changed
+                                        (GtkSpinButton   *spinbutton,
+                                        gpointer         user_data);
+
+
+void 
+callbacks_set_comp_bypass_button_state (int band, int state);
+
+
+void 
+callbacks_set_eq_bypass_button_state (int state);
+
+
+void 
+callbacks_set_limiter_bypass_button_state (int state);
+
+void 
+callbacks_set_low_delay_button_state (int state);
+
+void 
+callbacks_set_mid_delay_button_state (int state);
+
+void
+on_eqb_value_changed                   (GtkRange        *range,
+                                        gpointer         user_data);
+
+gboolean
+on_eqb_enter_notify_event              (GtkWidget       *widget,
+                                        GdkEventCrossing *event,
+                                        gpointer         user_data);
+
+gboolean
+on_eqbl_enter_notify_event             (GtkWidget       *widget,
+                                        GdkEventCrossing *event,
+                                        gpointer         user_data);
+
+void
+on_global_bypass_toggled               (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void 
+callbacks_blink_bypass_button (int button, int start);
+
+
+gboolean
+on_global_bypass_event_box_enter_notify_event
+                                        (GtkWidget       *widget,
+                                        GdkEventCrossing *event,
+                                        gpointer         user_data);
+
+gboolean
+on_meter_text_button_press_event       (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+void
+on_out_meter_peak_button_clicked       (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_out_meter_full_button_clicked       (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_rms_meter_peak_button_clicked       (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_rms_meter_full_button_clicked       (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_rmsTimeValue_value_changed          (GtkSpinButton   *spinbutton,
+                                        gpointer         user_data);
+
+void
+on_hdeq_spectrum_color_activate        (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_reset_hdeq_curve1_activate          (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_release_parametric_eq_controls1_activate
+                                        (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_cancel2_activate                    (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_help2_activate                      (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_scene_menu_help_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_pref_help_clicked                   (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_limiter_combo_changed               (GtkComboBox     *combobox,
+                                        gpointer         user_data);
+
+void
+on_SpectrumComboBox_changed            (GtkComboBox     *combobox,
+                                        gpointer         user_data);
+
+void
+on_ColorsComboBox_changed              (GtkComboBox     *combobox,
+                                        gpointer         user_data);
+
+void
+on_LowDelayButton_toggled              (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+on_MidDelayButton_toggled              (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+on_LowDelaySpinButton_value_changed    (GtkSpinButton   *spinbutton,
+                                        gpointer         user_data);
+
+void
+on_MidDelaySpinButton_value_changed    (GtkSpinButton   *spinbutton,
+                                        gpointer         user_data);
+
+void
+on_logscale_scale_value_changed        (GtkRange        *range,
+                                        gpointer         user_data);
+
+gboolean
+on_pref_dialog_delete_event            (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_pref_dialog_delete_event            (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_window2_delete_event                (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+on_show_help                           (GtkWidget       *widget,
+                                        GtkWidgetHelpType  help_type,
+                                        gpointer         user_data);
+
+void
+on_presets_in_trim_scale_value_changed (GtkRange        *range,
+                                        gpointer         user_data);
+
+void
+on_presets_pan_scale_value_changed     (GtkRange        *range,
+                                        gpointer         user_data);
+
+gboolean
+on_eButton1_button_press_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+void
+on_presets_out_trim_scale_value_changed
+                                        (GtkRange        *range,
+                                        gpointer         user_data);
+
+gboolean
+on_window3_delete_event                (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
+
+
+gboolean
+on_eButton1_button_press_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+void
+on_presets_in_trim_scale_value_changed (GtkRange        *range,
+                                        gpointer         user_data);
+
+void
+on_presets_pan_scale_value_changed     (GtkRange        *range,
+                                        gpointer         user_data);
+
+void
+on_presets_out_trim_scale_value_changed
+                                        (GtkRange        *range,
+                                        gpointer         user_data);
+
+

@@ -4,7 +4,7 @@
 
 <ladspa>
   <global>
-    <meta name="maker" value="xxx &lt;yyy@zzz.com&gt;"/>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
     <meta name="copyright" value="GPL"/>
     <meta name="properties" value="HARD_RT_CAPABLE"/>
     <code><![CDATA[
@@ -37,7 +37,7 @@ printf(". %d\n", scene);
 	  if (last_scene != scene) {
 	    last_scene = scene;
 	    if (last_scene > 0 && last_scene <= NUM_SCENES) {
-	      lo_send(address, SCENE_URI, "i", last_scene);
+	      lo_send(address, OSC_PATH, "i", last_scene);
 	    }
 	  }
 #ifdef DEBUG

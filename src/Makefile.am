@@ -2,6 +2,7 @@
 
 INCLUDES = \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
+	-DPACKAGE_LIB_DIR=\""$(libdir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	@PACKAGE_CFLAGS@ @JAMIN_CFLAGS@
 
@@ -35,11 +36,13 @@ jamin_SOURCES = \
 	jackstatus.h \
 	limiter.h \
 	limiter-ui.c limiter-ui.h \
+	presets-ui.c presets-ui.h \
 	main.c main.h \
 	plugin.c plugin.h \
 	process.c process.h \
 	resource.c resource.h \
 	ringbuffer.c ringbuffer.h \
+	rms.c rms.h \
 	spectrum.c spectrum.h \
 	spline.c \
 	state.c state.h \
