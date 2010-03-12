@@ -1,2 +1,2 @@
-1001_use_AM_CFLAGS_for_CFLAGS.patch
-1002_compile_with_-fPIC.patch
+#1001_use_AM_CFLAGS_for_CFLAGS.patch
+#1002_compile_with_-fPIC.patch
