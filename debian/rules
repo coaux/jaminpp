@@ -34,10 +34,6 @@ debian/stamp-intltoolize:
 # Avoid graphics and sound files upsetting dpkg-source
 DEB_COPYRIGHT_CHECK_IGNORE_REGEX = ^\./(pixmaps/.*\.(png|jpg)|test/files/junk\.jam|debian/(changelog|copyright(|_hints|_newhints)))$
 
-# after the directories are created but before dh_compress is run.
-common-binary-post-install-arch::
-	dh_buildinfo
-
 clean::
 	rm -f Makefile.in controller/Makefile.in data/Makefile.in examples/Makefile.in pixmaps/Makefile.in src/Makefile.in
 	rm -f po/Makefile.in.in aclocal.m4 config.h.in configure controller/jamincont_1912.c ltmain.sh
