@@ -1,29 +1,184 @@
-This package was debianized by Robert Jordens <jordens@debian.org> on
-Mon,  8 Sep 2003 10:23:43 +0200.
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
+Name: JAMin
+Maintainer: Steve Harris <steve@plugin.org.uk>
+Source: http://jamin.sourcforge.net
+	:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jamin
 
-It was downloaded from: http://jamin.sourcforge.net
-CVS Address: :pserver:anonymous@cvs.sourceforge.net:/cvsroot/jamin
+Copyright: 2003-2004,2006, Steve Harris
+License: GPL-2+
 
-Upstream Author: Steve Harris <steve@plugin.org.uk>
-SourceForge CVS developers: Jan Depner, Steve Harris, Jack O'Quin, 
-  Ron Parker, Patrick Shirkey
+Files: ./src/io.c,
+	./src/io.h,
+	./src/jackstatus.h,
+	./src/resource.c,
+	./src/resource.h,
+	./src/status-ui.c,
+	./src/transport.c,
+	./src/transport.h
+Copyright: 2003-2004, Jack O'Quin
+License: GPL-2+
 
-Copyright:
+Files: ./src/hdeq.c,
+	./src/hdeq.h,
+	./src/help.c,
+	./src/help.h,
+	./src/preferences.c,
+	./src/preferences.h,
+	./src/scenes.c,
+	./src/spectrum.h
+Copyright: 2003-2004, Jan C. Depner
+License: GPL-2+
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your
-option) any later version.
-                                                                                
-This program is distributed in the hope that it will be useful, but
-WITHOUTANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
-                                                                                
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-                                                                                
-On Debian systems, the complete text of the GNU General Public License
-can be found in /usr/share/common-licenses/GPL file.
+Files: ./src/callbacks.c,
+	./src/debug.h,
+	./src/main.h,
+	./src/process.c
+Copyright: 2003, Jack O'Quin
+Copyright: 2003, Jan C. Depner
+Copyright: 2003, Steve Harris <steve@plugin.org.uk>
+License: GPL-2+
 
+Files: ./compile,
+	./config.guess,
+	./config.sub
+	./depcomp,
+	./intltool-extract.in
+	./intltool-update.in
+	./missing
+Copyright: 1992-2002 Free Software Foundation, Inc.
+License: GPL-2+ or other-sa-Autoconf
+
+Files: ./src/geq.h,
+	./src/scenes.h,
+	./src/spectrum.c
+Copyright: 2003, Jan C. Depner
+	2003, Steve Harris <steve@plugin.org.uk>
+License: GPL-2+
+
+Files: ./src/io-menu.h,
+	./src/status-ui.h
+Copyright: 2003, Jack O'Quin
+	2003, Jan C. Depner
+License: GPL-2+
+
+Files: ./src/ringbuffer.c,
+	./src/ringbuffer.h
+Copyright: 2000, Paul Davis
+	2003, Rohan Drape
+License: LGPL-2.1+
+
+Files: ./intltool-merge.in
+Copyright: 2000-2003 Free Software Foundation, Inc.
+	2000-2001, Eazel, Inc
+License: GPL-2+ or other-sa-Autoconf
+
+Files: ./po/fr.po
+Copyright: 2007, Raphaël Doursenaud <rdoursenaud@free.fr>
+	2008, Emmanuel Saracco <esaracco@free.fr>
+License: GPL-2+
+
+Files: ./src/main.c
+	./jam-ui.glade
+	./src/callbacks_help.h
+	./src/interface.c
+Copyright: 2003-2005, Jan C. Depner
+	2003-2005, Jack O'Quin
+	2003-2005, Patrick Shirkey
+	2003-2005, Ron Parker
+	2003-2005, Steve Harris <steve@plugin.org.uk>
+License: GPL-2+
+
+Files: ./src/process.h
+Copyright: 2003, Jack O'Quin
+	2003, Steve Harris <steve@plugin.org.uk>
+License: GPL-2+
+
+Files: ./src/io-menu.c
+Copyright: 2003, Jack O'Quin
+	2003, Patrick Shirkey
+License: GPL-2+
+
+Files: ladspa.h
+Copyright: 2000-2002, Richard W.E. Furse
+	2000-2002, Paul Barton-Davis
+	2000-2002, Stefan Westerfeld
+License: LGPL-2.1+
+
+Files: ./src/spline.c
+Copyright: *No copyright*
+License: other-PD
+
+Files: ./INSTALL
+Copyright: 1994-1996, 1999-2002, Free Software
+License: other-GAP-INSTALL
+
+Files: ./install-sh
+Copyright: 1991, the Massachusetts Institute of Technology
+License: other-MIT
+
+Files: ./debian/*
+Copyright: 2003-2005, Robert Jordens <rjo@gmx.de>
+	2010, Jonas Smedegaard <dr@jones.dk>
+License: GPL-2+
+
+License: GPL-2+
+ This file is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ (GPL) version 2 can be found an 2/usr/share/common-licenses/GPL-2".
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+License: LGPL-2.1+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation; either version 2.1 of
+ the License, or (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ .
+ On Debian systems, the complete text of the GNU Lesser General Public
+ License (LGPL) version 2.1 can be found at
+ "/usr/share/common-licenses/LGPL-2.1".
+ .
+ You should have received a copy of the GNU Lesser General Public
+ License along with this program.  If not, see
+ <http://www.gnu.org/licenses/>.
+
+License: other-GAP-INSTALL
+ This file is free documentation; the Free Software Foundation gives
+ unlimited permission to copy, distribute and modify it.
+
+License: other-sa-Autoconf
+ As a special exception to the GNU General Public License, if you
+ distribute this file as part of a program that contains a
+ configuration script generated by Autoconf, you may include it under
+ the same distribution terms that you use for the rest of that program.
+
+License: other-PD
+ This source is in the public domain.  It is distributed in the hope that
+ it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+License: other-MIT
+ Permission to use, copy, modify, distribute, and sell this software and its
+ documentation for any purpose is hereby granted without fee, provided that
+ the above copyright notice appear in all copies and that both that
+ copyright notice and this permission notice appear in supporting
+ documentation, and that the name of M.I.T. not be used in advertising or
+ publicity pertaining to distribution of the software without specific,
+ written prior permission.  M.I.T. makes no representations about the
+ suitability of this software for any purpose.  It is provided "as is"
+ without express or implied warranty.
