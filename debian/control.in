@@ -1,0 +1,42 @@
+Source: jamin
+Section: sound
+Priority: optional
+Maintainer: Robert Jordens <jordens@debian.org>
+Build-Depends: @cdbs@,
+ docbook-to-man,
+ fftw3-dev,
+ indent,
+ ladspa-sdk,
+ libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386],
+ libgtk2.0-dev,
+ libjack0.100.0-dev,
+ liblo-dev,
+ libxml2-dev,
+ libxml-parser-perl,
+ perl-base,
+ swh-plugins (>= 0.4.6)
+Standards-Version: 3.6.1
+
+Package: jamin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, swh-plugins (>= 0.4.6), jackd (>= 0.50.0)
+Description: Audio mastering from a mixed down multitrack source with JACK
+ JAM is a tool for producing audio masters from a mixed down multitrack source.
+ It runs in the JACK Audio Connection Kit, and uses LADSPA for its backend DSP
+ work, specifically the swh plugins created by Steve Harris, JAM's main author.
+ .
+ Features:
+  * Linear filters (though this seems to be going out of fashion, oh well)
+  * JACK i/o
+  * 30band graphic EQ
+  * 1023band graphic EQ
+  * Spectrum analyser
+  * 3band peak compressor
+  * Lookahead brickwall limiter
+ .
+ Planned features (in rough order of difficulty):
+  * Multiband stereo processing
+  * Parametric EQ
+  * Loudness maximiser
+  * Presets and scenes
+
