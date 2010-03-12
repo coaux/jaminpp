@@ -40,4 +40,4 @@ common-binary-post-install-arch::
 
 clean::
 	rm -f Makefile.in controller/Makefile.in data/Makefile.in examples/Makefile.in pixmaps/Makefile.in src/Makefile.in
-	rm -f aclocal.m4 config.h.in configure controller/jamincont_1912.c ltmain.sh
+	rm -f po/Makefile.in.in aclocal.m4 config.h.in configure controller/jamincont_1912.c ltmain.sh
