@@ -8,6 +8,11 @@
 #
 # $Id: rules 121 2003-09-08 09:27:20Z rj $
 
+DEB_AUTO_UPDATE_LIBTOOL = pre
+DEB_AUTO_UPDATE_AUTOCONF = 2.65
+DEB_AUTO_UPDATE_AUTOHEADER = 2.65
+DEB_AUTO_UPDATE_ACLOCAL = 1.11
+DEB_AUTO_UPDATE_AUTOMAKE = 1.11
 
 include /usr/share/cdbs/1/class/makefile.mk
 DEB_UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*//')
@@ -21,6 +26,26 @@ pre-build::
 	cp -f controller/jamincont_1912.c controller/jamincont_1912.so.c
 clean::
 	rm -f controller/jamincont_1912.so.c
+
+# put aside upstream-shipped temp files during build but after copyright-check
+upstreamtmpfiles = examples/jamin_ui examples/marble_jamin_ui po/jamin.pot src/jamin.1 \
+	Makefile.in controller/Makefile.in data/Makefile.in examples/Makefile.in pixmaps/Makefile.in po/Makefile.in.in src/Makefile.in \
+	aclocal.m4 config.h.in configure ltmain.sh po/ru.gmo
+pre-build:: debian/stamp-upstreamtmpstuff
+debian/stamp-upstreamtmpstuff:
+	for file in $(upstreamtmpfiles); do \
+		[ ! -e $$file ] || [ -e $$file.upstream ] || cp $$file $$file.upstream; \
+	done
+	touch $@
+clean::
+	for file in $(upstreamtmpfiles); do \
+		[ ! -e $$file.upstream ] || mv -f $$file.upstream $$file; \
+	done
+	rm -f debian/stamp-upstreamtmpstuff
+
+debian/stamp-autotools-files: debian/stamp-intltoolize
+debian/stamp-intltoolize:
+	intltoolize -c -f
 
 # after the directories are created but before dh_compress is run.
 common-binary-post-install-arch::
