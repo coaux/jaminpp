@@ -13,7 +13,6 @@ Build-Depends: @cdbs@,
  liblo-dev,
  libxml2-dev,
  libxml-parser-perl,
- perl-base,
  swh-plugins (>= 0.4.6)
 Standards-Version: 3.6.1
 
