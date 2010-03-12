@@ -17,6 +17,11 @@ DEB_UPSTREAM_TARBALL_VERSION := $(shell echo $(DEB_UPSTREAM_VERSION) | sed 's/+[
 include /usr/share/cdbs/1/class/autotools.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 
+pre-build::
+	cp -f controller/jamincont_1912.c controller/jamincont_1912.so.c
+clean::
+	rm -f controller/jamincont_1912.so.c
+
 # after the directories are created but before dh_compress is run.
 common-binary-post-install-arch::
 	dh_buildinfo
