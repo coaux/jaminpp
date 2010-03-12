@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: process.h,v 1.31 2004/10/28 08:20:33 theno23 Exp $
+ *  $Id: process.h,v 1.40 2008/12/03 03:22:03 kotau Exp $
  */
 
 #ifndef PROCESS_H
@@ -52,10 +52,17 @@
 #define LIM_PEAK_IN  0
 #define LIM_PEAK_OUT 1
 
+
+/*  Important note - definition of spectrum mode is in the same order as
+    the combo box buttons.  Don't add to or rearrange the spectrum modes unless
+    you set the combo box entries to match.  */
+
+/* spectrum modes */
 #define SPEC_PRE_EQ    0
 #define SPEC_POST_EQ   1
 #define SPEC_POST_COMP 2
 #define SPEC_OUTPUT    3
+
 
 #define ACTIVE	0
 #define MUTE    1
@@ -64,13 +71,30 @@
 #define FFT 0
 #define IIR 1
 
+/* bypass type */
+#define EQ_BYPASS          0
+#define LOW_COMP_BYPASS    1
+#define MID_COMP_BYPASS    2
+#define HIGH_COMP_BYPASS   3
+#define LIMITER_BYPASS     4
+#define GLOBAL_BYPASS      5
+
+
+/*  Important note - definition of limiter types is in the same order as
+    the combo box buttons.  Don't add to or rearrange the limiter types unless
+    you set the combo box entries to match.  */
+
+/* limiter type */
+#define FAST               0
+#define FOO                1
+
+extern volatile int global_gui;
+
 extern const jack_nframes_t dsp_block_size;
 extern float sample_rate;
 extern float eq_coefs[];
-extern float in_peak[], out_peak[];
+extern float in_peak[], out_peak[], rms_peak[];
 extern float lim_peak[];
-
-extern volatile int global_bypass;
 
 float bin_peak_read_and_clear(int bin);
 
@@ -78,11 +102,13 @@ void process_set_spec_mode(int mode);
 
 int process_get_spec_mode();
 
+void process_set_limiter_plugin(int id);
+
+int process_get_limiter_plugin();
+
 void process_set_stereo_width(int xo_band, float width);
 
 void process_set_stereo_balance(int xo_band, float bias);
-
-void process_set_limiter_input_gain(float gain);
 
 void process_set_ws_boost(float val);
 
@@ -105,10 +131,22 @@ void process_set_low2mid_xover (float freq);
 void process_set_mid2high_xover (float freq);
 float process_get_low2mid_xover ();
 float process_get_mid2high_xover ();
+void process_get_bypass_states (int *eq, int *comp, int *limit, int *global);
+int process_get_bypass_state (int bypass_type);
+float process_get_sample_rate ();
+int process_get_rms_time_slice ();
+void process_set_rms_time_slice (int milliseconds);
+void process_set_global_bypass (int state);
+int process_limiter_plugins_available ();
+int process_get_xo_delay_state (int band);
+void process_set_xo_delay_state (int band, int state);
+float process_get_xo_delay_time (int band);
+void process_set_xo_delay_time (int band, float ms);
+void process_set_limiter_logscale (float value);
 
 extern comp_settings compressors[XO_NBANDS];
-extern lim_settings limiter;
-
+extern lim_settings limiter[2];
+extern int limiter_plugin;
 extern plugin *comp_plugin;
 
 #ifdef FILTER_TUNING

@@ -1,3 +1,40 @@
+2008-02-08  Emmanuel Saracco  <esaracco@free.fr>
+
+	* Take in account libdir defined at compile time
+	  for LADSPA plugins search path.
+
+2008-02-04  Emmanuel Saracco  <esaracco@free.fr>
+
+	* Avoid some GCC warnings about cast.
+
+2008-02-03  Emmanuel Saracco  <esaracco@free.fr>
+
+	* Version: 0.97.13
+	* Install libs under lib64 directory on 64bits architectures.
+
+2008-02-02  Emmanuel Saracco  <esaracco@free.fr>
+
+	* Save/Load Crossover type to/from JAMin session file.
+	* Refresh preferences dialog properties when session file is loaded.
+
+2005-11-15  Steve Harris  <steve@plugin.org.uk>
+
+	* Fixed OSC scene path discrepencies.
+
+2005-08-17  Jan Depner  <eviltwin69@cableone.net>
+
+	* Cleaned up the preferences dialog a bit.
+	* Added warning tooltips to crossover type buttons.
+
+2005-04-24  Jan Depner  <eviltwin69@cableone.net>
+
+	* Made parametric (notch) handles larger for ease of use.
+	* Allow parametric notch Q handles to overlap.
+	* Button 2 can now also be used to move parametric handles without
+	  the possibility of missing and drawing the EQ curve.
+	* Fixed the preferences scene crossfade time option so you can
+	  select by .1 second.
+
 2005-01-22  Steve Harris  <steve@plugin.org.uk>
 
 	* gtkmeter.c: fixed incorrect constant in gtkmeter.c that caused the

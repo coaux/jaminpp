@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: limiter-ui.c,v 1.16 2005/02/06 23:31:12 jdepner Exp $
+ *  $Id: limiter-ui.c,v 1.19 2007/07/01 15:33:18 jdepner Exp $
  */
 
 #include <stdio.h>
@@ -24,21 +24,49 @@
 #include "gtkmeter.h"
 #include "state.h"
 #include "db.h"
+#include "process.h"
+#include "limiter-ui.h"
+
 
 void li_changed(int id, float value);
 void lh_changed(int id, float value);
 void ll_changed(int id, float value);
 void boost_changed(int id, float value);
+void logscale_changed (int id, float value);
+
 
 static GtkAdjustment *lh_adj, *ll_adj;
-static GtkLabel *lh_label, *ll_label;
+static GtkLabel *lh_label, *ll_label, *l_limiterlabel = NULL, *l_logscale_label = NULL;
+
+static char limiter_text[2][42] = {"<b>Fast-lookahead-limiter (Harris)</b>", "<b>Foo-limiter (Savolainen)</b>"};
 
 static GtkMeter *in_meter, *att_meter, *out_meter;
 static GtkAdjustment *in_meter_adj, *att_meter_adj, *out_meter_adj;
+static GtkScale *l_logscale_scale = NULL;
+
 
 void bind_limiter()
 {
     GtkWidget *scale;
+
+
+    l_limiterlabel = GTK_LABEL (lookup_widget (main_window, "limiterlabel"));
+    gtk_label_set_text (l_limiterlabel, limiter_text[process_get_limiter_plugin ()]);
+    gtk_label_set_use_markup (l_limiterlabel, TRUE);
+
+    l_logscale_label = GTK_LABEL (lookup_widget (main_window, "logscale_label"));
+    l_logscale_scale = GTK_SCALE (lookup_widget (main_window, "logscale_scale"));
+    if (process_get_limiter_plugin () == FOO)
+      {
+        limiter_logscale_set_state (TRUE);
+      }
+    else
+      {
+        limiter_logscale_set_state (FALSE);
+      }
+    s_set_adjustment (S_LIM_LOGSCALE, gtk_range_get_adjustment (GTK_RANGE (GTK_WIDGET (l_logscale_scale))));
+    s_set_callback (S_LIM_LOGSCALE, logscale_changed);
+
 
     s_set_callback(S_LIM_INPUT, li_changed);
 
@@ -73,7 +101,7 @@ void bind_limiter()
 
 void li_changed(int id, float value)
 {
-    limiter.ingain = value;
+    limiter[limiter_plugin].ingain = value;
 }
 
 void lh_changed(int id, float value)
@@ -88,14 +116,14 @@ void lh_changed(int id, float value)
     }
     gtk_label_set_text(lh_label, text);
 
-    limiter.release = powf(10.0f, value - 3.0f);
+    limiter[limiter_plugin].release = powf(10.0f, value - 3.0f);
 }
 
 void ll_changed(int id, float value)
 {
     char text[256];
 
-    limiter.limit = value;
+    limiter[limiter_plugin].limit = value;
 	        
     snprintf(text, 255, _("%.1f dB"), value);
     gtk_label_set_text(ll_label, text);
@@ -106,11 +134,16 @@ void boost_changed(int id, float value)
     process_set_ws_boost(value);
 }
 
+void logscale_changed(int id, float value)
+{
+  process_set_limiter_logscale (value);
+}
+
 void limiter_meters_update()
 {
     float peak_in = lin2db(lim_peak[LIM_PEAK_IN]);
     float peak_out = lin2db(lim_peak[LIM_PEAK_OUT]);
-    float atten = -limiter.attenuation;
+    float atten = -limiter[limiter_plugin].attenuation;
     lim_peak[LIM_PEAK_IN] = 0.0f;
     lim_peak[LIM_PEAK_OUT] = 0.0f;
 
@@ -128,6 +161,24 @@ void limiter_outmeter_reset_peak ()
 {
   gtk_meter_reset_peak (att_meter);
   gtk_meter_reset_peak (out_meter);
+}
+
+void limiter_set_label (int limiter_plugin)
+{
+  if (l_limiterlabel)
+    {
+      gtk_label_set_text (l_limiterlabel, limiter_text[limiter_plugin]);
+      gtk_label_set_use_markup (l_limiterlabel, TRUE);
+    }
+}
+
+void limiter_logscale_set_state (gboolean state)
+{
+  if (l_logscale_label)
+    {
+      gtk_widget_set_sensitive (GTK_WIDGET (l_logscale_label), state);
+      gtk_widget_set_sensitive (GTK_WIDGET (l_logscale_scale), state);
+    }
 }
 
 /* vi:set ts=8 sts=4 sw=4: */

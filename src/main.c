@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: main.c,v 1.60 2005/02/20 15:58:49 jdepner Exp $
+ *  $Id: main.c,v 1.68 2008/12/03 03:22:03 kotau Exp $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -53,14 +53,17 @@
 #include "scenes.h"
 #include "help.h"
 #include "preferences.h"
+#include "callbacks.h"
 
 
-GtkWidget *main_window;
+
+GtkWidget *main_window, *presets_window;
 char *jamin_dir = NULL;
 char *default_session = NULL;
 char *resource_file = NULL;		/* GTK resource file */
 
 char user_default_session[PATH_MAX];	/* user's default session name */
+extern int show_gui;					/* Which gui to Display first */
 
 static gboolean update_meters(gpointer data);
 static void set_configuration_files(void);
@@ -75,6 +78,7 @@ int main(int argc, char *argv[])
 {
 #ifdef HAVE_OSC
     lo_server_thread st;
+    char * urlstr;
 #endif
 
 #ifdef ENABLE_NLS
@@ -95,12 +99,13 @@ int main(int argc, char *argv[])
     io_init(argc, argv);
         
     resource_file_parse();
+
     state_init();
     add_pixmap_directory(JAMIN_PIXMAP_DIR);
     add_pixmap_directory("pixmaps");
     preferences_init();
     main_window = create_window1();
-
+	presets_window = create_window3();
 
 #ifdef FILTER_TUNING
     GtkWidget *ft = create_filter_tuning();
@@ -111,6 +116,7 @@ int main(int argc, char *argv[])
 
     /* bind the graphic equaliser sliders to adjustments */
 
+	gtk_widget_show(presets_window);
     bind_geq();
     bind_hdeq();
     gtk_widget_show(main_window);
@@ -121,6 +127,15 @@ int main(int argc, char *argv[])
     bind_spectrum();
     bind_stereo();
     bind_scenes();
+	
+	
+	/* Show the correct window */
+	
+	if(show_gui)
+		gtk_widget_hide(main_window);
+	else
+		gtk_widget_hide(presets_window);
+	
 
     s_clear_history();
 
@@ -129,8 +144,11 @@ int main(int argc, char *argv[])
 #ifdef HAVE_OSC
     st = lo_server_thread_new(OSC_PORT, error);
     if (st) {
-	lo_server_thread_add_method(st, SCENE_URI, "i", scene_handler, NULL);
+	lo_server_thread_add_method(st, OSC_PATH, "i", scene_handler, NULL);
 	lo_server_thread_start(st);
+	urlstr = lo_server_thread_get_url (st);
+	fprintf(stderr, "Started OSC server thread at %s\n", urlstr);
+	free (urlstr);
     } else {
 	fprintf(stderr, "This " PACKAGE " instance will not have OSC support,\n"		"probably the port is allread in use\n");
     }
@@ -208,9 +226,12 @@ static void set_configuration_files(void)
 static gboolean update_meters(gpointer data)
 {
     static unsigned int count = 1;
+    int global, eq, comp[XO_NBANDS], limiter;
+
 
     in_meter_value(in_peak);
     out_meter_value(out_peak);
+    rms_meter_value(rms_peak);
     limiter_meters_update();
     compressor_meters_update();
     spectrum_timeout_check();
@@ -220,8 +241,25 @@ static gboolean update_meters(gpointer data)
 
     /*  Only update the remaining status once a second.  */
 
-    if (!(count = (count + 1) % 10)) status_update (main_window);
+    if (!(count = (count + 1) % 10))
+      {
+        status_update (main_window);
+      }
 
+
+    /*  Only blink the bypass buttons twice a second when bypass is on.  */
+
+    if (!(count % 5))
+      {
+        process_get_bypass_states (&eq, comp, &limiter, &global);
+
+        if (global) callbacks_blink_bypass_button (GLOBAL_BYPASS, 0);
+        if (eq) callbacks_blink_bypass_button (EQ_BYPASS, 0);
+        if (comp[0] == BYPASS) callbacks_blink_bypass_button (LOW_COMP_BYPASS, 0);
+        if (comp[1] == BYPASS) callbacks_blink_bypass_button (MID_COMP_BYPASS, 0);
+        if (comp[2] == BYPASS) callbacks_blink_bypass_button (HIGH_COMP_BYPASS, 0);
+        if (limiter) callbacks_blink_bypass_button (LIMITER_BYPASS, 0);
+      }
 
     return TRUE;
 }
