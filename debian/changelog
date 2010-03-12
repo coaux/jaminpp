@@ -1,3 +1,30 @@
+jamin (0.97.14~cvs~81203-1) UNRELEASED; urgency=low
+
+  * Friendly takeover: Maintain in Debian Multimedia Team, with myself
+    as Uploader. Thanks for your contributions, Robert.
+  * New upstream development snapshot.
+  * Use dpkg source format "3.0 (quilt)".
+  * Build-depend on liblo-dev (not liblo0-dev).
+  * Revert packaging cruft.
+  * Isolate patches:
+    + 1001: use AM_FLAGS for CFLAGS.
+    + 1002: compile with fPIC against renamed jamincont_1912.c.
+    Disable both patches (but keep in source).
+  * Enable CDBS autoreconf.
+  * Enable CDBS conditional control file updating.
+  * Enable CDBS copyright check.
+  * Rewrite watch file.
+  * Update section name in menu file. Quote strings.
+  * Drop superfluous dirs and docs files.
+  * Bump debhelper compat level to 6. Tighten build-dependency
+    accordingly.
+  * Drop superfluous build-dependency on perl-base.
+  * Add proper licensing header to rules file.
+  * Rewrite copyright file as draft DEP5 rev. 135 format.
+  * Bump Standards-Version to 3.8.4.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Fri, 12 Mar 2010 12:21:16 +0100
+
 jamin (0.95.0-4) unstable; urgency=low
 
   * Porter NMU.
