@@ -1,7 +1,8 @@
 Source: jamin
 Section: sound
 Priority: optional
-Maintainer: Robert Jordens <jordens@debian.org>
+Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
+Uploaders: Jonas Smedegaard <dr@jones.dk>
 Build-Depends: @cdbs@,
  docbook-to-man,
  fftw3-dev,
