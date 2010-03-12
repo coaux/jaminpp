@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: jamin-scene.c,v 1.4 2004/05/26 23:23:27 joq Exp $
+ *  $Id: jamin-scene.c,v 1.5 2004/10/03 14:12:38 theno23 Exp $
  */
 
 #include <stdlib.h>
