@@ -15,7 +15,7 @@ Build-Depends: @cdbs@,
  libxml2-dev,
  libxml-parser-perl,
  swh-plugins (>= 0.4.6)
-Standards-Version: 3.6.1
+Standards-Version: 3.8.4
 
 Package: jamin
 Architecture: any
