@@ -1,2 +1,4 @@
-version=2
-ftp://ftp.sourceforge.net/pub/sourceforge/j/ja/jamin/jamin-(.*)\.tar\.gz	debian	uupdate
+# Run the "uscan" command to check for upstream updates and more.
+version=3
+# use qa.debian.org redirector; see man uscan
+http://sf.net/jamin/jamin-(\d.*)\.tar\.gz
