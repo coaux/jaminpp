@@ -30,6 +30,9 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 debian/stamp-autotools-files: debian/stamp-intltoolize
 debian/stamp-intltoolize:
 	intltoolize -c -f
+	touch $@
+clean::
+	rm -f debian/stamp-intltoolize
 
 # Avoid graphics and sound files upsetting dpkg-source
 DEB_COPYRIGHT_CHECK_IGNORE_REGEX = ^\./(pixmaps/.*\.(png|jpg)|test/files/junk\.jam|debian/(changelog|copyright(|_hints|_newhints)))$
