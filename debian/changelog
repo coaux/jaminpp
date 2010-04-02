@@ -1,3 +1,12 @@
+jamin (0.97.14~cvs~81203-3) unstable; urgency=low
+
+  * Revert to depend (not just recommend) swh-plugins.
+    Thanks to Jaromír Mikeš.
+  * Refresh patch, using compacting quilt options --no-timestamps
+    --no-index -pab.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Fri, 02 Apr 2010 21:20:49 +0200
+
 jamin (0.97.14~cvs~81203-2) unstable; urgency=low
 
   * Update feature list in long description to match website.
