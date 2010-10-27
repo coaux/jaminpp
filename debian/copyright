@@ -1,7 +1,7 @@
 Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
 Name: JAMin
 Maintainer: Steve Harris <steve@plugin.org.uk>
-Source: http://jamin.sourcforge.net
+Source: http://jamin.sourceforge.net
 	:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jamin
 
 Copyright: 2003-2004,2006, Steve Harris
