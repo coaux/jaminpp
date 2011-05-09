@@ -9,6 +9,7 @@ Build-Depends: cdbs,
  automake1.11,
  autoconf,
  debhelper (>= 6),
+ dh-buildinfo,
  docbook-to-man,
  fftw3-dev,
  indent,
@@ -22,7 +23,7 @@ Build-Depends: cdbs,
  libxml-parser-perl,
  swh-plugins
 Homepage: http://jamin.sourceforge.net/
-Standards-Version: 3.8.4
+Standards-Version: 3.9.2
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/jamin.git
 Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/jamin.git;a=summary
 
