@@ -1,6 +1,13 @@
---- a/configure.in
-+++ b/configure.in
-@@ -109,7 +109,7 @@
+Description: Link with -ldl to prevent FTBFS with binutils-gold.
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=554928
+Author: Jonas Smedegaard <dr@jones.dk>
+---
+ configure.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- jamin.orig/configure.in
++++ jamin/configure.in
+@@ -109,7 +109,7 @@ if test "${libdir}" = '${exec_prefix}/li
    libdir='${exec_prefix}/'${libnn}
  fi
  
