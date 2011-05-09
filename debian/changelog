@@ -1,3 +1,27 @@
+jamin (0.97.14~cvs~81203-4) unstable; urgency=low
+
+  * Team upload.
+  * ACK NMU (bug#588554), thanks to Alexander Reichle-Schmehl for the
+    good job:
+    - debian/patches/1004_install_correct_dir.patch: Install files into
+      /usr/lib instead of /usr/lib64.
+  * Fix desktop file as Freedesktop.org's per-spec:
+    - Remove deprecated Encoding key.
+    - Remove deprecated Application from Categories field.
+    - Append Audio to Categories field.
+  * jamin.1 documents both 'jamin' and 'jamin-scene' commands, link
+    jamin.1.gz to jamin-scene.1.gz; thanks to Nicholas Humfrey for
+    the report (Closes: #329960).
+  * Get rid of unneeded *.la files (Closes: #621646).
+  * Add DEP-3 compliant header to the patches.
+  * debian/copyright:
+    - Fix small typo in the source URL.
+  * debian/control:
+    - Add Homepage field.
+    - Bump Standards.
+
+ -- Alessio Treglia <alessio@debian.org>  Mon, 09 May 2011 12:32:14 +0200
+
 jamin (0.97.14~cvs~81203-3.1) unstable; urgency=low
 
   * Non-maintainer upload.
