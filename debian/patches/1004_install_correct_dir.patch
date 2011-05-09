@@ -1,5 +1,13 @@
---- a/configure.in
-+++ b/configure.in
+Description: Install files into /usr/lib instead of /usr/lib64.
+Author: Alexander Reichle-Schmehl <tolimar@debian.org>
+Bug-Debian: http://bugs.debian.org/588554
+Forwarded: no
+---
+ configure.in |    7 -------
+ 1 file changed, 7 deletions(-)
+
+--- jamin.orig/configure.in
++++ jamin/configure.in
 @@ -97,13 +97,6 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GE
  AM_GLIB_GNU_GETTEXT
  
