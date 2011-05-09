@@ -1,0 +1,20 @@
+Subject: Fix desktop file as Freedesktop.org's per-spec.
+Author: Alessio Treglia <alessio@debian.org>
+Forwarded: no
+---
+ data/jamin.desktop.in |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+--- jamin.orig/data/jamin.desktop.in
++++ jamin/data/jamin.desktop.in
+@@ -1,9 +1,8 @@
+ [Desktop Entry]
+-Encoding=UTF-8
+ _Name=JAMin
+ _GenericName=
+ _Comment=JACK Audio Mastering interface
+-Categories=Application;AudioVideo;
++Categories=AudioVideo;Audio;
+ Exec=jamin
+ Icon=jamin.svg
+ MimeType=application/x-jamin;

@@ -2,3 +2,4 @@
 #1002_compile_with_-fPIC.patch
 1003_add_dynamic_linking.patch
 1004_install_correct_dir.patch
+1005_desktop_file.patch
