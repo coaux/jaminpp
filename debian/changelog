@@ -1,3 +1,11 @@
+jamin (0.97.14~cvs~81203-3.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * debian/patches/1004_install_correct_dir.patch: Install files into
+    /usr/lib instead of /usr/lib64 (Closes: #588554)
+
+ -- Alexander Reichle-Schmehl <tolimar@debian.org>  Thu, 15 Jul 2010 15:00:24 +0200
+
 jamin (0.97.14~cvs~81203-3) unstable; urgency=low
 
   * Revert to depend (not just recommend) swh-plugins.
