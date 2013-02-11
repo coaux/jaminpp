@@ -568,9 +568,9 @@ jamin-callbacks.o: callbacks.c ../config.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/wchar.h /usr/include/jack/types.h \
  /usr/include/jack/transport.h /usr/include/jack/weakmacros.h plugin.h \
  ladspa.h compressor.h process.h limiter.h interface.h intrim.h \
- compressor-ui.h gtkmeter.h state.h db.h presets-ui.h multiout-ui.h \
- status-ui.h limiter-ui.h io-menu.h transport.h scenes.h constants.h \
- spectrum.h preferences.h help.h
+ compressor-ui.h state.h db.h presets-ui.h multiout-ui.h status-ui.h \
+ limiter-ui.h io-menu.h transport.h scenes.h constants.h spectrum.h \
+ preferences.h help.h
 
 ../config.h:
 
@@ -1861,8 +1861,6 @@ interface.h:
 intrim.h:
 
 compressor-ui.h:
-
-gtkmeter.h:
 
 state.h:
 

@@ -40,7 +40,7 @@
 #include "process.h"
 #include "intrim.h"
 #include "compressor-ui.h"
-#include "gtkmeter.h"
+//#include "gtkmeter.h"
 //#include "gtkmeterscale.h"
 #include "state.h"
 #include "db.h"
