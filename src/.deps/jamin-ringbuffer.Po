@@ -1,3 +1,0 @@
-jamin-ringbuffer.o: ringbuffer.c ../config.h
-
-../config.h:
