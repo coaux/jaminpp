@@ -1167,14 +1167,14 @@ create_window1 (void)
 //  GTK_WIDGET_UNSET_FLAGS (inmeter_l, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (inmeter_l, GTK_CAN_DEFAULT);
 
-  custom15 = make_mscale ("custom15", "left right", "", -60, 6);
+/*  custom15 = make_mscale ("custom15", "left right", "", -60, 6);
   gtk_widget_set_name (custom15, "custom15");
   gtk_widget_show (custom15);
   gtk_box_pack_start (GTK_BOX (inmeter_hbox), custom15, TRUE, TRUE, 0);
   gtk_widget_set_size_request (custom15, 10, 0);
 //  GTK_WIDGET_UNSET_FLAGS (custom15, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (custom15, GTK_CAN_DEFAULT);
-
+*/
   inmeter_r = make_meter ("inmeter_r", "", "", -60, 6);
   gtk_widget_set_name (inmeter_r, "inmeter_r");
   gtk_widget_show (inmeter_r);
@@ -2440,14 +2440,14 @@ create_window1 (void)
 //  GTK_WIDGET_UNSET_FLAGS (comp_le_1, GTK_CAN_DEFAULT);
   gtk_widget_set_tooltip_text (comp_le_1, _("Level"));
 
-  custom_1_l = make_mscale ("custom_1_l", "top bottom", "", -40, 0);
+/*  custom_1_l = make_mscale ("custom_1_l", "top bottom", "", -40, 0);
   gtk_widget_set_name (custom_1_l, "custom_1_l");
   gtk_widget_show (custom_1_l);
   gtk_box_pack_start (GTK_BOX (vbox_l), custom_1_l, FALSE, TRUE, 0);
   gtk_widget_set_size_request (custom_1_l, 0, 10);
 //  GTK_WIDGET_UNSET_FLAGS (custom_1_l, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (custom_1_l, GTK_CAN_DEFAULT);
-
+*/
   comp_ga_1 = make_meter ("comp_ga_1", "left", "", -40, 0);
   gtk_widget_set_name (comp_ga_1, "comp_ga_1");
   gtk_widget_show (comp_ga_1);
@@ -2743,14 +2743,14 @@ create_window1 (void)
 //  GTK_WIDGET_UNSET_FLAGS (comp_le_2, GTK_CAN_DEFAULT);
   gtk_widget_set_tooltip_text ( comp_le_2, _("Level"));
 
-  custom_1_m = make_mscale ("custom_1_m", "top bottom", "", -40, 0);
+/*  custom_1_m = make_mscale ("custom_1_m", "top bottom", "", -40, 0);
   gtk_widget_set_name (custom_1_m, "custom_1_m");
   gtk_widget_show (custom_1_m);
   gtk_box_pack_start (GTK_BOX (vbox_m), custom_1_m, FALSE, TRUE, 0);
   gtk_widget_set_size_request (custom_1_m, 0, 10);
 //  GTK_WIDGET_UNSET_FLAGS (custom_1_m, GTK_CAN_FOCUS);
  // GTK_WIDGET_UNSET_FLAGS (custom_1_m, GTK_CAN_DEFAULT);
-
+*/
   comp_ga_2 = make_meter ("comp_ga_2", "left", "", -40, 0);
   gtk_widget_set_name (comp_ga_2, "comp_ga_2");
   gtk_widget_show (comp_ga_2);
@@ -3046,14 +3046,14 @@ create_window1 (void)
  // GTK_WIDGET_UNSET_FLAGS (comp_le_3, GTK_CAN_DEFAULT);
   gtk_widget_set_tooltip_text ( comp_le_3, _("Level"));
 
-  custom_1_h = make_mscale ("custom_1_h", "top bottom", "", -40, 0);
+/*  custom_1_h = make_mscale ("custom_1_h", "top bottom", "", -40, 0);
   gtk_widget_set_name (custom_1_h, "custom_1_h");
   gtk_widget_show (custom_1_h);
   gtk_box_pack_start (GTK_BOX (vbox_h), custom_1_h, FALSE, TRUE, 0);
   gtk_widget_set_size_request (custom_1_h, 0, 10);
  // GTK_WIDGET_UNSET_FLAGS (custom_1_h, GTK_CAN_FOCUS);
  // GTK_WIDGET_UNSET_FLAGS (custom_1_h, GTK_CAN_DEFAULT);
-
+*/
   comp_ga_3 = make_meter ("comp_ga_3", "left", "", -40, 0);
   gtk_widget_set_name (comp_ga_3, "comp_ga_3");
   gtk_widget_show (comp_ga_3);
@@ -3197,14 +3197,14 @@ create_window1 (void)
   gtk_container_add (GTK_CONTAINER (lim_in_meter_eventbox), vbox158);
   gtk_container_set_border_width (GTK_CONTAINER (vbox158), 1);
 
-  custom19 = make_mscale ("custom19", "bottom", "", -40, 6);
+/*  custom19 = make_mscale ("custom19", "bottom", "", -40, 6);
   gtk_widget_set_name (custom19, "custom19");
   gtk_widget_show (custom19);
   gtk_box_pack_start (GTK_BOX (vbox158), custom19, TRUE, TRUE, 0);
   gtk_widget_set_size_request (custom19, 0, 12);
 //GTK_WIDGET_UNSET_FLAGS (custom19, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (custom19, GTK_CAN_DEFAULT);
-
+*/
   lim_in_meter = make_meter ("lim_in_meter", "right", "", -40, 6);
   gtk_widget_set_name (lim_in_meter, "lim_in_meter");
   gtk_widget_show (lim_in_meter);
@@ -3301,14 +3301,14 @@ create_window1 (void)
 //  GTK_WIDGET_UNSET_FLAGS (lim_att_meter, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (lim_att_meter, GTK_CAN_DEFAULT);
 
-  custom20 = make_mscale ("custom20", "top bottom", "", -20, 0);
+/*  custom20 = make_mscale ("custom20", "top bottom", "", -20, 0);
   gtk_widget_set_name (custom20, "custom20");
   gtk_widget_show (custom20);
   gtk_box_pack_start (GTK_BOX (vbox159), custom20, TRUE, TRUE, 0);
   gtk_widget_set_size_request (custom20, 0, 10);
 //  GTK_WIDGET_UNSET_FLAGS (custom20, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (custom20, GTK_CAN_DEFAULT);
-
+*/
   lim_out_meter = make_meter ("lim_out_meter", "right", "", -20, 0);
   gtk_widget_set_name (lim_out_meter, "lim_out_meter");
   gtk_widget_show (lim_out_meter);
@@ -3480,14 +3480,14 @@ create_window1 (void)
 //  GTK_WIDGET_UNSET_FLAGS (outmeter_l, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (outmeter_l, GTK_CAN_DEFAULT);
 
-  custom21 = make_mscale ("custom21", "left right", "", -60, 6);
+/*  custom21 = make_mscale ("custom21", "left right", "", -60, 6);
   gtk_widget_set_name (custom21, "custom21");
   gtk_widget_show (custom21);
   gtk_box_pack_start (GTK_BOX (outmeter_hbox), custom21, TRUE, TRUE, 0);
   gtk_widget_set_size_request (custom21, 10, 0);
 //  GTK_WIDGET_UNSET_FLAGS (custom21, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (custom21, GTK_CAN_DEFAULT);
-
+*/
   outmeter_r = make_meter ("outmeter_r", "up", "", -60, 6);
   gtk_widget_set_name (outmeter_r, "outmeter_r");
   gtk_widget_show (outmeter_r);
@@ -4551,7 +4551,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, inmeter_eventbox, "inmeter_eventbox");
   GLADE_HOOKUP_OBJECT (window1, inmeter_hbox, "inmeter_hbox");
   GLADE_HOOKUP_OBJECT (window1, inmeter_l, "inmeter_l");
-  GLADE_HOOKUP_OBJECT (window1, custom15, "custom15");
+//  GLADE_HOOKUP_OBJECT (window1, custom15, "custom15");
   GLADE_HOOKUP_OBJECT (window1, inmeter_r, "inmeter_r");
   GLADE_HOOKUP_OBJECT (window1, pan_label, "pan_label");
   GLADE_HOOKUP_OBJECT (window1, pan_scale_event_box, "pan_scale_event_box");
@@ -4776,7 +4776,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, eventbox63, "eventbox63");
   GLADE_HOOKUP_OBJECT (window1, comp_ma_1, "comp_ma_1");
   GLADE_HOOKUP_OBJECT (window1, comp_le_1, "comp_le_1");
-  GLADE_HOOKUP_OBJECT (window1, custom_1_l, "custom_1_l");
+//  GLADE_HOOKUP_OBJECT (window1, custom_1_l, "custom_1_l");
   GLADE_HOOKUP_OBJECT (window1, comp_ga_1, "comp_ga_1");
   GLADE_HOOKUP_OBJECT (window1, low_band_vbox, "low_band_vbox");
   GLADE_HOOKUP_OBJECT (window1, low_stereo_event_box, "low_stereo_event_box");
@@ -4828,7 +4828,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, eventbox64, "eventbox64");
   GLADE_HOOKUP_OBJECT (window1, comp_ma_2, "comp_ma_2");
   GLADE_HOOKUP_OBJECT (window1, comp_le_2, "comp_le_2");
-  GLADE_HOOKUP_OBJECT (window1, custom_1_m, "custom_1_m");
+//  GLADE_HOOKUP_OBJECT (window1, custom_1_m, "custom_1_m");
   GLADE_HOOKUP_OBJECT (window1, comp_ga_2, "comp_ga_2");
   GLADE_HOOKUP_OBJECT (window1, mid_band_vbox, "mid_band_vbox");
   GLADE_HOOKUP_OBJECT (window1, mid_stereo_event_box, "mid_stereo_event_box");
@@ -4880,7 +4880,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, eventbox65, "eventbox65");
   GLADE_HOOKUP_OBJECT (window1, comp_ma_3, "comp_ma_3");
   GLADE_HOOKUP_OBJECT (window1, comp_le_3, "comp_le_3");
-  GLADE_HOOKUP_OBJECT (window1, custom_1_h, "custom_1_h");
+//  GLADE_HOOKUP_OBJECT (window1, custom_1_h, "custom_1_h");
   GLADE_HOOKUP_OBJECT (window1, comp_ga_3, "comp_ga_3");
   GLADE_HOOKUP_OBJECT (window1, high_band_vbox, "high_band_vbox");
   GLADE_HOOKUP_OBJECT (window1, high_stereo_event_box, "high_stereo_event_box");
@@ -4906,7 +4906,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, lim_input_hscale, "lim_input_hscale");
   GLADE_HOOKUP_OBJECT (window1, lim_in_meter_eventbox, "lim_in_meter_eventbox");
   GLADE_HOOKUP_OBJECT (window1, vbox158, "vbox158");
-  GLADE_HOOKUP_OBJECT (window1, custom19, "custom19");
+// GLADE_HOOKUP_OBJECT (window1, custom19, "custom19");
   GLADE_HOOKUP_OBJECT (window1, lim_in_meter, "lim_in_meter");
   GLADE_HOOKUP_OBJECT (window1, table15, "table15");
   GLADE_HOOKUP_OBJECT (window1, limit_val_label, "limit_val_label");
@@ -4918,7 +4918,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, lim_out_meter_eventbox, "lim_out_meter_eventbox");
   GLADE_HOOKUP_OBJECT (window1, vbox159, "vbox159");
   GLADE_HOOKUP_OBJECT (window1, lim_att_meter, "lim_att_meter");
-  GLADE_HOOKUP_OBJECT (window1, custom20, "custom20");
+//  GLADE_HOOKUP_OBJECT (window1, custom20, "custom20");
   GLADE_HOOKUP_OBJECT (window1, lim_out_meter, "lim_out_meter");
   GLADE_HOOKUP_OBJECT (window1, hbox80, "hbox80");
   GLADE_HOOKUP_OBJECT (window1, logscale_label, "logscale_label");
@@ -4943,7 +4943,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, outmeter_hbox, "outmeter_hbox");
   GLADE_HOOKUP_OBJECT (window1, rmsmeter_l, "rmsmeter_l");
   GLADE_HOOKUP_OBJECT (window1, outmeter_l, "outmeter_l");
-  GLADE_HOOKUP_OBJECT (window1, custom21, "custom21");
+ // GLADE_HOOKUP_OBJECT (window1, custom21, "custom21");
   GLADE_HOOKUP_OBJECT (window1, outmeter_r, "outmeter_r");
   GLADE_HOOKUP_OBJECT (window1, rmsmeter_r, "rmsmeter_r");
   GLADE_HOOKUP_OBJECT (window1, global_bypass_event_box, "global_bypass_event_box");
@@ -6553,14 +6553,14 @@ create_window3 (void)
 //  GTK_WIDGET_UNSET_FLAGS (presets_inmeter_l, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (presets_inmeter_l, GTK_CAN_DEFAULT);
 
-  custom23 = make_mscale ("custom23", "left right", "", -60, 6);
+/*  custom23 = make_mscale ("custom23", "left right", "", -60, 6);
   gtk_widget_set_name (custom23, "custom23");
   gtk_widget_show (custom23);
   gtk_box_pack_start (GTK_BOX (hbox83), custom23, TRUE, TRUE, 0);
   gtk_widget_set_size_request (custom23, 10, 0);
 //  GTK_WIDGET_UNSET_FLAGS (custom23, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (custom23, GTK_CAN_DEFAULT);
-
+*/
   presets_inmeter_r = make_meter ("presets_inmeter_r", "", "", -60, 6);
   gtk_widget_set_name (presets_inmeter_r, "presets_inmeter_r");
   gtk_widget_show (presets_inmeter_r);
@@ -6676,14 +6676,14 @@ create_window3 (void)
 //  GTK_WIDGET_UNSET_FLAGS (presets_outmeter_l, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (presets_outmeter_l, GTK_CAN_DEFAULT);
 
-  custom26 = make_mscale ("custom26", "left right", "", -60, 6);
+/*  custom26 = make_mscale ("custom26", "left right", "", -60, 6);
   gtk_widget_set_name (custom26, "custom26");
   gtk_widget_show (custom26);
   gtk_box_pack_start (GTK_BOX (hbox85), custom26, TRUE, TRUE, 0);
   gtk_widget_set_size_request (custom26, 10, 0);
 //  GTK_WIDGET_UNSET_FLAGS (custom26, GTK_CAN_FOCUS);
 //  GTK_WIDGET_UNSET_FLAGS (custom26, GTK_CAN_DEFAULT);
-
+*/
   presets_outmeter_r = make_meter ("presets_outmeter_r", "up", "", -60, 6);
   gtk_widget_set_name (presets_outmeter_r, "presets_outmeter_r");
   gtk_widget_show (presets_outmeter_r);
@@ -6765,7 +6765,7 @@ create_window3 (void)
   GLADE_HOOKUP_OBJECT (window3, eventbox71, "eventbox71");
   GLADE_HOOKUP_OBJECT (window3, hbox83, "hbox83");
   GLADE_HOOKUP_OBJECT (window3, presets_inmeter_l, "presets_inmeter_l");
-  GLADE_HOOKUP_OBJECT (window3, custom23, "custom23");
+//  GLADE_HOOKUP_OBJECT (window3, custom23, "custom23");
   GLADE_HOOKUP_OBJECT (window3, presets_inmeter_r, "presets_inmeter_r");
   GLADE_HOOKUP_OBJECT (window3, presets_pan_label, "presets_pan_label");
   GLADE_HOOKUP_OBJECT (window3, eventbox72, "eventbox72");
@@ -6784,7 +6784,7 @@ create_window3 (void)
   GLADE_HOOKUP_OBJECT (window3, eventbox74, "eventbox74");
   GLADE_HOOKUP_OBJECT (window3, hbox85, "hbox85");
   GLADE_HOOKUP_OBJECT (window3, presets_outmeter_l, "presets_outmeter_l");
-  GLADE_HOOKUP_OBJECT (window3, custom26, "custom26");
+//  GLADE_HOOKUP_OBJECT (window3, custom26, "custom26");
   GLADE_HOOKUP_OBJECT (window3, presets_outmeter_r, "presets_outmeter_r");
   GLADE_HOOKUP_OBJECT (window3, global_bypass_event_box_presets, "global_bypass_event_box_presets");
   GLADE_HOOKUP_OBJECT (window3, checkbutton1, "checkbutton1");

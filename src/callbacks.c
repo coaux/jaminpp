@@ -40,7 +40,7 @@
 #include "process.h"
 #include "intrim.h"
 #include "compressor-ui.h"
-//#include "gtkmeter.h"
+#include "gtkmeter.h"
 //#include "gtkmeterscale.h"
 #include "state.h"
 #include "db.h"
@@ -566,24 +566,41 @@ make_meter (gchar *widget_name, gchar *string1, gchar *string2,
                 gint int1, gint int2)
 {
     GtkWidget *ret;
- /*   gint dir = GTK_METER_UP;
+    gint dir = GTK_METER_UP;
+    int sides = 0;
     GtkAdjustment *adjustment = (GtkAdjustment*) gtk_adjustment_new (0.0,
-		    (float)int1, (float)int2, 0.0, 0.0, 0.0);
+                    (float)int1, (float)int2, 0.0, 0.0, 0.0);
 
     if (!string1 || !strcmp(string1, "up")) {
         dir = GTK_METER_UP;
     } else if (!strcmp(string1, "down")) {
-	dir = GTK_METER_DOWN;
+        dir = GTK_METER_DOWN;
     } else if (!strcmp(string1, "left")) {
-	dir = GTK_METER_LEFT;
+        dir = GTK_METER_LEFT;
     } else if (!strcmp(string1, "right")) {
-	dir = GTK_METER_RIGHT;
+        dir = GTK_METER_RIGHT;
+    }
+  
+
+    if (string1 && strstr(string1, "left")) {
+        sides |= GTK_METERSCALE_LEFT;
+    }
+    if (string1 && strstr(string1, "right")) {
+        sides |= GTK_METERSCALE_RIGHT;
+    }
+    if (string1 && strstr(string1, "top")) {
+        sides |= GTK_METERSCALE_TOP;
+    }
+    if (string1 && strstr(string1, "bottom")) {
+        sides |= GTK_METERSCALE_BOTTOM;
     }
 
-    ret = gtk_meter_new(adjustment, dir);
+    ret = gtk_meter_new(adjustment, dir, sides, int1, int2);
+    gtk_meter_set_adjustment(GTK_METER (ret), adjustment);
 
     return ret;
- */ 
+
+  
 }
 
 

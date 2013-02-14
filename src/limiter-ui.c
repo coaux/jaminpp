@@ -21,7 +21,7 @@
 #include "process.h"
 #include "support.h"
 #include "main.h"
-//#include "gtkmeter.h"
+#include "gtkmeter.h"
 #include "state.h"
 #include "db.h"
 #include "process.h"
@@ -40,7 +40,7 @@ static GtkLabel *lh_label, *ll_label, *l_limiterlabel = NULL, *l_logscale_label 
 
 static char limiter_text[2][42] = {"<b>Fast-lookahead-limiter (Harris)</b>", "<b>Foo-limiter (Savolainen)</b>"};
 
-//static GtkMeter *in_meter, *att_meter, *out_meter;
+static GtkMeter *in_meter, *att_meter, *out_meter;
 static GtkAdjustment *in_meter_adj, *att_meter_adj, *out_meter_adj;
 static GtkScale *l_logscale_scale = NULL;
 
@@ -69,7 +69,7 @@ void bind_limiter()
 
 
     s_set_callback(S_LIM_INPUT, li_changed);
-/*
+
     scale = lookup_widget(main_window, "lim_lh_scale");
     lh_adj = gtk_range_get_adjustment(GTK_RANGE(scale));
     lh_label = GTK_LABEL(lookup_widget(main_window, "release_val_label"));
@@ -94,10 +94,10 @@ void bind_limiter()
     out_meter_adj = gtk_meter_get_adjustment(out_meter);
 
     /* Handle waveshaper boost stuff */
-/*    scale = lookup_widget(main_window, "boost_scale");
+    scale = lookup_widget(main_window, "boost_scale");
     s_set_adjustment(S_BOOST, gtk_range_get_adjustment(GTK_RANGE(scale)));
     s_set_callback(S_BOOST, boost_changed);
-*/    
+   
 }
 
 void li_changed(int id, float value)
@@ -155,13 +155,13 @@ void limiter_meters_update()
 
 void limiter_inmeter_reset_peak ()
 {
- // gtk_meter_reset_peak (in_meter);
+  gtk_meter_reset_peak (in_meter);
 }
 
 void limiter_outmeter_reset_peak ()
 {
-//  gtk_meter_reset_peak (att_meter);
-//  gtk_meter_reset_peak (out_meter);
+  gtk_meter_reset_peak (att_meter);
+  gtk_meter_reset_peak (out_meter);
 }
 
 void limiter_set_label (int limiter_plugin)

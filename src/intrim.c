@@ -22,11 +22,11 @@
 #include "support.h"
 #include "main.h"
 #include "intrim.h"
-//#include "gtkmeter.h"
+#include "gtkmeter.h"
 #include "state.h"
 #include "db.h"
 
-//static GtkMeter *in_meter[4], *out_meter[4], *rms_meter[2];
+static GtkMeter *in_meter[4], *out_meter[4], *rms_meter[2];
 static GtkAdjustment *in_meter_adj[4], *out_meter_adj[4], *rms_meter_adj[2];
 static GtkLabel	*pan_label[2];
 static GtkEntry *out_meter_text[2], *rms_meter_text[2];
@@ -44,7 +44,7 @@ float in_pan_gain[2] = {1.0f, 1.0f};
 
 void bind_intrim()
 {
-/*	
+	
 	in_meter[0] = GTK_METER(lookup_widget(main_window, "inmeter_l"));
     in_meter[1] = GTK_METER(lookup_widget(main_window, "inmeter_r"));
 	in_meter[2] = GTK_METER(lookup_widget(presets_window, "presets_inmeter_l"));
@@ -98,7 +98,7 @@ void bind_intrim()
     s_set_callback(S_IN_PAN, inpan_cb);
     s_set_adjustment(S_IN_PAN, gtk_range_get_adjustment(GTK_RANGE(lookup_widget(main_window, "pan_scale"))));
 //	s_set_adjustment(S_IN_PAN, gtk_range_get_adjustment(GTK_RANGE(lookup_widget(presets_window, "presets_pan_scale"))));
-	*/
+	
 }
 
 void intrim_cb(int id, float value)
@@ -147,8 +147,8 @@ void out_meter_value(float amp[])
 
     if (out_meter_peak_pref)
       {
- //       lamp[0] = gtk_meter_get_peak (out_meter[0]);
- //       lamp[1] = gtk_meter_get_peak (out_meter[1]);
+        lamp[0] = gtk_meter_get_peak (out_meter[0]);
+        lamp[1] = gtk_meter_get_peak (out_meter[1]);
       }
     else
       {
@@ -178,8 +178,8 @@ void rms_meter_value(float amp[])
 
     if (rms_meter_peak_pref)
       {
- //       lamp[0] = gtk_meter_get_peak (rms_meter[0]);
- //       lamp[1] = gtk_meter_get_peak (rms_meter[1]);
+        lamp[0] = gtk_meter_get_peak (rms_meter[0]);
+        lamp[1] = gtk_meter_get_peak (rms_meter[1]);
       }
     else
       {
@@ -233,42 +233,42 @@ void update_pan_label(float balance)
 
 void intrim_inmeter_reset_peak ()
 {
-//  gtk_meter_reset_peak (in_meter[0]);
-//  gtk_meter_reset_peak (in_meter[1]);
+  gtk_meter_reset_peak (in_meter[0]);
+  gtk_meter_reset_peak (in_meter[1]);
 }
 
 void intrim_outmeter_reset_peak ()
 {
-//  gtk_meter_reset_peak (out_meter[0]);
-//  gtk_meter_reset_peak (out_meter[1]);
+  gtk_meter_reset_peak (out_meter[0]);
+  gtk_meter_reset_peak (out_meter[1]);
 }
 
 void intrim_rmsmeter_reset_peak ()
 {
-//  gtk_meter_reset_peak (rms_meter[0]);
-//  gtk_meter_reset_peak (rms_meter[1]);
+  gtk_meter_reset_peak (rms_meter[0]);
+  gtk_meter_reset_peak (rms_meter[1]);
 }
 
 void intrim_inmeter_set_warn (float level)
 {
   inmeter_warn_level = level;
 
-//  gtk_meter_set_warn_point (in_meter[0], level);
-//  gtk_meter_set_warn_point (in_meter[1], level);
+  gtk_meter_set_warn_point (in_meter[0], level);
+  gtk_meter_set_warn_point (in_meter[1], level);
 }
 
 void intrim_outmeter_set_warn (float level)
 {
   outmeter_warn_level = level;
-//  gtk_meter_set_warn_point (out_meter[0], level);
-//  gtk_meter_set_warn_point (out_meter[1], level);
+  gtk_meter_set_warn_point (out_meter[0], level);
+  gtk_meter_set_warn_point (out_meter[1], level);
 }
 
 void intrim_rmsmeter_set_warn (float level)
 {
   rmsmeter_warn_level = level;
-//  gtk_meter_set_warn_point (rms_meter[0], level);
-//  gtk_meter_set_warn_point (rms_meter[1], level);
+  gtk_meter_set_warn_point (rms_meter[0], level);
+  gtk_meter_set_warn_point (rms_meter[1], level);
 }
 
 float intrim_inmeter_get_warn ()

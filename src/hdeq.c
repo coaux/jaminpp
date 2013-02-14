@@ -416,6 +416,14 @@ void hdeq_low2mid_set (GtkRange *range)
        // gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
 		color = get_color (HDEQ_SPECTRUM_COLOR);
 		cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+		
+	// cr = gdk_cairo_create (widget->window);	
+	//cairo_rectangle (cr, 0, length, width-1, 2);
+	//cairo_set_source_rgba (cr, 0.5,0.5,0.5, 1.0); 
+	//cairo_fill (cr);
+	//  cairo_destroy(cr);  
+		
+		
         for (i = 0 ; i < EQ_INTERP ; i++)
           {
         //    if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
