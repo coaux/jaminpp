@@ -27,6 +27,7 @@ jamin_SOURCES = \
 	debug.h \
 	ladspa.h \
 	geq.c geq.h \
+	gtkmeter.c gtkmeter.h \
 	hdeq.c hdeq.h \
 	intrim.c intrim.h \
 	io.c io.h \
