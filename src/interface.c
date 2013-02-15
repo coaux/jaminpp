@@ -2468,7 +2468,7 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (low_band_vbox), low_stereo_event_box, TRUE, TRUE, 0);
   gtk_widget_set_tooltip_text (low_stereo_event_box, _("Low Band Stereo Width"));
 
-  hscale_1_l = gtk_scale_new (GTK_ORIENTATION_VERTICAL, GTK_ADJUSTMENT (gtk_adjustment_new (0, -1, 1, 0.1, 0.1, 0)));
+  hscale_1_l = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (gtk_adjustment_new (0, -1, 1, 0.1, 0.1, 0)));
   gtk_widget_set_name (hscale_1_l, "hscale_1_l");
   gtk_widget_show (hscale_1_l);
   gtk_container_add (GTK_CONTAINER (low_stereo_event_box), hscale_1_l);

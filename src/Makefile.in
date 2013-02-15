@@ -75,7 +75,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_jamin_OBJECTS = jamin-callbacks.$(OBJEXT) \
 	jamin-compressor-ui.$(OBJEXT) jamin-geq.$(OBJEXT) \
-	jamin-hdeq.$(OBJEXT) jamin-intrim.$(OBJEXT) jamin-io.$(OBJEXT) \
+	jamin-gtkmeter.$(OBJEXT) jamin-hdeq.$(OBJEXT) \
+	jamin-intrim.$(OBJEXT) jamin-io.$(OBJEXT) \
 	jamin-io-menu.$(OBJEXT) jamin-limiter-ui.$(OBJEXT) \
 	jamin-presets-ui.$(OBJEXT) jamin-main.$(OBJEXT) \
 	jamin-multiout-ui.$(OBJEXT) jamin-plugin.$(OBJEXT) \
@@ -335,6 +336,7 @@ jamin_SOURCES = \
 	debug.h \
 	ladspa.h \
 	geq.c geq.h \
+	gtkmeter.c gtkmeter.h \
 	hdeq.c hdeq.h \
 	intrim.c intrim.h \
 	io.c io.h \
@@ -472,6 +474,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jamin-callbacks.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jamin-compressor-ui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jamin-geq.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jamin-gtkmeter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jamin-hdeq.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jamin-help.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jamin-intrim.Po@am__quote@
@@ -574,6 +577,20 @@ jamin-geq.obj: geq.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='geq.c' object='jamin-geq.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -c -o jamin-geq.obj `if test -f 'geq.c'; then $(CYGPATH_W) 'geq.c'; else $(CYGPATH_W) '$(srcdir)/geq.c'; fi`
+
+jamin-gtkmeter.o: gtkmeter.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -MT jamin-gtkmeter.o -MD -MP -MF $(DEPDIR)/jamin-gtkmeter.Tpo -c -o jamin-gtkmeter.o `test -f 'gtkmeter.c' || echo '$(srcdir)/'`gtkmeter.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/jamin-gtkmeter.Tpo $(DEPDIR)/jamin-gtkmeter.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkmeter.c' object='jamin-gtkmeter.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -c -o jamin-gtkmeter.o `test -f 'gtkmeter.c' || echo '$(srcdir)/'`gtkmeter.c
+
+jamin-gtkmeter.obj: gtkmeter.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -MT jamin-gtkmeter.obj -MD -MP -MF $(DEPDIR)/jamin-gtkmeter.Tpo -c -o jamin-gtkmeter.obj `if test -f 'gtkmeter.c'; then $(CYGPATH_W) 'gtkmeter.c'; else $(CYGPATH_W) '$(srcdir)/gtkmeter.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/jamin-gtkmeter.Tpo $(DEPDIR)/jamin-gtkmeter.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkmeter.c' object='jamin-gtkmeter.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -c -o jamin-gtkmeter.obj `if test -f 'gtkmeter.c'; then $(CYGPATH_W) 'gtkmeter.c'; else $(CYGPATH_W) '$(srcdir)/gtkmeter.c'; fi`
 
 jamin-hdeq.o: hdeq.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -MT jamin-hdeq.o -MD -MP -MF $(DEPDIR)/jamin-hdeq.Tpo -c -o jamin-hdeq.o `test -f 'hdeq.c' || echo '$(srcdir)/'`hdeq.c

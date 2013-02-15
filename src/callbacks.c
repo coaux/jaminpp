@@ -567,7 +567,7 @@ make_meter (gchar *widget_name, gchar *string1, gchar *string2,
 {
     GtkWidget *ret;
     gint dir = GTK_METER_UP;
-    int sides = 0;
+    int sides = GTK_METERSCALE_TOP;
     GtkAdjustment *adjustment = (GtkAdjustment*) gtk_adjustment_new (0.0,
                     (float)int1, (float)int2, 0.0, 0.0, 0.0);
 
@@ -583,16 +583,16 @@ make_meter (gchar *widget_name, gchar *string1, gchar *string2,
   
 
     if (string1 && strstr(string1, "left")) {
-        sides |= GTK_METERSCALE_LEFT;
+        sides = GTK_METERSCALE_LEFT;
     }
     if (string1 && strstr(string1, "right")) {
-        sides |= GTK_METERSCALE_RIGHT;
+        sides = GTK_METERSCALE_RIGHT;
     }
     if (string1 && strstr(string1, "top")) {
-        sides |= GTK_METERSCALE_TOP;
+        sides = GTK_METERSCALE_TOP;
     }
     if (string1 && strstr(string1, "bottom")) {
-        sides |= GTK_METERSCALE_BOTTOM;
+        sides = GTK_METERSCALE_BOTTOM;
     }
 
     ret = gtk_meter_new(adjustment, dir, sides, int1, int2);

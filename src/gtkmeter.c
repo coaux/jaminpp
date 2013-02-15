@@ -1,6 +1,8 @@
 /* GTK - The GIMP Toolkit
  * Copyright (C) 1995-1997 Peter Mattis, Spencer Kimball and Josh MacDonald
- *
+ * Copyright (C) 2003 Steve Harris
+ * Copyright (C) 2013 Patrick Shirkey
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
@@ -51,7 +53,8 @@ static void create_meter(GtkWidget *widget, cairo_t *cr);
 static void rotate_widget(GtkMeterPrivate *priv, cairo_t *cr, int length, int width);                           
 static void meterscale_draw_notch_label(GtkMeter *meterscale, float db,
 		int mark, PangoRectangle *last_label_rect);
-static void meterscale_draw_notch(GtkMeter *meterscale, float db, int mark);						
+static void draw_notch(GtkMeter *meter, GtkMeterPrivate * priv, cairo_t * cr, float db,
+		int mark, int length, int width);						
 static void gtk_meter_update                   (GtkMeter *meter);
 static void gtk_meter_adjustment_changed       (GtkAdjustment    *adjustment,
 						gpointer          data);
@@ -541,21 +544,42 @@ static void create_meter(GtkWidget *widget, cairo_t *cr)
 /* generate colors */
 
       // Green levels
-      if(vert)
-		cairo_rectangle (cr, 1, length - g_h + 1, width-1, g_h);
-      else
-		cairo_rectangle (cr, 1, 1, g_h, width-1);
-      cairo_set_source_rgba (cr, 0.1, 0.5, 0.2, 0.8); // a set the opacity level
+      switch (priv->direction) {
+		case GTK_METER_UP:
+		case GTK_METER_DOWN:
+		  cairo_rectangle (cr, 1, length - g_h + 1, width-1, g_h);
+		  cairo_set_source_rgba (cr, 0.1, 0.5, 0.2, 0.8);
+		  break;
+		case GTK_METER_LEFT:
+		  cairo_rectangle (cr,   a_h + 1, 1, length - a_h, width -1);
+		  cairo_set_source_rgba (cr, 0.8,0.8,0.2, 0.8);
+		  break;
+		case GTK_METER_RIGHT:
+		  cairo_rectangle (cr, 1, 1, g_h, width-1);	
+		  cairo_set_source_rgba (cr, 0.1, 0.5, 0.2, 0.8);	  
+		  break;          
+		}
+
+       // a set the opacity level
       cairo_fill (cr);
 //		rotate_widget(priv, cr, length, width);
       
       
       if (a_h > g_h) {
 	// amber levels
-		if(vert)
+      switch (priv->direction) {
+		case GTK_METER_UP:
+		case GTK_METER_DOWN:
 			cairo_rectangle (cr, 1, length - a_h + 1, width-1, a_h - g_h);
-		else
-			cairo_rectangle (cr, g_h, 1, a_h -g_h ,  width-1);	
+		  break;
+		case GTK_METER_LEFT:
+		//	cairo_rectangle (cr, length - a_h + 1, 1, length -(length - g_h), width-1);
+		  break;
+		case GTK_METER_RIGHT:
+			cairo_rectangle (cr, g_h, 1, a_h -g_h ,  width-1);		
+		  break;          
+		}	
+
         cairo_set_source_rgba (cr, 0.8,0.8,0.2, 0.8); // a set the opacity level
         cairo_fill (cr);
 //		rotate_widget(priv, cr, length, width);
@@ -563,21 +587,39 @@ static void create_meter(GtkWidget *widget, cairo_t *cr)
       }
       if (r_h > a_h) {
 	// red levels
-		if(vert)
+      switch (priv->direction) {
+		case GTK_METER_UP:
+		case GTK_METER_DOWN:
 			cairo_rectangle (cr, 1, length - r_h + 1, width-1, r_h - a_h);
-		else 
-			cairo_rectangle (cr, r_h, 1,  r_h - a_h , width-1);	
+		  break;
+		case GTK_METER_LEFT:
+		//  cairo_rectangle (cr, length - r_h + 1 , 1, length - (length - a_h), width-1);			
+		  break;
+		case GTK_METER_RIGHT:
+		  cairo_rectangle (cr, a_h, 1,  r_h - a_h , width-1);	
+		  break;          
+		}		
+
         cairo_set_source_rgba (cr, 1,0,0.1, 0.8); // a set the opacity level
         cairo_fill (cr);
 //		rotate_widget(priv, cr, length, width);
       }
       if (peak_frac > 0) {
         // peak levels
-		if(vert)
+       switch (priv->direction) {
+		case GTK_METER_UP:
+		case GTK_METER_DOWN:
 			cairo_rectangle (cr, 1, length * (1.0f - peak_frac) + 1, width, 1);
-		else 
-			cairo_rectangle (cr, 1, length * (1.0f - peak_frac) + 1, 1, width);	
-        cairo_set_source_rgba (cr, 0.1,0.3,1, 0.7); // a set the opacity level
+		  break;
+		case GTK_METER_LEFT:
+		//  cairo_rectangle (cr, length * (1.0f - peak_frac) + 1, 1, 1, width-1);			
+		  break;
+		case GTK_METER_RIGHT:
+			cairo_rectangle (cr, length * peak_frac, 1, 1, width-1);
+		  break;          
+		}	       
+
+        cairo_set_source_rgba (cr, 0.9,0.1,0.1, 0.7); // a set the opacity level
         cairo_fill (cr);
 //		rotate_widget(priv, cr, length, width);
       }  
@@ -586,6 +628,7 @@ static void create_meter(GtkWidget *widget, cairo_t *cr)
  // Create glassy layer effect
 
 // left border
+
   if(vert)
 	cairo_rectangle (cr, 0, 0, 2, length+2);
   else 
@@ -620,6 +663,7 @@ static void create_meter(GtkWidget *widget, cairo_t *cr)
   cairo_set_source_rgba (cr, 0.5,0.5,0.5, 1.0); 
   cairo_fill (cr);
 //  rotate_widget(priv, cr, length, width);
+
  // left hand glass bubble effect  
   if(vert)
 	pat = cairo_pattern_create_linear (width/2, 0, 0, 0);
@@ -635,6 +679,7 @@ static void create_meter(GtkWidget *widget, cairo_t *cr)
     cairo_fill (cr);
     cairo_pattern_destroy (pat);
 // rotate_widget(priv, cr, length, width);
+
  // right hand glass bubble effect
   if(vert)
 	pat = cairo_pattern_create_linear (width/2, 0, width, 0);
@@ -651,38 +696,36 @@ static void create_meter(GtkWidget *widget, cairo_t *cr)
     cairo_fill (cr);
     cairo_pattern_destroy (pat);
 //  rotate_widget(priv, cr, length, width);
-	
-	
-	
-
-
 
   
-/*    
-  lr.x = 0;
-  lr.y = 0;
-  lr.width = 0;
-  lr.height = 0;
+  
+ // lr.x = 0;
+ // lr.y = 0;
+ // lr.width = 0;
+ // lr.height = 0;
+  
 
   // meterscale_draw_notch_label(meter, 0.0f, 3, &lr);
-  meterscale_draw_notch(meter, 0.0f, 3);
+  draw_notch(meter,priv, cr, 0.0f, 3, length, width);
 
-  for (val = 5.0f; val < meter->upper; val += 5.0f) {
+
+  for (val = 5.0f; val < priv->upper; val += 5.0f) {
    // meterscale_draw_notch_label(meter, val, 2, &lr);
-    meterscale_draw_notch(meter, val, 2);
+    draw_notch(meter,priv, cr, val, 2, length, width);
   }
 
-  for (val = -5.0f; val > meter->lower+5.0f; val -= 5.0f) {
+  for (val = -5.0f; val > priv->lower+5.0f; val -= 5.0f) {
  //  meterscale_draw_notch_label(meter, val, 2, &lr);
-     meterscale_draw_notch(meter, val, 2);
+     draw_notch(meter,priv, cr, val, 2, length, width);
   }
   
-  for (val = -10.0f; val < meter->upper; val += 1.0f) {
-    meterscale_draw_notch(meter, val, 1);
+  for (val = -10.0f; val < priv->upper; val += 1.0f) {
+    draw_notch(meter, priv, cr, val, 1, length, width);
   }
   
  //   g_object_unref (&lr);
- */ 
+  
+ 	
  	
 }
 
@@ -823,46 +866,42 @@ static void meterscale_draw_notch_label(GtkMeter *meterscale, float db,
     
     
 }
-
-static void meterscale_draw_notch(GtkMeter *meterscale, float db,
-		int mark)
+*/
+static void draw_notch(GtkMeter *meter, GtkMeterPrivate * priv, cairo_t * cr, float db,
+		int mark, int length, int width)
 {
-    GtkWidget *widget = GTK_WIDGET(meterscale);
-    int pos, length, width;
+    int pos;
 
-    if (meterscale->sides & GTK_METERSCALE_LEFT ||
-        meterscale->sides & GTK_METERSCALE_RIGHT) {
-	    length = widget->allocation.height - 2;
-	    width = widget->allocation.width - 2;
-	    pos = length - length * (iec_scale(db) - meterscale->iec_lower) /
-		    (meterscale->iec_upper - meterscale->iec_lower);
+    if (priv->sides & GTK_METERSCALE_LEFT ||
+        priv->sides & GTK_METERSCALE_RIGHT) {
+	    pos = length - length * (iec_scale(db) - priv->iec_lower) /
+		    (priv->iec_upper - priv->iec_lower);
     } else {
-	    length = widget->allocation.width - 2;
-	    width = widget->allocation.height - 2;
-	    pos = length * (iec_scale(db) - meterscale->iec_lower) /
-		    (meterscale->iec_upper - meterscale->iec_lower);
+	    pos = length * (iec_scale(db) - priv->iec_lower) /
+		    (priv->iec_upper - priv->iec_lower);
     }
 
-    if (meterscale->sides & GTK_METERSCALE_LEFT) {
-      gdk_draw_rectangle(widget->window, widget->style->black_gc, TRUE,
-	    2, pos, mark+1, 1);
+	cairo_set_source_rgba (cr, 0,0,0, 0.8); 
+
+    if (priv->sides & GTK_METERSCALE_LEFT) {
+	    cairo_rectangle (cr, pos, width/2 - mark/2, 1, mark+1);	
+		cairo_fill (cr);
     }
-    if (meterscale->sides & GTK_METERSCALE_RIGHT) {
-      gdk_draw_rectangle(widget->window, widget->style->black_gc, TRUE,
-	    width - mark - 2, pos, mark+1, 1);
+    if (priv->sides & GTK_METERSCALE_RIGHT) {
+		cairo_rectangle (cr, length -pos, width/2 - mark/2, 1, mark+1);
+		cairo_fill (cr);
     }
-    if (meterscale->sides & GTK_METERSCALE_TOP) {
-      gdk_draw_rectangle(widget->window, widget->style->black_gc, TRUE,
-	    pos+1, 1, 1, mark);
+    if (priv->sides & GTK_METERSCALE_TOP) {
+		cairo_rectangle (cr, width/2 - mark/2, length - pos, mark +1, 1);
+		cairo_fill (cr);	    
     }
-    if (meterscale->sides & GTK_METERSCALE_BOTTOM) {
-      gdk_draw_rectangle(widget->window, widget->style->black_gc, TRUE,
-	    pos+1, width -mark + 1, 1, mark);
+    if (priv->sides & GTK_METERSCALE_BOTTOM) {
+		cairo_rectangle (cr, width/2 - mark/2, pos, mark +1, 1);
+		cairo_fill (cr);	    
     }
     
 
 }
-*/
 
 static void
 gtk_meter_update (GtkMeter *meter)

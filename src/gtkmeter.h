@@ -1,6 +1,8 @@
 /* GTK - The GIMP Toolkit
  * Copyright (C) 1995-1997 Peter Mattis, Spencer Kimball and Josh MacDonald
- *
+ * Copyright (C) 2003 Steve Harris
+ * Copyright (C) 2013 Patrick Shirkey
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either

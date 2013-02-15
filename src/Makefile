@@ -75,7 +75,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_jamin_OBJECTS = jamin-callbacks.$(OBJEXT) \
 	jamin-compressor-ui.$(OBJEXT) jamin-geq.$(OBJEXT) \
-	jamin-hdeq.$(OBJEXT) jamin-intrim.$(OBJEXT) jamin-io.$(OBJEXT) \
+	jamin-gtkmeter.$(OBJEXT) jamin-hdeq.$(OBJEXT) \
+	jamin-intrim.$(OBJEXT) jamin-io.$(OBJEXT) \
 	jamin-io-menu.$(OBJEXT) jamin-limiter-ui.$(OBJEXT) \
 	jamin-presets-ui.$(OBJEXT) jamin-main.$(OBJEXT) \
 	jamin-multiout-ui.$(OBJEXT) jamin-plugin.$(OBJEXT) \
@@ -233,8 +234,8 @@ OTOOL =
 OTOOL64 = 
 PACKAGE = jamin
 PACKAGE_BUGREPORT = 
-PACKAGE_CFLAGS = -pthread -I/usr/include/gtk-3.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/libdrm -I/usr/include/clutter-1.0 -I/usr/include/cogl -I/usr/include/json-glib-1.0 -I/usr/include/clutter-gtk-1.0  
-PACKAGE_LIBS = -pthread -lclutter-gtk-1.0 -lclutter-1.0 -lgtk-3 -lcogl-pango -ljson-glib-1.0 -lXi -lcogl -lEGL -lX11 -lXext -lXdamage -lXcomposite -lgmodule-2.0 -lrt -lXfixes -lgdk-3 -latk-1.0 -lgio-2.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0  
+PACKAGE_CFLAGS = -pthread -I/usr/include/gtk-3.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/libdrm  
+PACKAGE_LIBS = -lgtk-3 -lgdk-3 -latk-1.0 -lgio-2.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0  
 PACKAGE_NAME = 
 PACKAGE_STRING = 
 PACKAGE_TARNAME = 
@@ -254,7 +255,7 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = strip
 USE_NLS = yes
-VERSION = 0.98.3
+VERSION = 0.98.5
 XGETTEXT = /usr/bin/xgettext
 XML_CFLAGS = -I/usr/include/libxml2  
 XML_LIBS = -lxml2  
@@ -316,7 +317,7 @@ INCLUDES = \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	-DPACKAGE_LIB_DIR=\""$(libdir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
-	-pthread -I/usr/include/gtk-3.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/libdrm -I/usr/include/clutter-1.0 -I/usr/include/cogl -I/usr/include/json-glib-1.0 -I/usr/include/clutter-gtk-1.0   -g    -I/usr/include/libxml2    -Wall
+	-pthread -I/usr/include/gtk-3.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/libdrm   -g    -I/usr/include/libxml2    -Wall
 
 
 # use a convenience library to build non-optimized sources.
@@ -324,7 +325,7 @@ noinst_LIBRARIES = libnopt.a
 libnopt_a_SOURCES = interface.c interface.h
 libnopt_a_CFLAGS = -g -g    -I/usr/include/libxml2    -Wall
 jamin_CFLAGS = -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED -g    -I/usr/include/libxml2    -Wall
-jamin_LDADD = libnopt.a -pthread -lclutter-gtk-1.0 -lclutter-1.0 -lgtk-3 -lcogl-pango -ljson-glib-1.0 -lXi -lcogl -lEGL -lX11 -lXext -lXdamage -lXcomposite -lgmodule-2.0 -lrt -lXfixes -lgdk-3 -latk-1.0 -lgio-2.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0   -lfftw3f -lm   -lxml2   -ljack   
+jamin_LDADD = libnopt.a -lgtk-3 -lgdk-3 -latk-1.0 -lgio-2.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0   -lfftw3f -lm   -lxml2   -ljack   
 man_MANS = jamin.1
 jamin_SOURCES = \
 	callbacks.c callbacks.h callbacks_help.h \
@@ -335,6 +336,7 @@ jamin_SOURCES = \
 	debug.h \
 	ladspa.h \
 	geq.c geq.h \
+	gtkmeter.c gtkmeter.h \
 	hdeq.c hdeq.h \
 	intrim.c intrim.h \
 	io.c io.h \
@@ -472,6 +474,7 @@ distclean-compile:
 include ./$(DEPDIR)/jamin-callbacks.Po
 include ./$(DEPDIR)/jamin-compressor-ui.Po
 include ./$(DEPDIR)/jamin-geq.Po
+include ./$(DEPDIR)/jamin-gtkmeter.Po
 include ./$(DEPDIR)/jamin-hdeq.Po
 include ./$(DEPDIR)/jamin-help.Po
 include ./$(DEPDIR)/jamin-intrim.Po
@@ -574,6 +577,20 @@ jamin-geq.obj: geq.c
 #	source='geq.c' object='jamin-geq.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -c -o jamin-geq.obj `if test -f 'geq.c'; then $(CYGPATH_W) 'geq.c'; else $(CYGPATH_W) '$(srcdir)/geq.c'; fi`
+
+jamin-gtkmeter.o: gtkmeter.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -MT jamin-gtkmeter.o -MD -MP -MF $(DEPDIR)/jamin-gtkmeter.Tpo -c -o jamin-gtkmeter.o `test -f 'gtkmeter.c' || echo '$(srcdir)/'`gtkmeter.c
+	$(am__mv) $(DEPDIR)/jamin-gtkmeter.Tpo $(DEPDIR)/jamin-gtkmeter.Po
+#	source='gtkmeter.c' object='jamin-gtkmeter.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -c -o jamin-gtkmeter.o `test -f 'gtkmeter.c' || echo '$(srcdir)/'`gtkmeter.c
+
+jamin-gtkmeter.obj: gtkmeter.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -MT jamin-gtkmeter.obj -MD -MP -MF $(DEPDIR)/jamin-gtkmeter.Tpo -c -o jamin-gtkmeter.obj `if test -f 'gtkmeter.c'; then $(CYGPATH_W) 'gtkmeter.c'; else $(CYGPATH_W) '$(srcdir)/gtkmeter.c'; fi`
+	$(am__mv) $(DEPDIR)/jamin-gtkmeter.Tpo $(DEPDIR)/jamin-gtkmeter.Po
+#	source='gtkmeter.c' object='jamin-gtkmeter.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -c -o jamin-gtkmeter.obj `if test -f 'gtkmeter.c'; then $(CYGPATH_W) 'gtkmeter.c'; else $(CYGPATH_W) '$(srcdir)/gtkmeter.c'; fi`
 
 jamin-hdeq.o: hdeq.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(jamin_CFLAGS) $(CFLAGS) -MT jamin-hdeq.o -MD -MP -MF $(DEPDIR)/jamin-hdeq.Tpo -c -o jamin-hdeq.o `test -f 'hdeq.c' || echo '$(srcdir)/'`hdeq.c
