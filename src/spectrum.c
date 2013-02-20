@@ -21,7 +21,7 @@
 #include "support.h"
 #include "main.h"
 #include "process.h"
-//#include "gtkmeter.h"
+#include "gtkmeter.h"
 //#include "gtkmeterscale.h"
 #include "db.h"
 
@@ -52,11 +52,11 @@ void bind_spectrum()
     float band_bin_count[BANDS];
 
     root = lookup_widget(main_window, "spectrum_hbox");
-    hbox = gtk_box_new(TRUE, 0);
+    hbox = gtk_hbox_new(TRUE, 0);
     gtk_box_pack_start(GTK_BOX(root), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
 
-    vbox = gtk_box_new(FALSE, 1);
+    vbox = gtk_vbox_new(FALSE, 1);
     gtk_widget_show(vbox);
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
  //   mscale = gtk_meterscale_new(GTK_METERSCALE_RIGHT, LOWER_SPECTRUM_DB, 
@@ -68,26 +68,27 @@ void bind_spectrum()
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
     for (i = 0; i < BANDS; i++) {
-	vbox = gtk_box_new(FALSE, 1);
+	vbox = gtk_vbox_new(FALSE, 1);
 	gtk_widget_show(vbox);
 	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 
-	adjustment[i] = GTK_ADJUSTMENT(gtk_adjustment_new(LOWER_SPECTRUM_DB, 
+	adjustment[i] = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 
                                                           LOWER_SPECTRUM_DB, 
                                                           UPPER_SPECTRUM_DB,
                                                           0.0, 0.0, 0.0));
-//	meter = gtk_meter_new(adjustment[i], GTK_METER_UP);
+	meter = gtk_meter_new(adjustment[i], GTK_METER_UP,GTK_METERSCALE_TOP,LOWER_SPECTRUM_DB, UPPER_SPECTRUM_DB);
+	gtk_meter_set_adjustment(GTK_METER(meter), adjustment[i]);
 	//gtk_widget_set_usize(GTK_WIDGET(meter), 14, -1);
 //	gtk_meter_set_warn_point(GTK_METER(meter), 0.0);
-//	gtk_widget_show(meter);
-//	gtk_box_pack_start(GTK_BOX(vbox), meter, TRUE, TRUE, 0);
+	gtk_widget_show(meter);
+	gtk_box_pack_start(GTK_BOX(vbox), meter, TRUE, TRUE, 0);
 
 	label = make_mini_label(band_lbls[i]);
 	gtk_widget_show(label);
 	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
     }
 
-    vbox = gtk_box_new(FALSE, 1);
+    vbox = gtk_vbox_new(FALSE, 1);
     gtk_widget_show(vbox);
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
  //   mscale = gtk_meterscale_new(GTK_METERSCALE_LEFT, LOWER_SPECTRUM_DB, 
@@ -142,7 +143,7 @@ gboolean spectrum_update(gpointer data)
 
     float decay_rate = 0.2f;
 
-    page = 1; // get_current_notebook1_page ();
+    page = get_current_notebook1_page ();
     count = BINS / 2;
 
     if (page == 2) {
@@ -158,6 +159,7 @@ gboolean spectrum_update(gpointer data)
           levels[i] = (single_levels[band_bin[i]] +
                        single_levels[band_bin[i]+1]) * 0.5;
         }
+//        printf("spectrum: setting adj %i \n", i);
         gtk_adjustment_set_value(adjustment[i], lin2db(levels[i]));
       }
     }
@@ -169,7 +171,7 @@ gboolean spectrum_update(gpointer data)
         single_levels[i] *= 1.0f - decay_rate;
         single_levels[i] += bin_peak_read_and_clear(i) * decay_rate;
       }
-    //  draw_EQ_spectrum_curve (single_levels);
+      draw_EQ_spectrum_curve (single_levels);
     }
 
     return (timeout_ret);
@@ -205,7 +207,7 @@ void spectrum_timeout_check()
 {
   int milliseconds;
 
-
+//	printf("spectrum: timeout check\n");
   if (spectrum_freq && timeout_countdown)
     {
       timeout_countdown--;
@@ -215,6 +217,7 @@ void spectrum_timeout_check()
             timeout_ret = TRUE;
             milliseconds = 1000 / spectrum_freq;
             g_timeout_add (milliseconds, spectrum_update, NULL);
+//            printf("spectrum: a: timeout check\n");
         }
     }
 }

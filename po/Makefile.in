@@ -19,7 +19,7 @@
 
 GETTEXT_PACKAGE = jamin
 PACKAGE = jamin
-VERSION = 0.98.5
+VERSION = 0.98.6
 
 SHELL = /bin/bash
 

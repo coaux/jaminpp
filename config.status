@@ -731,7 +731,7 @@ fi
 
 
     PACKAGE='jamin'
-    VERSION='0.98.5'
+    VERSION='0.98.6'
     TIMESTAMP=''
     RM='rm -f'
     ofile='libtool'
@@ -984,7 +984,7 @@ S["AUTOHEADER"]="${SHELL} /media/art/code/jamin/missing --run autoheader"
 S["AUTOMAKE"]="${SHELL} /media/art/code/jamin/missing --run automake-1.11"
 S["AUTOCONF"]="${SHELL} /media/art/code/jamin/missing --run autoconf"
 S["ACLOCAL"]="${SHELL} /media/art/code/jamin/missing --run aclocal-1.11"
-S["VERSION"]="0.98.5"
+S["VERSION"]="0.98.6"
 S["PACKAGE"]="jamin"
 S["CYGPATH_W"]="echo"
 S["am__isrc"]=""
@@ -1077,7 +1077,7 @@ D["PACKAGE_STRING"]=" \"\""
 D["PACKAGE_BUGREPORT"]=" \"\""
 D["PACKAGE_URL"]=" \"\""
 D["PACKAGE"]=" \"jamin\""
-D["VERSION"]=" \"0.98.5\""
+D["VERSION"]=" \"0.98.6\""
 D["STDC_HEADERS"]=" 1"
 D["HAVE_SYS_TYPES_H"]=" 1"
 D["HAVE_SYS_STAT_H"]=" 1"

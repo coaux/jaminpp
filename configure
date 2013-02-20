@@ -2761,7 +2761,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=jamin
- VERSION=0.98.5
+ VERSION=0.98.6
 
 
 cat >>confdefs.h <<_ACEOF

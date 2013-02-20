@@ -32,9 +32,9 @@ on_EQ_curve_configure_event            (GtkWidget       *widget,
                                         gpointer         user_data);
 
 gboolean
-on_EQ_curve_expose_event               (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_EQ_curve_draw               (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_EQ_curve_realize                    (GtkWidget       *widget,

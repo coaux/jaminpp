@@ -235,12 +235,12 @@ on_window1_show                        (GtkWidget       *widget,
 
 
 gboolean
-on_EQ_curve_expose_event               (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_EQ_curve_draw             (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-    hdeq_curve_exposed (widget, event);
-
+//    hdeq_curve_exposed (widget, event);
+	hdeq_curve_draw (widget, cr, data);
     return FALSE;
 }
 

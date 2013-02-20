@@ -3689,8 +3689,8 @@ create_window1 (void)
   g_signal_connect ((gpointer) EQ_curve_event_box, "enter_notify_event",
                     G_CALLBACK (on_EQ_curve_event_box_enter_notify_event),
                     NULL);
-  g_signal_connect ((gpointer) EQ_curve, "expose_event",
-                    G_CALLBACK (on_EQ_curve_expose_event),
+  g_signal_connect ((gpointer) EQ_curve, "draw",
+                    G_CALLBACK (on_EQ_curve_draw),
                     NULL);
   g_signal_connect ((gpointer) EQ_curve, "realize",
                     G_CALLBACK (on_EQ_curve_realize),
