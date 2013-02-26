@@ -79,27 +79,27 @@ on_pan_scale_value_changed             (GtkRange        *range,
                                         gpointer         user_data);
 
 gboolean
-on_comp1_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_comp1_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_comp1_curve_realize                 (GtkWidget       *widget,
                                         gpointer         user_data);
 
 gboolean
-on_comp2_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_comp2_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_comp2_curve_realize                 (GtkWidget       *widget,
                                         gpointer         user_data);
 
 gboolean
-on_comp3_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_comp3_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_comp3_curve_realize                 (GtkWidget       *widget,

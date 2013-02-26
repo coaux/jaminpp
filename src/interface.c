@@ -4070,8 +4070,8 @@ create_window1 (void)
   g_signal_connect ((gpointer) low_curve_box, "enter_notify_event",
                     G_CALLBACK (on_low_curve_box_enter_notify_event),
                     NULL);
-  g_signal_connect ((gpointer) comp1_curve, "expose_event",
-                    G_CALLBACK (on_comp1_curve_expose_event),
+  g_signal_connect ((gpointer) comp1_curve, "draw",
+                    G_CALLBACK (on_comp1_curve_draw),
                     NULL);
   g_signal_connect ((gpointer) comp1_curve, "realize",
                     G_CALLBACK (on_comp1_curve_realize),
@@ -4085,8 +4085,8 @@ create_window1 (void)
   g_signal_connect ((gpointer) mid_curve_box, "enter_notify_event",
                     G_CALLBACK (on_mid_curve_box_enter_notify_event),
                     NULL);
-  g_signal_connect ((gpointer) comp2_curve, "expose_event",
-                    G_CALLBACK (on_comp2_curve_expose_event),
+  g_signal_connect ((gpointer) comp2_curve, "draw",
+                    G_CALLBACK (on_comp2_curve_draw),
                     NULL);
   g_signal_connect ((gpointer) comp2_curve, "realize",
                     G_CALLBACK (on_comp2_curve_realize),
@@ -4100,8 +4100,8 @@ create_window1 (void)
   g_signal_connect ((gpointer) high_curve_box, "enter_notify_event",
                     G_CALLBACK (on_high_curve_box_enter_notify_event),
                     NULL);
-  g_signal_connect ((gpointer) comp3_curve, "expose_event",
-                    G_CALLBACK (on_comp3_curve_expose_event),
+  g_signal_connect ((gpointer) comp3_curve, "draw",
+                    G_CALLBACK (on_comp3_curve_draw),
                     NULL);
   g_signal_connect ((gpointer) comp3_curve, "realize",
                     G_CALLBACK (on_comp3_curve_realize),

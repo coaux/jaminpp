@@ -42,7 +42,7 @@ void kn_changed(int id, float value);
 void ma_changed(int id, float value);
 
 void calc_auto_gain(int i);
-void draw_comp_curve (int i);
+void draw_comp_curve (int i, cairo_t * cr);
 
 static GtkWidget *ma[XO_BANDS];
 static GtkAdjustment *adj_at[XO_BANDS];
@@ -177,7 +177,7 @@ void at_changed(int id, float value)
 
                   g_signal_handler_unblock (adj_at[j], sig_hand_at[j]);
                 }
- //             draw_comp_curve(j);
+				comp_curve_update(j);
             }
         }
     }
@@ -186,7 +186,7 @@ void at_changed(int id, float value)
 
 
   compressors[i].attack = value;
-//  draw_comp_curve(i);
+  comp_curve_update(i);
 }
 
 void re_changed(int id, float value)
@@ -217,7 +217,7 @@ void re_changed(int id, float value)
 
                   g_signal_handler_unblock (adj_re[j], sig_hand_re[j]);
                 }
- //             draw_comp_curve(j);
+				comp_curve_update(j);
             }
         }
     }
@@ -226,7 +226,7 @@ void re_changed(int id, float value)
 
 
   compressors[i].release = value;
-//  draw_comp_curve(i);
+  comp_curve_update;
 }
 
 void th_changed(int id, float value)
@@ -260,7 +260,7 @@ void th_changed(int id, float value)
               if (auto_gain[j]) {
                 calc_auto_gain(j);
               } else {
-    //            draw_comp_curve(j);
+				comp_curve_update(j);
               }
               gtk_meter_set_warn_point(le_meter[j], new_value);
             }
@@ -274,7 +274,7 @@ void th_changed(int id, float value)
   if (auto_gain[i]) {
     calc_auto_gain(i);
   } else {
-  //  draw_comp_curve(i);
+	comp_curve_update(i);
   }
   gtk_meter_set_warn_point(le_meter[i], value);
 }
@@ -310,7 +310,7 @@ void ra_changed(int id, float value)
               if (auto_gain[j]) {
                 calc_auto_gain(j);
               } else {
-        //        draw_comp_curve(j);
+				comp_curve_update(j);
               }
               gtk_meter_set_warn_point(le_meter[j], new_value);
             }
@@ -324,7 +324,7 @@ void ra_changed(int id, float value)
   if (auto_gain[i]) {
     calc_auto_gain(i);
   } else {
- //   draw_comp_curve(i);
+	comp_curve_update(i);
   }
   gtk_meter_set_warn_point(le_meter[i], value);
 }
@@ -357,7 +357,7 @@ void kn_changed(int id, float value)
 
                   g_signal_handler_unblock (adj_kn[j], sig_hand_kn[j]);
                 }
-            //  draw_comp_curve(j);
+				comp_curve_update(j);
             }
         }
     }
@@ -366,7 +366,7 @@ void kn_changed(int id, float value)
 
 
   compressors[i].knee = value * 10.0f;
-//  draw_comp_curve(i);
+  comp_curve_update(i);
 }
 
 void ma_changed(int id, float value)
@@ -403,7 +403,7 @@ void ma_changed(int id, float value)
 		  gtk_button_set_label (GTK_BUTTON(autobutton[j]), val);
 		  free (val);
                 }
-   //           draw_comp_curve(j);
+              comp_curve_update(j);
             }
 
         }
@@ -418,7 +418,7 @@ void ma_changed(int id, float value)
   gtk_button_set_label (GTK_BUTTON(autobutton[i]), val);
   free (val);
 
- // draw_comp_curve(i);
+  comp_curve_update(i);
 }
 
 void calc_auto_gain(int i)

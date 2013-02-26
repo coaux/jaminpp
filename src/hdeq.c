@@ -822,7 +822,7 @@ void reset_hdeq ()
     /*  Redraw the EQ curve.  */
 
 //    draw_EQ_curve ();
-
+	gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
     /*  Set the scene warning button so that people will know to save it.  */
 
@@ -977,7 +977,8 @@ void draw_EQ_curve (cairo_t *EQ_cr)
           {
             freq2xpix ((float) x0, &x1);
 
-				cairo_move_to (EQ_cr, x1, 0); cairo_line_to (EQ_cr, x1, EQ_curve_height);
+				cairo_move_to (EQ_cr, x1, 0); 
+				cairo_line_to (EQ_cr, x1, EQ_curve_height);
 				cairo_stroke (EQ_cr);
 
           }
@@ -1015,7 +1016,8 @@ void draw_EQ_curve (cairo_t *EQ_cr)
     freq2xpix (process_get_low2mid_xover (), &x1);
     
 
-		cairo_move_to (EQ_cr, x1, 0); cairo_line_to (EQ_cr, x1, EQ_curve_height);
+		cairo_move_to (EQ_cr, x1, 0); 
+		cairo_line_to (EQ_cr, x1, EQ_curve_height);
 		cairo_stroke (EQ_cr);
  
 		cairo_rectangle (EQ_cr, x1 - XOVER_HANDLE_HALF_SIZE, 0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
@@ -1033,7 +1035,8 @@ void draw_EQ_curve (cairo_t *EQ_cr)
 	cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);  
     freq2xpix (process_get_mid2high_xover (), &x1);
  
-  		cairo_move_to (EQ_cr, x1, 0); cairo_line_to (EQ_cr, x1, EQ_curve_height);
+  		cairo_move_to (EQ_cr, x1, 0); 
+  		cairo_line_to (EQ_cr, x1, EQ_curve_height);
 		cairo_stroke (EQ_cr);
 
   		cairo_rectangle (EQ_cr, x1 - XOVER_HANDLE_HALF_SIZE, 0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
@@ -1867,29 +1870,30 @@ void hdeq_curve_motion (GdkEventMotion *event)
           {
           //  gdk_draw_pixmap (EQ_drawable, EQ_gc, hdeq_pixmap, 0, 0, 0, 0,
           //                   EQ_curve_width + 1, EQ_curve_height + 1);
+			
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
-
-            if (get_spectrum_freq ())
-              {
+ //           if (get_spectrum_freq ())
+ //             {
                 /*  Set the foreground color for drawing the spectrum curve.  */
 
  //               gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
-                color = get_color (HDEQ_SPECTRUM_COLOR);
-				cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+ //               color = get_color (HDEQ_SPECTRUM_COLOR);
+//				cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
 
-                for (i = 0 ; i < EQ_INTERP ; i++)
-                  {
+ //               for (i = 0 ; i < EQ_INTERP ; i++)
+  //                {
   //                  if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
   //                                        spectrum_x[i], spectrum_y[i]);
-                  }
+  //                }
 
 
                 /*  Reset the foreground color to the text color.  */
 
 //                gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-                color = get_color (TEXT_COLOR);
-				cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
-              }
+ //               color = get_color (TEXT_COLOR);
+//				cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+ //             }
           }
       }
 }
@@ -2009,6 +2013,7 @@ void hdeq_curve_button_press (GdkEventButton *event)
                             insert_notch ();
                             set_EQ ();
                    //         draw_EQ_curve ();
+							gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
                           }
                         else
                           {
@@ -2270,6 +2275,7 @@ void hdeq_curve_button_press (GdkEventButton *event)
             /*  Redraw the curve.  */
 
      //       draw_EQ_curve ();
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
           }
         break;
 
@@ -2337,6 +2343,7 @@ void hdeq_curve_button_release (GdkEventButton  *event)
             EQ_input_points = 0;
 
      //       draw_EQ_curve ();
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
           }
         break;
       }
@@ -2433,6 +2440,7 @@ void hdeq_popup (int action)
 
         set_EQ ();
   //      draw_EQ_curve ();
+		gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
 
         /*  Set the scene warning button so that people will know to save it.  */
@@ -2454,6 +2462,7 @@ void hdeq_popup (int action)
             EQ_input_points = 0;
 
    //         draw_EQ_curve ();
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
           }
         break;
       }
@@ -2509,6 +2518,7 @@ void set_EQ_curve_values (int id, float value)
     /*  Redraw the curve.  */
 
  //   draw_EQ_curve ();
+	gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 }
 
 
@@ -2538,6 +2548,7 @@ void hdeq_set_lower_gain (float gain)
   EQ_curve_range_y = EQ_gain_upper - EQ_gain_lower;
 
 // draw_EQ_curve ();
+  gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
   set_scene_warning_button ();
 }
@@ -2555,6 +2566,7 @@ void hdeq_set_upper_gain (float gain)
   EQ_curve_range_y = EQ_gain_upper - EQ_gain_lower;
 
  // draw_EQ_curve ();
+  gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
   set_scene_warning_button ();
 }
@@ -2599,9 +2611,16 @@ static void comp_write_annotation (int i, char *string)
 }
 
 
+void comp_curve_update(int i)
+{
+	
+		gtk_widget_queue_draw(GTK_WIDGET(l_comp_curve[i])); 
+	
+}
+
 /*  Draw the compressor curve (0-2).  */
 
-void draw_comp_curve (int i)
+void draw_comp_curve (int i, cairo_t *cr)
 {
     int              j, x0, y0 = 0.0, x1 = 0.0, y1 = 0.0;
     float            x, y;
@@ -2630,6 +2649,9 @@ void draw_comp_curve (int i)
 
 //            gdk_draw_line (comp_drawable[i], comp_gc[i], x1, 0, x1, 
 //                comp_curve_height[i]);
+				cairo_move_to (cr, x1, 0); 
+				cairo_line_to (cr, x1, comp_curve_height[i]);
+				cairo_stroke (cr);
           }
       }
 
@@ -2641,11 +2663,13 @@ void draw_comp_curve (int i)
               {
  //               gdk_gc_set_line_attributes (comp_gc[i], 2, GDK_LINE_SOLID, 
  //                   GDK_CAP_BUTT, GDK_JOIN_MITER);
+					cairo_set_line_width (cr, 2.0);
               }
             else
               {
  //               gdk_gc_set_line_attributes (comp_gc[i], 1, GDK_LINE_SOLID, 
  //                   GDK_CAP_BUTT, GDK_JOIN_MITER);
+					cairo_set_line_width (cr, 1.0);
               }
 
             y1 = comp_curve_height[i] - NINT (((float) (j - comp_start_y[i]) / 
@@ -2653,6 +2677,9 @@ void draw_comp_curve (int i)
 
  //           gdk_draw_line (comp_drawable[i], comp_gc[i], 0, y1, 
  //               comp_curve_width[i], y1);
+				cairo_move_to (cr, 0, y1); 
+				cairo_line_to (cr, comp_curve_width[i], y1);
+				cairo_stroke (cr);
           }
       }
 
@@ -2663,7 +2690,9 @@ void draw_comp_curve (int i)
 //        GDK_JOIN_MITER);
 //    gdk_gc_set_foreground (comp_gc[i], get_color (LOW_BAND_COLOR + i));
 
-
+	color = get_color (LOW_BAND_COLOR + i);
+    cairo_set_source_rgb (cr,color->red,color->green, color->blue);
+    
     comp = comp_get_settings (i);
 
     x0 = 999.0;
@@ -2678,8 +2707,14 @@ void draw_comp_curve (int i)
         y1 = comp_curve_height[i] - NINT (((y - comp_start_y[i]) / 
             comp_curve_range_y[i]) * comp_curve_height[i]);
 
-        if (x0 != 999.0) 
+        if (x0 != 999.0) {
  //           gdk_draw_line (comp_drawable[i], comp_gc[i], x0, y0, x1, y1);
+ 
+			cairo_move_to (cr, x0, y0); 
+			cairo_line_to (cr, x1, y1);
+			cairo_stroke (cr);
+			
+		}	
 
         x0 = x1;
         y0 = y1;
@@ -2692,7 +2727,7 @@ void draw_comp_curve (int i)
 
 /*  The compressor curve expose/resize callback (0-2).  */
 
-void comp_curve_expose (GtkWidget *widget, int i)
+void comp_curve_draw (GtkWidget *widget, cairo_t *cr, int i)
 {
     /*  Since we're doing inclusive plots on the compressor curves we'll
         not decrement the width and height.  */
@@ -2703,7 +2738,7 @@ void comp_curve_expose (GtkWidget *widget, int i)
     comp_curve_height[i] = allocation->height;
 	g_free(allocation);	
 	
-    draw_comp_curve (i);
+    draw_comp_curve (i, cr);
 }
 
 
@@ -2758,10 +2793,10 @@ void comp_curve_box_motion (int i, GdkEventMotion  *event)
 
 void comp_box_leave (int i)
 {
- //   gtk_widget_modify_fg ((GtkWidget *) l_comp_lbl[i], GTK_STATE_NORMAL, 
- //                         get_color (TEXT_COLOR));
- //   gtk_widget_modify_fg ((GtkWidget *) l_c_curve_lbl[i], GTK_STATE_NORMAL, 
- //                         get_color (TEXT_COLOR));
+    gtk_widget_modify_fg ((GtkWidget *) l_comp_lbl[i], GTK_STATE_NORMAL, 
+                          get_color (TEXT_COLOR));
+    gtk_widget_modify_fg ((GtkWidget *) l_c_curve_lbl[i], GTK_STATE_NORMAL, 
+                          get_color (TEXT_COLOR));
 }
 
 
@@ -2770,10 +2805,10 @@ void comp_box_leave (int i)
 
 void comp_box_enter (int i)
 {
-//    gtk_widget_modify_fg ((GtkWidget *) l_comp_lbl[i], GTK_STATE_NORMAL, 
-//                          get_color (LOW_BAND_COLOR + i));
-//    gtk_widget_modify_fg ((GtkWidget *) l_c_curve_lbl[i], GTK_STATE_NORMAL, 
-//                          get_color (LOW_BAND_COLOR + i));
+    gtk_widget_modify_fg ((GtkWidget *) l_comp_lbl[i], GTK_STATE_NORMAL, 
+                          get_color (LOW_BAND_COLOR + i));
+    gtk_widget_modify_fg ((GtkWidget *) l_c_curve_lbl[i], GTK_STATE_NORMAL, 
+                          get_color (LOW_BAND_COLOR + i));
 }
 
 

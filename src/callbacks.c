@@ -330,11 +330,11 @@ on_lim_out_trim_scale_value_changed        (GtkRange        *range,
 
 
 gboolean
-on_comp1_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_comp1_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-   comp_curve_expose (widget, 0);
+   comp_curve_draw (widget, cr, 0);
 
     return FALSE;
 }
@@ -349,11 +349,11 @@ on_comp1_curve_realize                 (GtkWidget       *widget,
 
 
 gboolean
-on_comp2_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_comp2_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-    comp_curve_expose (widget, 1);
+    comp_curve_draw (widget, cr, 1);
 
     return FALSE;
 }
@@ -368,11 +368,11 @@ on_comp2_curve_realize                 (GtkWidget       *widget,
 
 
 gboolean
-on_comp3_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_comp3_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-    comp_curve_expose (widget, 2);
+    comp_curve_draw (widget, cr, 2);
 
     return FALSE;
 }
@@ -423,7 +423,7 @@ on_low_curve_box_leave_notify_event    (GtkWidget       *widget,
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    draw_comp_curve (0);
+    //draw_comp_curve (0);
 
     comp_box_leave (0);
 
@@ -436,7 +436,7 @@ on_mid_curve_box_leave_notify_event    (GtkWidget       *widget,
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    draw_comp_curve (1);
+  //  draw_comp_curve (1);
 
     comp_box_leave (1);
 
@@ -449,7 +449,7 @@ on_high_curve_box_leave_notify_event   (GtkWidget       *widget,
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    draw_comp_curve (2);
+  //  draw_comp_curve (2);
 
     comp_box_leave (2);
 
