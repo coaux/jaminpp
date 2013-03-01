@@ -42,6 +42,7 @@ void reset_hdeq ();
 //void hdeq_curve_exposed (GtkWidget *widget, GdkEventExpose  *event);
 void hdeq_curve_draw (GtkWidget *widget, cairo_t *cr, gpointer data);
 void hdeq_curve_init (GtkWidget *widget);
+void hdeq_curve_update();
 void hdeq_curve_motion (GdkEventMotion *event);
 void hdeq_curve_button_press (GdkEventButton *event);
 void hdeq_curve_button_release (GdkEventButton  *event);

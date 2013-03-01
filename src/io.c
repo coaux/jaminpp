@@ -786,7 +786,7 @@ void io_init(int argc, char *argv[])
 
     spectrum_freq = 10;
     crossfade_time = 1.0;
-
+	gui_mode = 0;
 
     /* basename $0 */
     pname = strrchr(argv[0], '/');

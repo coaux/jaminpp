@@ -61,40 +61,40 @@ void bind_geq()
     }
 
     for (i=0; i<EQ_BANDS; i++) {
-	sprintf(name, "eqb%d", i+1);
-	geqr[i] = GTK_RANGE(lookup_widget(main_window, name));
-	geqa[i] = GTK_ADJUSTMENT(gtk_range_get_adjustment(GTK_RANGE(geqr[i])));
-	g_signal_connect(G_OBJECT(geqa[i]), "value-changed", 
-                         G_CALLBACK(eqb_changed), GINT_TO_POINTER (i+1));
-     //   g_signal_connect(G_OBJECT(geqa[i]), "value-changed", 
-      //                   G_CALLBACK(hdeq_eqb_mod), NULL);
-    }
+		sprintf(name, "eqb%d", i+1);
+		geqr[i] = GTK_RANGE(lookup_widget(main_window, name));
+		geqa[i] = GTK_ADJUSTMENT(gtk_range_get_adjustment(GTK_RANGE(geqr[i])));
+		g_signal_connect(G_OBJECT(geqa[i]), "value-changed", 
+							 G_CALLBACK(eqb_changed), GINT_TO_POINTER (i+1));
+		g_signal_connect(G_OBJECT(geqa[i]), "value-changed", 
+							 G_CALLBACK(hdeq_eqb_mod), NULL);
+	}
 
 
     for (i=0; i<BANDS + 1; i++) {
-	geq_gains[i] = 1.0f;
+		geq_gains[i] = 1.0f;
     }
 
     bin = 0;
     while (bin <= geq_freqs[0] / hz_per_bin && bin < (BINS / 2) - 1) {
-	bin_base[bin] = 0;
-	bin_delta[bin++] = 0.0f;
+		bin_base[bin] = 0;
+		bin_delta[bin++] = 0.0f;
     }
 
     for (i = 1; i < BANDS - 1 && bin < (BINS / 2) - 1
 	 && geq_freqs[i+1] < sample_rate / 2; i++) {
-	last_bin = bin;
-	next_bin = geq_freqs[i+1] / hz_per_bin;
-	while (bin <= next_bin) {
-	    bin_base[bin] = i;
-	    bin_delta[bin] = (float)(bin-last_bin) / (float)(next_bin-last_bin);
-	    bin++;
-	}
+		last_bin = bin;
+		next_bin = geq_freqs[i+1] / hz_per_bin;
+		while (bin <= next_bin) {
+			bin_base[bin] = i;
+			bin_delta[bin] = (float)(bin-last_bin) / (float)(next_bin-last_bin);
+			bin++;
+		}
     }
 
     for (; bin < (BINS / 2); bin++) {
-	bin_base[bin] = BANDS - 1;
-	bin_delta[bin] = 0.0f;
+		bin_base[bin] = BANDS - 1;
+		bin_delta[bin] = 0.0f;
     }
 
     geq_set_gains();
@@ -106,6 +106,7 @@ void geq_set_gains()
 
     if (!EQ_drawn)
       {
+//		printf("setting geq gains");  
         eq_coefs[0] = 1.0f;
         for (bin = 1; bin < (BINS/2 - 1); bin++) {
           eq_coefs[bin] = ((1.0f-bin_delta[bin]) * geq_gains[bin_base[bin]])
@@ -217,7 +218,7 @@ gboolean eqb_changed(GtkAdjustment *adj, gpointer user_data)
 {
     int band = GPOINTER_TO_INT (user_data);
 
-//    geq_gains[band-1] = db2lin(adj->value);
+    geq_gains[band-1] = db2lin(gtk_adjustment_get_value(adj));
 
     geq_set_gains();
 
@@ -231,6 +232,7 @@ gboolean eqb_changed(GtkAdjustment *adj, gpointer user_data)
       {
         set_scene_warning_button ();
   //      draw_EQ_curve ();
+		hdeq_curve_update();
       }
 
     return FALSE;

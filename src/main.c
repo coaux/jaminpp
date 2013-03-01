@@ -119,15 +119,16 @@ int main(int argc, char *argv[])
 	/* Bind the ui widgets to adjustments */
 	bind_geq();
 	bind_hdeq();
+	
 
 	/* Show Preset or Main window  - commandline toggle "-g" */
 	//g_print(_("11: show_gui = %i\n"), show_gui);
 
-	if(gui_mode != 2){ 
-	    if(gui_mode == 1){      
-		gtk_widget_show(presets_window);
-	    }else{
-		gtk_widget_show(main_window);
+	if(gui_mode != 2){ // Daemon mode
+	    if(gui_mode == 1){ // Presets
+			gtk_widget_show(presets_window);
+	    }else{ // Default
+			gtk_widget_show(main_window);
 	    }   
 	}
 	/* Bind the ui widgets to adjustments */

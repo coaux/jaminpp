@@ -127,12 +127,12 @@ void state_init()
     s_value[S_NOTCH_Q(2)] = 5.0;
     s_value[S_NOTCH_Q(3)] = 5.0;
 
- /*   s_value[S_NOTCH_FREQ(0)] = hdeq_get_notch_default_freq (0);
+    s_value[S_NOTCH_FREQ(0)] = hdeq_get_notch_default_freq (0);
     s_value[S_NOTCH_FREQ(1)] = hdeq_get_notch_default_freq (1);
     s_value[S_NOTCH_FREQ(2)] = hdeq_get_notch_default_freq (2);
     s_value[S_NOTCH_FREQ(3)] = hdeq_get_notch_default_freq (3);
     s_value[S_NOTCH_FREQ(4)] = hdeq_get_notch_default_freq (4);
-*/
+
 
     s_history_add("Initial state");
 }
@@ -213,7 +213,7 @@ void s_set_value_block(float *values, int base, int count)
 	s_value[base + i] = values[i];
     }
     last_changed = base;
-    //s_set_events(base, values[i]);
+    s_set_events(base, values[i]);
 }
 
 void s_set_value_no_history(int id, float value)
@@ -236,7 +236,7 @@ void s_clear_history()
     history = NULL;
     s_history_add("Initial state");
     undo_pos = history->next;
-    //s_restore_state((s_state *)history->data);
+    s_restore_state((s_state *)history->data);
     last_changed = S_LOAD;
 }
 
@@ -380,7 +380,7 @@ void s_undo()
         if (crc[0] == crc[1]) set_scene_button (scene);
       }
 
-  //  set_EQ_curve_values (0, 0.0);
+    set_EQ_curve_values (0, 0.0);
     last_changed = S_LOAD;
 }
 
@@ -425,7 +425,7 @@ void s_redo()
                 set_scene_warning_button (scene);
               }
           }
-   //     set_EQ_curve_values (0, 0.0);
+        set_EQ_curve_values (0, 0.0);
       }
 }
 
@@ -453,7 +453,7 @@ void s_crossfade_to_state(s_state *state, float time)
 	 * the endpoint */
 	s_target[i] = state->value[i];
 	s_duration[i] = duration;
-	//s_set_events(i, state->value[i]);
+	s_set_events(i, state->value[i]);
     }
     suppress_feedback--;
 }
@@ -543,8 +543,8 @@ void s_save_session (const gchar *fname)
     s_save_global_float(doc, "ct", crossfade_time);
     s_save_global_float(doc, "inwl", intrim_inmeter_get_warn());
     s_save_global_float(doc, "outwl", intrim_outmeter_get_warn());
-  //  s_save_global_float(doc, "lgain", hdeq_get_lower_gain());
-  //  s_save_global_float(doc, "hgain", hdeq_get_upper_gain());
+    s_save_global_float(doc, "lgain", hdeq_get_lower_gain());
+    s_save_global_float(doc, "hgain", hdeq_get_upper_gain());
 
     s_save_global_int(doc, "eq bypass", process_get_bypass_state (EQ_BYPASS));
     s_save_global_int(doc, "comp bypass0", process_get_bypass_state (LOW_COMP_BYPASS));
@@ -758,9 +758,9 @@ void s_load_session (const gchar *fname)
 
     process_set_spec_mode (gp.mode);
     set_spectrum_freq (gp.freq);
- //   hdeq_set_upper_gain (gp.hgain);
+    hdeq_set_upper_gain (gp.hgain);
     geq_set_range (gtk_adjustment_get_lower(geq_get_adjustment(0)), gp.hgain);
- //   hdeq_set_lower_gain (gp.lgain);
+    hdeq_set_lower_gain (gp.lgain);
     geq_set_range (gp.lgain, gtk_adjustment_get_upper(geq_get_adjustment(0)));
     s_set_crossfade_time (gp.ct);
     intrim_inmeter_set_warn (gp.inwl);
@@ -832,9 +832,9 @@ void s_load_session (const gchar *fname)
     if (!override_limiter_default) process_set_limiter_plugin (gp.limiter_plugin);
     override_limiter_default = FALSE;
 
-
-  //  hdeq_set_xover ();
-  //  set_EQ_curve_values (0, 0.0);
+	if(gui_mode == 0) // Default mode
+		hdeq_set_xover ();
+    set_EQ_curve_values (0, 0.0);
 
     s_clear_history();
     pref_set_all_values ();

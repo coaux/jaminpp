@@ -68,24 +68,24 @@ void bind_spectrum()
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
     for (i = 0; i < BANDS; i++) {
-	vbox = gtk_vbox_new(FALSE, 1);
-	gtk_widget_show(vbox);
-	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+		vbox = gtk_vbox_new(FALSE, 1);
+		gtk_widget_show(vbox);
+		gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 
-	adjustment[i] = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 
-                                                          LOWER_SPECTRUM_DB, 
-                                                          UPPER_SPECTRUM_DB,
-                                                          0.0, 0.0, 0.0));
-	meter = gtk_meter_new(adjustment[i], GTK_METER_UP,GTK_METERSCALE_TOP,LOWER_SPECTRUM_DB, UPPER_SPECTRUM_DB);
-	gtk_meter_set_adjustment(GTK_METER(meter), adjustment[i]);
-	//gtk_widget_set_usize(GTK_WIDGET(meter), 14, -1);
-//	gtk_meter_set_warn_point(GTK_METER(meter), 0.0);
-	gtk_widget_show(meter);
-	gtk_box_pack_start(GTK_BOX(vbox), meter, TRUE, TRUE, 0);
+		adjustment[i] = GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 
+															  LOWER_SPECTRUM_DB, 
+															  UPPER_SPECTRUM_DB,
+															  0.0, 0.0, 0.0));
+		meter = gtk_meter_new(adjustment[i], GTK_METER_UP,GTK_METERSCALE_TOP,LOWER_SPECTRUM_DB, UPPER_SPECTRUM_DB);
+		gtk_meter_set_adjustment(GTK_METER(meter), adjustment[i]);
+		//gtk_widget_set_usize(GTK_WIDGET(meter), 14, -1);
+	//	gtk_meter_set_warn_point(GTK_METER(meter), 0.0);
+		gtk_widget_show(meter);
+		gtk_box_pack_start(GTK_BOX(vbox), meter, TRUE, TRUE, 0);
 
-	label = make_mini_label(band_lbls[i]);
-	gtk_widget_show(label);
-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+		label = make_mini_label(band_lbls[i]);
+		gtk_widget_show(label);
+		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
     }
 
     vbox = gtk_vbox_new(FALSE, 1);
@@ -101,34 +101,34 @@ void bind_spectrum()
 
     /* Calcuate the centre frequency for each band */
     for (band=0; band<BANDS; band++) {
-	band_freq[band] = 1000.0 * pow(10.0, (double)(band-16) * 0.1);
-	//printf("band %d is at %f Hz\n", band, band_freq[band]);
-	band_bin_count[band] = 0;
+		band_freq[band] = 1000.0 * pow(10.0, (double)(band-16) * 0.1);
+		//printf("band %d is at %f Hz\n", band, band_freq[band]);
+		band_bin_count[band] = 0;
     }
 
     for (bin=0; bin<BINS/2; bin++) {
-	const float bin_freq = (bin + 0.5f) * sample_rate / BINS;
-	int nearest_band = 0;
-	float nearest_dist = 9999999.0f;
-	for (band=0; band<BANDS; band++) {
-	    if (fabs(bin_freq - band_freq[band]) < nearest_dist) {
-		nearest_band = band;
-		nearest_dist = fabs(bin_freq - band_freq[band]);
-	    }
-	}
-	bin_bands[bin] = nearest_band;
-	//printf("bin %d (%f Hz) is nearest band %d (%f Hz)\n", bin, bin_freq, nearest_band, band_freq[nearest_band]);
-	band_bin_count[nearest_band]++;
+		const float bin_freq = (bin + 0.5f) * sample_rate / BINS;
+		int nearest_band = 0;
+		float nearest_dist = 9999999.0f;
+		for (band=0; band<BANDS; band++) {
+			if (fabs(bin_freq - band_freq[band]) < nearest_dist) {
+			nearest_band = band;
+			nearest_dist = fabs(bin_freq - band_freq[band]);
+			}
+		}
+		bin_bands[bin] = nearest_band;
+		//printf("bin %d (%f Hz) is nearest band %d (%f Hz)\n", bin, bin_freq, nearest_band, band_freq[nearest_band]);
+		band_bin_count[nearest_band]++;
     }
 
     for (band=0; band<BANDS; band++) {
-	if (band_bin_count[band] == 0) {
-	    band_bin[band] = band_freq[band] * BINS / sample_rate;
-	    //printf("band %d is unassigned, use bin %d\n", band, band_bin[band]);
-	} else {
-	    /* Mark for no reverse lookup */
-	    band_bin[band] = -1;
-	}
+		if (band_bin_count[band] == 0) {
+			band_bin[band] = band_freq[band] * BINS / sample_rate;
+			//printf("band %d is unassigned, use bin %d\n", band, band_bin[band]);
+		} else {
+			/* Mark for no reverse lookup */
+			band_bin[band] = -1;
+		}
     }
 }
 
@@ -146,7 +146,7 @@ gboolean spectrum_update(gpointer data)
     page = get_current_notebook1_page ();
     count = BINS / 2;
 
-    if (page == 2) {
+    if (page == 2) { // geq tab
       for (i=0; i<BANDS; i++) {
         levels[i] = 0.0f;
       }
@@ -163,7 +163,7 @@ gboolean spectrum_update(gpointer data)
         gtk_adjustment_set_value(adjustment[i], lin2db(levels[i]));
       }
     }
-    else if (page == 0) {
+    else if (page == 0) { // hdeq tab
       for (i=0; i<BANDS; i++) {
         levels[i] = 0.0f;
       }

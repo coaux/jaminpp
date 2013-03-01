@@ -223,7 +223,7 @@ configure: failed program was:
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE_URL ""
 | #define PACKAGE "jamin"
-| #define VERSION "0.98.7"
+| #define VERSION "0.98.8"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 configure:5410: result: gcc -E
@@ -242,7 +242,7 @@ configure: failed program was:
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE_URL ""
 | #define PACKAGE "jamin"
-| #define VERSION "0.98.7"
+| #define VERSION "0.98.8"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 configure:5473: checking for grep that handles long lines and -e
@@ -427,7 +427,7 @@ configure:12399: checking how to hardcode library paths into programs
 configure:12424: result: immediate
 configure:12518: checking for shl_load
 configure:12518: gcc -o conftest -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED   conftest.c  >&5
-/tmp/ccv3qPXC.o: In function `main':
+/tmp/cc5Fo8pq.o: In function `main':
 conftest.c:(.text+0xa): undefined reference to `shl_load'
 collect2: error: ld returned 1 exit status
 configure:12518: $? = 1
@@ -440,7 +440,7 @@ configure: failed program was:
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE_URL ""
 | #define PACKAGE "jamin"
-| #define VERSION "0.98.7"
+| #define VERSION "0.98.8"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -507,7 +507,7 @@ configure: failed program was:
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE_URL ""
 | #define PACKAGE "jamin"
-| #define VERSION "0.98.7"
+| #define VERSION "0.98.8"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -539,7 +539,7 @@ configure: failed program was:
 configure:12556: result: no
 configure:12561: checking for dlopen
 configure:12561: gcc -o conftest -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED   conftest.c  >&5
-/tmp/ccX2gbGY.o: In function `main':
+/tmp/cckWvMGC.o: In function `main':
 conftest.c:(.text+0xa): undefined reference to `dlopen'
 collect2: error: ld returned 1 exit status
 configure:12561: $? = 1
@@ -552,7 +552,7 @@ configure: failed program was:
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE_URL ""
 | #define PACKAGE "jamin"
-| #define VERSION "0.98.7"
+| #define VERSION "0.98.8"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -615,7 +615,7 @@ configure:12801: $? = 0
 configure:12819: result: yes
 configure:12824: checking whether a statically linked program can dlopen itself
 configure:12904: gcc -o conftest -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED  -DHAVE_DLFCN_H  -Wl,--export-dynamic -static conftest.c -ldl  >&5
-/tmp/ccANamvt.o: In function `main':
+/tmp/cc0XwLQO.o: In function `main':
 conftest.c:(.text+0x1e): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
 /usr/bin/ld: dynamic STT_GNU_IFUNC symbol `strcmp' with pointer equality in `/usr/lib/gcc/x86_64-linux-gnu/4.7/../../../x86_64-linux-gnu/libc.a(strcmp.o)' can not be used when making an executable; recompile with -fPIE and relink with -pie
 collect2: error: ld returned 1 exit status
@@ -685,7 +685,7 @@ configure:13957: $? = 0
 configure:13966: result: yes
 configure:13977: checking for jack_create_thread in -ljack
 configure:14002: gcc -o conftest -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED   conftest.c -ljack  -lpthread  >&5
-/tmp/cc6fcnxE.o: In function `main':
+/tmp/ccDa12n8.o: In function `main':
 conftest.c:(.text+0xa): undefined reference to `jack_create_thread'
 collect2: error: ld returned 1 exit status
 configure:14002: $? = 1
@@ -698,7 +698,7 @@ configure: failed program was:
 | #define PACKAGE_BUGREPORT ""
 | #define PACKAGE_URL ""
 | #define PACKAGE "jamin"
-| #define VERSION "0.98.7"
+| #define VERSION "0.98.8"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -1151,7 +1151,7 @@ STRIP='strip'
 USE_NLS='yes'
 USE_OSC_FALSE=''
 USE_OSC_TRUE='#'
-VERSION='0.98.7'
+VERSION='0.98.8'
 XGETTEXT='/usr/bin/xgettext'
 XML_CFLAGS='-I/usr/include/libxml2  '
 XML_LIBS='-lxml2  '
@@ -1219,7 +1219,7 @@ target_alias=''
 #define PACKAGE_BUGREPORT ""
 #define PACKAGE_URL ""
 #define PACKAGE "jamin"
-#define VERSION "0.98.7"
+#define VERSION "0.98.8"
 #define STDC_HEADERS 1
 #define HAVE_SYS_TYPES_H 1
 #define HAVE_SYS_STAT_H 1
