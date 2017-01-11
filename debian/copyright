@@ -34,8 +34,8 @@ Files: ./src/callbacks.c,
 	./src/main.h,
 	./src/process.c
 Copyright: 2003, Jack O'Quin
-Copyright: 2003, Jan C. Depner
-Copyright: 2003, Steve Harris <steve@plugin.org.uk>
+ 2003, Jan C. Depner
+ 2003, Steve Harris <steve@plugin.org.uk>
 License: GPL-2+
 
 Files: ./compile,
