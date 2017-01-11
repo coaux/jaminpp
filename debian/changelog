@@ -1,3 +1,10 @@
+jamin (0.97.14~cvs~81203-4.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Pass --add-missing to automake (Closes: #818390)
+
+ -- Helmut Grohne <helmut@subdivi.de>  Thu, 15 Dec 2016 09:38:51 +0100
+
 jamin (0.97.14~cvs~81203-4) unstable; urgency=low
 
   * Team upload.
