@@ -97,6 +97,7 @@ void bind_limiter()
     scale = lookup_widget(main_window, "boost_scale");
     s_set_adjustment(S_BOOST, gtk_range_get_adjustment(GTK_RANGE(scale)));
     s_set_callback(S_BOOST, boost_changed);
+   
 }
 
 void li_changed(int id, float value)

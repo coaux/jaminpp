@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: callbacks.c,v 1.179 2008/12/03 03:22:03 kotau Exp $
+ *  $Id: callbacks.c,v 1.181 2013/02/09 15:47:29 kotau Exp $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -41,10 +41,11 @@
 #include "intrim.h"
 #include "compressor-ui.h"
 #include "gtkmeter.h"
-#include "gtkmeterscale.h"
+//#include "gtkmeterscale.h"
 #include "state.h"
 #include "db.h"
 #include "presets-ui.h"
+#include "multiout-ui.h"
 #include "status-ui.h"
 #include "limiter-ui.h"
 #include "io-menu.h"
@@ -234,12 +235,12 @@ on_window1_show                        (GtkWidget       *widget,
 
 
 gboolean
-on_EQ_curve_expose_event               (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_EQ_curve_draw             (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-    hdeq_curve_exposed (widget, event);
-
+//    hdeq_curve_exposed (widget, event);
+	hdeq_curve_draw (widget, cr, data);
     return FALSE;
 }
 
@@ -322,18 +323,18 @@ void
 on_lim_out_trim_scale_value_changed        (GtkRange        *range,
                                         gpointer         user_data)
 {
-    s_set_value_ui(S_LIM_LIMIT,
-		    gtk_range_get_adjustment(GTK_RANGE(range))->value);
+    s_set_value_ui(S_LIM_LIMIT,  
+		    gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range))));
 }
 
 
 
 gboolean
-on_comp1_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_comp1_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-    comp_curve_expose (widget, 0);
+   comp_curve_draw (widget, cr, 0);
 
     return FALSE;
 }
@@ -348,11 +349,11 @@ on_comp1_curve_realize                 (GtkWidget       *widget,
 
 
 gboolean
-on_comp2_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_comp2_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-    comp_curve_expose (widget, 1);
+    comp_curve_draw (widget, cr, 1);
 
     return FALSE;
 }
@@ -367,11 +368,11 @@ on_comp2_curve_realize                 (GtkWidget       *widget,
 
 
 gboolean
-on_comp3_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data)
+on_comp3_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data)
 {
-    comp_curve_expose (widget, 2);
+    comp_curve_draw (widget, cr, 2);
 
     return FALSE;
 }
@@ -381,7 +382,7 @@ void
 on_comp3_curve_realize                 (GtkWidget       *widget,
                                         gpointer         user_data)
 {
-    comp_curve_realize (widget, 2);
+	comp_curve_realize (widget, 2);
 }
 
 
@@ -422,7 +423,7 @@ on_low_curve_box_leave_notify_event    (GtkWidget       *widget,
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    draw_comp_curve (0);
+    //draw_comp_curve (0);
 
     comp_box_leave (0);
 
@@ -435,7 +436,7 @@ on_mid_curve_box_leave_notify_event    (GtkWidget       *widget,
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    draw_comp_curve (1);
+  //  draw_comp_curve (1);
 
     comp_box_leave (1);
 
@@ -448,7 +449,7 @@ on_high_curve_box_leave_notify_event   (GtkWidget       *widget,
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    draw_comp_curve (2);
+  //  draw_comp_curve (2);
 
     comp_box_leave (2);
 
@@ -566,22 +567,40 @@ make_meter (gchar *widget_name, gchar *string1, gchar *string2,
 {
     GtkWidget *ret;
     gint dir = GTK_METER_UP;
+    int sides = GTK_METERSCALE_TOP;
     GtkAdjustment *adjustment = (GtkAdjustment*) gtk_adjustment_new (0.0,
-		    (float)int1, (float)int2, 0.0, 0.0, 0.0);
+                    (float)int1, (float)int2, 0.0, 0.0, 0.0);
 
     if (!string1 || !strcmp(string1, "up")) {
         dir = GTK_METER_UP;
     } else if (!strcmp(string1, "down")) {
-	dir = GTK_METER_DOWN;
+        dir = GTK_METER_DOWN;
     } else if (!strcmp(string1, "left")) {
-	dir = GTK_METER_LEFT;
+        dir = GTK_METER_LEFT;
     } else if (!strcmp(string1, "right")) {
-	dir = GTK_METER_RIGHT;
+        dir = GTK_METER_RIGHT;
+    }
+  
+
+    if (string1 && strstr(string1, "left")) {
+        sides = GTK_METERSCALE_LEFT;
+    }
+    if (string1 && strstr(string1, "right")) {
+        sides = GTK_METERSCALE_RIGHT;
+    }
+    if (string1 && strstr(string1, "top")) {
+        sides = GTK_METERSCALE_TOP;
+    }
+    if (string1 && strstr(string1, "bottom")) {
+        sides = GTK_METERSCALE_BOTTOM;
     }
 
-    ret = gtk_meter_new(adjustment, dir);
+    ret = gtk_meter_new(adjustment, dir, sides, int1, int2);
+    gtk_meter_set_adjustment(GTK_METER (ret), adjustment);
 
     return ret;
+
+  
 }
 
 
@@ -592,7 +611,7 @@ make_mscale (gchar *widget_name, gchar *string1, gchar *string2,
     int sides = 0;
     GtkWidget *ret;
 
-    if (string1 && strstr(string1, "left")) {
+ /*   if (string1 && strstr(string1, "left")) {
 	sides |= GTK_METERSCALE_LEFT;
     }
     if (string1 && strstr(string1, "right")) {
@@ -608,6 +627,8 @@ make_mscale (gchar *widget_name, gchar *string1, gchar *string2,
     ret = gtk_meterscale_new(sides, int1, int2);
 
     return ret;
+    
+*/ 
 }
 
 
@@ -640,7 +661,7 @@ on_lim_lh_scale_value_changed          (GtkRange        *range,
                                         gpointer         user_data)
 {
   s_set_value_ui(S_LIM_TIME,
-                 gtk_range_get_adjustment(GTK_RANGE(range))->value);
+                 gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range))));
 }
 
 void
@@ -650,7 +671,7 @@ on_release_val_label_realize           (GtkWidget       *widget,
     GtkRequisition size;
 
     gtk_widget_size_request(widget, &size);
-    gtk_widget_set_usize(widget, size.width, -1);
+ //   gtk_widget_set_usize(widget, size.width, -1);
 }
 
 void
@@ -658,7 +679,7 @@ on_hscale_1_l_value_changed               (GtkRange        *range,
                                         gpointer         user_data)
 {
   s_set_value_ui(S_STEREO_WIDTH(0),
-                 gtk_range_get_adjustment(GTK_RANGE(range))->value);
+                 gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range))));
 }
 
 
@@ -676,7 +697,7 @@ on_hscale_1_m_value_changed               (GtkRange        *range,
                                         gpointer         user_data)
 {
   s_set_value_ui(S_STEREO_WIDTH(1),
-                 gtk_range_get_adjustment(GTK_RANGE(range))->value);
+                 gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range))));
 }
 
 
@@ -694,7 +715,7 @@ on_hscale_1_h_value_changed               (GtkRange        *range,
                                         gpointer         user_data)
 {
   s_set_value_ui(S_STEREO_WIDTH(2),
-                 gtk_range_get_adjustment(GTK_RANGE(range))->value);
+                 gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range))));
 }
 
 
@@ -712,7 +733,7 @@ on_lim_input_hscale_value_changed      (GtkRange        *range,
                                         gpointer         user_data)
 {
   s_set_value_ui(S_LIM_INPUT,
-                 gtk_range_get_adjustment(GTK_RANGE(range))->value);
+                 gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range))));
 }
 
 
@@ -729,32 +750,10 @@ void
 on_optionmenu1_realize                 (GtkWidget       *widget,
                                         gpointer         user_data)
 {
-    gtk_option_menu_set_history (GTK_OPTION_MENU(widget), 1);
+//    gtk_option_menu_set_history (GTK_OPTION_MENU(widget), 1);
 }
 
 
-void
-on_high_meter_lbl_realize              (GtkWidget       *widget,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-on_low_meter_lbl_realize               (GtkWidget       *widget,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-on_mid_meter_lbl_realize               (GtkWidget       *widget,
-                                        gpointer         user_data)
-{
-
-}
 
 gboolean
 backward_transport                     (GtkWidget       *widget,
@@ -821,7 +820,7 @@ on_boost_scale_value_changed           (GtkRange        *range,
                                         gpointer         user_data)
 {
     s_set_value_ui(S_BOOST,
-                   gtk_range_get_adjustment(GTK_RANGE(range))->value);
+                   gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range))));
 }
 
 
@@ -1087,7 +1086,7 @@ on_EQ_curve_event_box_enter_notify_event
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    help_ptr = _(hdeq_help);
+  //  help_ptr = _(hdeq_help);
 
     return FALSE;
 }
@@ -1155,7 +1154,7 @@ on_comp_curve_eventbox_enter_notify_event
                                         GdkEventCrossing *event,
                                         gpointer         user_data)
 {
-    help_ptr = _(comp_curve_help);
+ //   help_ptr = _(comp_curve_help);
 
     return FALSE;
 }
@@ -1254,7 +1253,7 @@ on_scenes_eventbox_enter_notify_event  (GtkWidget       *widget,
 
 void
 on_notebook1_switch_page               (GtkNotebook     *notebook,
-                                        GtkNotebookPage *page,
+                                        GtkWidget *page,
                                         guint            page_num,
                                         gpointer         user_data)
 {
@@ -1543,7 +1542,7 @@ on_window1_key_press_event             (GtkWidget       *widget,
 
     if (force_keypress_help)
       {
-        if (key == GDK_F1 && state == GDK_SHIFT_MASK)   
+        if (key == GDK_KEY_F1 && state == GDK_SHIFT_MASK)   
           message (GTK_MESSAGE_INFO, help_ptr);
 	force_keypress_help = FALSE;
       }
@@ -1562,7 +1561,7 @@ on_window1_key_press_event             (GtkWidget       *widget,
 
         /*  Bypass  */
 
-      case GDK_b:
+      case GDK_KEY_b:
         tmp = gtk_toggle_button_get_active (l_global_bypass);
         gtk_toggle_button_set_active (l_global_bypass, (!tmp));
         break;
@@ -1570,184 +1569,184 @@ on_window1_key_press_event             (GtkWidget       *widget,
 
         /*  Toggle play  */
 
-      case GDK_space:
+      case GDK_KEY_space:
 	transport_toggle_play();
         break;
 
 
         /*  Rewind  */
 
-      case GDK_Home:
+      case GDK_KEY_Home:
 	transport_set_time(0.0);
         break;
 
 	/*  Skip backward */
 
-      case GDK_less:
+      case GDK_KEY_less:
 	transport_skip(-5.0);
         break;
 
 
         /*  Skip forward  */
 
-      case GDK_greater:
+      case GDK_KEY_greater:
 	transport_skip(5.0);
         break;
 
 
         /*  Select scene 1  */
 
-      case GDK_1:
-      case GDK_KP_1:
+      case GDK_KEY_1:
+      case GDK_KEY_KP_1:
         scene = 0;
         break;
 
 
         /*  Select scene 2  */
 
-      case GDK_2:
-      case GDK_KP_2:
+      case GDK_KEY_2:
+      case GDK_KEY_KP_2:
         scene = 1;
         break;
 
 
         /*  Select scene 3  */
 
-      case GDK_3:
-      case GDK_KP_3:
+      case GDK_KEY_3:
+      case GDK_KEY_KP_3:
         scene = 2;
         break;
 
 
         /*  Select scene 4  */
 
-      case GDK_4:
-      case GDK_KP_4:
+      case GDK_KEY_4:
+      case GDK_KEY_KP_4:
         scene = 3;
         break;
 
 
         /*  Select scene 5  */
 
-      case GDK_5:
-      case GDK_KP_5:
+      case GDK_KEY_5:
+      case GDK_KEY_KP_5:
         scene = 4;
         break;
 
 
         /*  Select scene 6  */
 
-      case GDK_6:
-      case GDK_KP_6:
+      case GDK_KEY_6:
+      case GDK_KEY_KP_6:
         scene = 5;
         break;
 
  
         /*  Select scene 7  */
 
-      case GDK_7:
-      case GDK_KP_7:
+      case GDK_KEY_7:
+      case GDK_KEY_KP_7:
         scene = 6;
         break;
 
  
         /*  Select scene 8  */
 
-      case GDK_8:
-      case GDK_KP_8:
+      case GDK_KEY_8:
+      case GDK_KEY_KP_8:
         scene = 7;
         break;
 
  
         /*  Select scene 9  */
 
-      case GDK_9:
-      case GDK_KP_9:
+      case GDK_KEY_9:
+      case GDK_KEY_KP_9:
         scene = 8;
         break;
 
  
         /*  Select scene 10  */
 
-      case GDK_0:
-      case GDK_KP_0:
+      case GDK_KEY_0:
+      case GDK_KEY_KP_0:
         scene = 9;
         break;
 
  
         /*  Select scene 11  */
 
-      case GDK_exclam:
+      case GDK_KEY_exclam:
         scene = 10;
         break;
 
 
         /*  Select scene 12  */
 
-      case GDK_at:
+      case GDK_KEY_at:
         scene = 11;
         break;
 
 
         /*  Select scene 13  */
 
-      case GDK_numbersign:
+      case GDK_KEY_numbersign:
         scene = 12;
         break;
 
 
         /*  Select scene 14  */
 
-      case GDK_dollar:
+      case GDK_KEY_dollar:
         scene = 13;
         break;
 
 
         /*  Select scene 15  */
 
-      case GDK_percent:
+      case GDK_KEY_percent:
         scene = 14;
         break;
 
 
         /*  Select scene 16  */
 
-      case GDK_asciicircum:
+      case GDK_KEY_asciicircum:
         scene = 15;
         break;
 
 
         /*  Select scene 17  */
 
-      case GDK_ampersand:
+      case GDK_KEY_ampersand:
         scene = 16;
         break;
 
 
         /*  Select scene 18  */
 
-      case GDK_asterisk:
+      case GDK_KEY_asterisk:
         scene = 17;
         break;
 
 
         /*  Select scene 19  */
 
-      case GDK_parenleft:
+      case GDK_KEY_parenleft:
         scene = 18;
         break;
 
 
         /*  Select scene 20  */
 
-      case GDK_parenright:
+      case GDK_KEY_parenright:
         scene = 19;
         break;
 
 
         /*  Switch to tab 1 (HDEQ) unless we're getting help.  */
 
-      case GDK_F1:
+      case GDK_KEY_F1:
         if (state != GDK_SHIFT_MASK) 
             gtk_notebook_set_current_page (l_notebook1, 0);
         break;
@@ -1755,28 +1754,28 @@ on_window1_key_press_event             (GtkWidget       *widget,
 
         /*  Switch to tab 2 (30 band EQ)  */
 
-      case GDK_F2:
+      case GDK_KEY_F2:
         gtk_notebook_set_current_page (l_notebook1, 1);
         break;
 
 
         /*  Switch to tab 3 (Spectrum)  */
 
-      case GDK_F3:
+      case GDK_KEY_F3:
         gtk_notebook_set_current_page (l_notebook1, 2);
         break;
 
 
         /*  Switch to tab 4 (Compressor curves)  */
 
-      case GDK_F4:
+      case GDK_KEY_F4:
         gtk_notebook_set_current_page (l_notebook1, 3);
         break;
 
 
         /*  Save As session  */
 
-      case GDK_a:
+      case GDK_KEY_a:
         if (state == GDK_CONTROL_MASK) on_save_as1_activate (NULL, NULL);
         break;
       }
@@ -2437,7 +2436,7 @@ on_ft_bias_a_value_changed             (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_bias_a_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_bias_a_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2447,7 +2446,7 @@ on_ft_bias_b_value_changed             (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_bias_b_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_bias_b_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2457,7 +2456,7 @@ on_ft_rez_lp_a_value_changed           (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_rez_lp_a_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_rez_lp_a_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2467,7 +2466,7 @@ on_ft_rez_hp_a_value_changed           (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_rez_hp_a_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_rez_hp_a_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2477,7 +2476,7 @@ on_ft_rez_lp_b_value_changed           (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_rez_lp_b_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_rez_lp_b_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2487,7 +2486,7 @@ on_ft_rez_hp_b_value_changed           (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_rez_hp_b_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_rez_hp_b_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2497,7 +2496,7 @@ on_ft_bias_a_hp_value_changed          (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_bias_a_hp_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_bias_a_hp_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2507,7 +2506,7 @@ on_ft_bias_b_hp_value_changed          (GtkRange        *range,
                                         gpointer         user_data)
 {
 #ifdef FILTER_TUNING
-  ft_bias_b_hp_val = gtk_range_get_adjustment(GTK_RANGE(range))->value;
+  ft_bias_b_hp_val = gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(range)));
 #endif
 }
 
@@ -2531,7 +2530,7 @@ on_MinGainSpin_value_changed           (GtkSpinButton   *spinbutton,
 
     hdeq_set_lower_gain (gain);
 
-    geq_set_range (gain, geq_get_adjustment(0)->upper);
+    geq_set_range (gain, gtk_adjustment_get_upper(geq_get_adjustment(0)));
 }
 
 
@@ -2546,7 +2545,7 @@ on_MaxGainSpin_value_changed           (GtkSpinButton   *spinbutton,
 
     hdeq_set_upper_gain (gain);
 
-    geq_set_range (geq_get_adjustment(0)->lower, gain);
+    geq_set_range (gtk_adjustment_get_lower(geq_get_adjustment(0)), gain);
 }
 
 
@@ -2842,20 +2841,30 @@ on_global_bypass_toggled               (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
   int state;
-
+  GtkToggleButton *togglebutton1;
 
   state = gtk_toggle_button_get_active(togglebutton);
 
   process_set_global_bypass (state);
 
+  if ( togglebutton == lookup_widget(presets_window, "checkbutton1")) 
+  {
+	  togglebutton1 = lookup_widget(main_window, "global_bypass");
+	  
+  } else {
+	  togglebutton1 = lookup_widget(presets_window, "checkbutton1");
+	  
+  }
 
   if (state) 
     {
       callbacks_blink_bypass_button (GLOBAL_BYPASS, 1);
+      gtk_toggle_button_set_active(togglebutton1, TRUE);
     }
   else
     {
       callbacks_blink_bypass_button (GLOBAL_BYPASS, -1);
+      gtk_toggle_button_set_active(togglebutton1, FALSE);
     }
 }
 
@@ -3027,6 +3036,7 @@ callbacks_blink_bypass_button (int button, int start)
         }
 
       gtk_widget_modify_bg ((GtkWidget *) l_global_bypass_event_box, GTK_STATE_NORMAL, &bypass);
+      gtk_widget_modify_bg (lookup_widget(presets_window, "global_bypass_event_box_presets"), GTK_STATE_NORMAL, &bypass);
       break;
     }
 } 
@@ -3052,7 +3062,7 @@ on_meter_text_button_press_event (GtkWidget       *widget,
                                   GdkEventButton  *event,
                                   gpointer         user_data)
 {
-  gtk_meter_reset_peak ((GtkMeter *) widget);
+ // gtk_meter_reset_peak ((GtkMeter *) widget);
 
   return FALSE;
 }
@@ -3249,7 +3259,7 @@ void
 on_logscale_scale_value_changed        (GtkRange        *range,
                                         gpointer         user_data)
 {
-  s_set_value_ui (S_LIM_LOGSCALE, gtk_range_get_adjustment (GTK_RANGE (range))->value);
+  s_set_value_ui (S_LIM_LOGSCALE, gtk_adjustment_get_value(gtk_range_get_adjustment (GTK_RANGE (range))));
 }
 
 gboolean
@@ -3290,24 +3300,41 @@ on_eButton1_button_press_event         (GtkWidget       *widget,
                                         gpointer         user_data)
 {
 	
-	if(global_gui  == 1)
-		global_gui = 0;
+	if(global_main_gui  == 1)
+		global_main_gui = 0;
 	else 
-		global_gui = 1;
+		global_main_gui = 1;
 	
-//	g_printerr("cllbk: clicked");
-	presets_ui_update ();
+//	g_print("cllbk: clicked");
+	presets_ui_show_main (widget);
 	
   return FALSE;
 }
 
 
+gboolean
+on_eButton2_button_press_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+	
+	if(global_multiout_gui  == 1)
+		global_multiout_gui = 0;
+	else 
+		global_multiout_gui = 1;
+	
+//	g_print("cllbk: clicked");
+	presets_ui_show_multiout (widget);
+	
+  return FALSE;
+}
+
 void
 on_presets_in_trim_scale_value_changed (GtkRange        *range,
                                         gpointer         user_data)
 {
-	s_set_value_ui(S_IN_GAIN, gtk_range_get_adjustment(range)->value);
-	gtk_range_set_value (GTK_RANGE(lookup_widget(main_window, "in_trim_scale")), gtk_range_get_adjustment(range)->value);
+	s_set_value_ui(S_IN_GAIN, gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
+	gtk_range_set_value (GTK_RANGE(lookup_widget(main_window, "in_trim_scale")), gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
 
 }
 
@@ -3316,8 +3343,8 @@ void
 on_presets_pan_scale_value_changed     (GtkRange        *range,
                                         gpointer         user_data)
 {
-	s_set_value_ui(S_IN_PAN, gtk_range_get_adjustment(range)->value);
-	gtk_range_set_value (GTK_RANGE(lookup_widget(main_window, "pan_scale")), gtk_range_get_adjustment(range)->value);
+	s_set_value_ui(S_IN_PAN, gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
+	gtk_range_set_value (GTK_RANGE(lookup_widget(main_window, "pan_scale")), gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
 }
 
 
@@ -3327,8 +3354,8 @@ on_presets_out_trim_scale_value_changed
                                         gpointer         user_data)
 {
 	
-    s_set_value_ui(S_OUT_GAIN, gtk_range_get_adjustment(range)->value);
-	gtk_range_set_value (GTK_RANGE(lookup_widget(main_window, "out_trim_scale")), gtk_range_get_adjustment(range)->value);
+    s_set_value_ui(S_OUT_GAIN, gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
+	gtk_range_set_value (GTK_RANGE(lookup_widget(main_window, "out_trim_scale")), gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
 }
 
 
@@ -3336,8 +3363,8 @@ void
 on_in_trim_scale_value_changed         (GtkRange        *range,
                                         gpointer         user_data)
 {
-    s_set_value_ui(S_IN_GAIN, gtk_range_get_adjustment(range)->value);
-	gtk_range_set_value (GTK_RANGE(lookup_widget(presets_window, "presets_in_trim_scale")), gtk_range_get_adjustment(range)->value);
+    s_set_value_ui(S_IN_GAIN, gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
+	gtk_range_set_value (GTK_RANGE(lookup_widget(presets_window, "presets_in_trim_scale")), gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
 
 }
 
@@ -3346,8 +3373,8 @@ void
 on_pan_scale_value_changed             (GtkRange        *range,
                                         gpointer         user_data)
 {
-    s_set_value_ui(S_IN_PAN, gtk_range_get_adjustment(range)->value);
-	gtk_range_set_value (GTK_RANGE(lookup_widget(presets_window, "presets_pan_scale")), gtk_range_get_adjustment(range)->value);
+    s_set_value_ui(S_IN_PAN, gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
+	gtk_range_set_value (GTK_RANGE(lookup_widget(presets_window, "presets_pan_scale")), gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
 
 }
 
@@ -3355,8 +3382,18 @@ void
 on_out_trim_scale_value_changed        (GtkRange        *range,
                                         gpointer         user_data)
 {
-    s_set_value_ui(S_OUT_GAIN, gtk_range_get_adjustment(range)->value);
-	gtk_range_set_value (GTK_RANGE(lookup_widget(presets_window, "presets_out_trim_scale")), gtk_range_get_adjustment(range)->value);
+    s_set_value_ui(S_OUT_GAIN, gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
+	gtk_range_set_value (GTK_RANGE(lookup_widget(presets_window, "presets_out_trim_scale")), gtk_adjustment_get_value(gtk_range_get_adjustment(range)));
 }
 
+
+gboolean
+on_window4_delete_event                (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data)
+{
+    clean_quit ();
+	
+  return FALSE;
+}
 

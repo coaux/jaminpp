@@ -32,9 +32,9 @@ on_EQ_curve_configure_event            (GtkWidget       *widget,
                                         gpointer         user_data);
 
 gboolean
-on_EQ_curve_expose_event               (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_EQ_curve_draw               (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_EQ_curve_realize                    (GtkWidget       *widget,
@@ -79,27 +79,27 @@ on_pan_scale_value_changed             (GtkRange        *range,
                                         gpointer         user_data);
 
 gboolean
-on_comp1_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_comp1_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_comp1_curve_realize                 (GtkWidget       *widget,
                                         gpointer         user_data);
 
 gboolean
-on_comp2_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_comp2_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_comp2_curve_realize                 (GtkWidget       *widget,
                                         gpointer         user_data);
 
 gboolean
-on_comp3_curve_expose_event            (GtkWidget       *widget,
-                                        GdkEventExpose  *event,
-                                        gpointer         user_data);
+on_comp3_curve_draw            (GtkWidget       *widget,
+                                        cairo_t *cr,
+                                        gpointer         data);
 
 void
 on_comp3_curve_realize                 (GtkWidget       *widget,
@@ -629,7 +629,7 @@ on_scenes_eventbox_enter_notify_event  (GtkWidget       *widget,
 
 void
 on_notebook1_switch_page               (GtkNotebook     *notebook,
-                                        GtkNotebookPage *page,
+                                        GtkWidget *page,
                                         guint            page_num,
                                         gpointer         user_data);
 
@@ -1334,24 +1334,6 @@ on_show_help                           (GtkWidget       *widget,
                                         GtkWidgetHelpType  help_type,
                                         gpointer         user_data);
 
-void
-on_presets_in_trim_scale_value_changed (GtkRange        *range,
-                                        gpointer         user_data);
-
-void
-on_presets_pan_scale_value_changed     (GtkRange        *range,
-                                        gpointer         user_data);
-
-gboolean
-on_eButton1_button_press_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-void
-on_presets_out_trim_scale_value_changed
-                                        (GtkRange        *range,
-                                        gpointer         user_data);
-
 gboolean
 on_window3_delete_event                (GtkWidget       *widget,
                                         GdkEvent        *event,
@@ -1362,7 +1344,12 @@ gboolean
 on_eButton1_button_press_event         (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data);
-
+                                        
+gboolean
+on_eButton2_button_press_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+                                        
 void
 on_presets_in_trim_scale_value_changed (GtkRange        *range,
                                         gpointer         user_data);
@@ -1376,4 +1363,8 @@ on_presets_out_trim_scale_value_changed
                                         (GtkRange        *range,
                                         gpointer         user_data);
 
+gboolean
+on_window4_delete_event                (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data);
 

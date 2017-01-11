@@ -52,7 +52,7 @@
 
     We're trying to stay away from extern'ed global variables as much as
     possible (I've been tainted by C++  ;-)  If you need to access a variable
-    that is used here (set or get) write a liitle one line function that
+    that is used here (set or get) write a little one line function that
     returns or sets it.  You can call it hdeq_set_... or hdeq_get_...  Yes,
     there is some overhead associated with it but it makes tracking things
     much easier.
@@ -75,7 +75,7 @@
 #include <math.h>
 #include <string.h>
 #include <gtk/gtk.h>
-
+//#include <cairo.h>
 
 #include "hdeq.h"
 #include "main.h"
@@ -85,8 +85,8 @@
 #include "support.h"
 #include "intrim.h"
 #include "compressor-ui.h"
-#include "gtkmeter.h"
-#include "gtkmeterscale.h"
+//#include "gtkmeter.h"
+//#include "gtkmeterscale.h"
 #include "state.h"
 #include "db.h"
 #include "transport.h"
@@ -136,7 +136,7 @@ static GtkMenu           *HDEQ_menu;
     avoid using XOR graphics and all of the pain and agony that entails
     ;-)  */
 
-static GdkPixmap *hdeq_pixmap = NULL;
+//static GdkPixmap *hdeq_pixmap = NULL;
 
 
 static GtkHScale       *l_low2mid, *l_mid2high;
@@ -144,10 +144,13 @@ static GtkWidget       *l_comp[3];
 static GtkLabel        *l_low2mid_lbl, *l_mid2high_lbl, *l_comp_lbl[3], 
                        *l_EQ_curve_lbl = NULL, *l_c_curve_lbl[3];
 static GtkDrawingArea  *l_EQ_curve, *l_comp_curve[3];
-static GdkDrawable     *EQ_drawable, *comp_drawable[3];
-static GdkGC           *EQ_gc, *comp_gc[3];
+//static GdkDrawable     *EQ_drawable, *comp_drawable[3];
+//static GdkGC           *EQ_gc, *comp_gc[3];
+static cairo_t 		   *EQ_cr, *comp_cr[3];
+static cairo_surface_t *EQ_surface, *comp_surface[3];
 static PangoContext    *comp_pc[3], *EQ_pc;
 static GtkAdjustment   *l_low2mid_adj;
+static GdkColor 	   *color;
 static float           EQ_curve_range_x, EQ_curve_range_y, EQ_curve_width,
                        EQ_curve_height, EQ_xinterp[EQ_INTERP + 1], EQ_start, 
                        EQ_end, EQ_interval, EQ_yinterp[EQ_INTERP + 1], 
@@ -339,14 +342,14 @@ void hdeq_low2mid_set (GtkRange *range)
         /*  This tells the state functions (state.c) not to do anything even 
             though we're going to move a GUI control.  */
 
-	s_suppress_push();
+		s_suppress_push();
 
         gtk_range_set_value ((GtkRange *) l_mid2high, value);
 
 
         /*  This lets the state functions behave normally again.  */
 
-	s_suppress_pop();
+		s_suppress_pop();
         gtk_widget_set_sensitive (l_comp[1], FALSE);
       }
     else
@@ -360,7 +363,7 @@ void hdeq_low2mid_set (GtkRange *range)
 
     l_low2mid_adj = gtk_range_get_adjustment (range);
 
-    if (value == l_low2mid_adj->lower)
+    if (value == gtk_adjustment_get_lower (l_low2mid_adj))
       {
         gtk_widget_set_sensitive (l_comp[0], FALSE);
       }
@@ -391,7 +394,7 @@ void hdeq_low2mid_set (GtkRange *range)
     gtk_label_set_use_markup (l_comp_lbl[1], TRUE);
     free(label);
 
-    lvalue = pow (10.0, l_low2mid_adj->lower);
+    lvalue = pow (10.0, gtk_adjustment_get_lower (l_low2mid_adj));
     mvalue = pow (10.0, value);
     label = g_strdup_printf(_("<b>Low : %d - %d</b>"), NINT (lvalue), NINT (mvalue));
     gtk_label_set_label (l_comp_lbl[0], label);
@@ -401,7 +404,7 @@ void hdeq_low2mid_set (GtkRange *range)
 
     /*  Replot the EQ curve (and set a few things at the same time).  */
 
-    draw_EQ_curve ();
+//    draw_EQ_curve ();
 
 
     /*  Draw the last spectrum curve if the update frequency is not 0.  */
@@ -410,18 +413,27 @@ void hdeq_low2mid_set (GtkRange *range)
       {
         /*  Set the foreground color for drawing the spectrum curve.  */
 
-        gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
-
+       // gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
+		color = get_color (HDEQ_SPECTRUM_COLOR);
+	//	cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+		
+	// cr = gdk_cairo_create (widget->window);	
+	//cairo_rectangle (cr, 0, length, width-1, 2);
+	//cairo_set_source_rgba (cr, 0.5,0.5,0.5, 1.0); 
+	//cairo_fill (cr);
+	//  cairo_destroy(cr);  
+		
+		
         for (i = 0 ; i < EQ_INTERP ; i++)
           {
-            if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
-                                  spectrum_x[i], spectrum_y[i]);
+        //    if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
+        //                          spectrum_x[i], spectrum_y[i]);
           }
 
 
             /*  Reset the foreground color to the text color.  */
 
-        gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
+       // gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
       }
 }
 
@@ -469,7 +481,7 @@ void hdeq_mid2high_set (GtkRange *range)
         compressor.  */
 
 
-    if (value == l_low2mid_adj->upper)
+    if (value == gtk_adjustment_get_upper (l_low2mid_adj))
       {
         gtk_widget_set_sensitive (l_comp[2], FALSE);
       }
@@ -500,7 +512,7 @@ void hdeq_mid2high_set (GtkRange *range)
     gtk_label_set_use_markup (l_comp_lbl[1], TRUE);
     free(label);
 
-    hvalue = pow (10.0, l_low2mid_adj->upper);
+    hvalue = pow (10.0, gtk_adjustment_get_upper (l_low2mid_adj));
     label = g_strdup_printf (_("<b>High : %d - %d</b>"), NINT (mvalue), NINT (hvalue));
     gtk_label_set_label (l_comp_lbl[2], label);
     gtk_label_set_use_markup (l_comp_lbl[2], TRUE);
@@ -509,7 +521,7 @@ void hdeq_mid2high_set (GtkRange *range)
 
     /*  Replot the EQ curve (and set a few things at the same time).  */
 
-    draw_EQ_curve ();
+ //   draw_EQ_curve ();
 
 
     /*  Draw the last spectrum curve if the update frequency is not 0.  */
@@ -518,18 +530,19 @@ void hdeq_mid2high_set (GtkRange *range)
       {
         /*  Set the foreground color for drawing the spectrum curve.  */
 
-        gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
-
+ //       gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
+		color = get_color (HDEQ_SPECTRUM_COLOR);
+//		cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
         for (i = 0 ; i < EQ_INTERP ; i++)
           {
-            if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
-                                  spectrum_x[i], spectrum_y[i]);
+       //     if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
+       //                           spectrum_x[i], spectrum_y[i]);
           }
 
 
             /*  Reset the foreground color to the text color.  */
 
-        gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
+     //   gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
       }
 }
 
@@ -600,8 +613,11 @@ hdeq_eqb_mod (GtkAdjustment *adj, gpointer user_data)
 
 static void logfreq2xpix (float log_freq, int *x)
 {
-  *x = NINT (((log_freq - l_low2mid_adj->lower) / EQ_curve_range_x) * 
+  *x = NINT (((log_freq - gtk_adjustment_get_lower (l_low2mid_adj)) / EQ_curve_range_x) * 
         EQ_curve_width);
+        
+  //      printf("%f, %f, %i, %i\n",log_freq, gtk_adjustment_get_lower (l_low2mid_adj),  EQ_curve_range_x, 
+  //      EQ_curve_width );
 }
 
 
@@ -649,24 +665,13 @@ static void loggain2ypix (float log_gain, int *y)
 void draw_EQ_spectrum_curve (float single_levels[])
 {
     int            i, bin;
-    float          step, range, freq;
-
+    float          step, range, freq;	
 
     /*  Don't update if we're drawing an EQ curve or we're moving a 
         crossover.  */
 
     if (!EQ_drawing && !xover_active)
       {
-
-        /*  Blast the pixmap containing all of the background elements to the widget.  */
-
-        gdk_draw_pixmap (EQ_drawable, EQ_gc, hdeq_pixmap, 0, 0, 0, 0, EQ_curve_width + 1,
-                         EQ_curve_height + 1);
-
-
-        /*  Set the foreground color for drawing the spectrum curve.  */
-
-        gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
 
 
         /*  Convert the single levels to db, plot, and save the pixel positions
@@ -695,16 +700,14 @@ void draw_EQ_spectrum_curve (float single_levels[])
 
             spectrum_y[i] = NINT (-(lin2db(single_levels[bin]) / EQ_SPECTRUM_RANGE) * 
                                   EQ_curve_height);
-
-            if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
-                                  spectrum_x[i], spectrum_y[i]);
+        
+			
           }
 
+		 gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
-        /*  Reset the foreground color to the text color.  */
-
-        gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
       }
+        
 }
 
 
@@ -745,15 +748,13 @@ static void set_EQ ()
 
 
     /*  Set EQ coefficients based on the hand-drawn curve.  */
-
-    geq_set_coefs (EQ_length, EQ_freq_xinterp, EQ_freq_yinterp);
-
+    	geq_set_coefs (EQ_length, EQ_freq_xinterp, EQ_freq_yinterp);
 
     /*  Set the graphic EQ sliders based on the hand-drawn curve.  */
-
-    geq_set_sliders (EQ_length, EQ_freq_xinterp, EQ_freq_yinterp);
-
-
+    	geq_set_sliders (EQ_length, EQ_freq_xinterp, EQ_freq_yinterp);
+	
+	//printf("%f, %f, %f\n",EQ_length, EQ_freq_xinterp, EQ_freq_yinterp);
+		
     EQ_mod = 0;
 }
 
@@ -807,8 +808,8 @@ void reset_hdeq ()
 
     /*  Redraw the EQ curve.  */
 
-    draw_EQ_curve ();
-
+//    draw_EQ_curve ();
+	gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
     /*  Set the scene warning button so that people will know to save it.  */
 
@@ -920,22 +921,29 @@ static void insert_notch ()
 /*  Draw the EQ curve.  This may be from the graphic EQ sliders if they have
     been modified.  Usually from the hand drawn EQ though.  */
 
-void draw_EQ_curve ()
+void draw_EQ_curve (cairo_t *EQ_cr)
 {
     int            i, x0 = 0, y0 = 0, x1, y1, inc;
     float          x[EQ_BANDS], y[EQ_BANDS];
-
-
+ 
     /*  If the EQ widget has not been realized (not visible), go away.  */
 
     if (!EQ_realized) return;
 
-
+	
     /*  Clear the curve drawing area.  */
 
-    gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_BACKGROUND_COLOR));
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, TRUE, 0, 0, EQ_curve_width + 1, EQ_curve_height + 1);
+    color = get_color (HDEQ_BACKGROUND_COLOR);
+    cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
 
+    cairo_rectangle (EQ_cr, 0, 0, EQ_curve_width + 1, EQ_curve_height + 1);
+    cairo_fill_preserve (EQ_cr);
+    
+    color = get_color (HDEQ_GRID_COLOR);
+	cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+
+	cairo_set_line_width (EQ_cr, 1.0);
+	cairo_stroke (EQ_cr);
 
     /*  Draw the grid lines.  First we get the latest and greatest GEQ gains
         and frequencies.  */
@@ -943,31 +951,22 @@ void draw_EQ_curve ()
     geq_get_freqs_and_gains (l_geq_freqs, l_geq_gains);
 
 
-    gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_GRID_COLOR));
-
-
-    /*  Box around the area.  */
-
-    gdk_gc_set_line_attributes (EQ_gc, 2, GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_MITER);
-    gdk_draw_line (hdeq_pixmap, EQ_gc, 1, 1, 1, EQ_curve_height);
-    gdk_draw_line (hdeq_pixmap, EQ_gc, 1, EQ_curve_height, EQ_curve_width, EQ_curve_height);
-    gdk_draw_line (hdeq_pixmap, EQ_gc, EQ_curve_width, EQ_curve_height, EQ_curve_width, 1);
-    gdk_draw_line (hdeq_pixmap, EQ_gc, EQ_curve_width, 1, 1, 1);
-
-
     /*  Frequency lines on log scale in X.  */
 
-    gdk_gc_set_line_attributes (EQ_gc, 1, GDK_LINE_SOLID, GDK_CAP_BUTT,
-        GDK_JOIN_MITER);
+ //   gdk_gc_set_line_attributes (EQ_gc, 1, GDK_LINE_SOLID, GDK_CAP_BUTT,
+ //       GDK_JOIN_MITER);
     i = ((int) (l_geq_freqs[0] + 10.0) / 10) * 10;
     inc = 10;
     while (i < l_geq_freqs[EQ_BANDS - 1])
       {
         for (x0 = i ; x0 <= inc * 10 ; x0 += inc)
           {
-            freq2xpix ((float) x0, &x1);
+				freq2xpix ((float) x0, &x1);
 
-            gdk_draw_line (hdeq_pixmap, EQ_gc, x1, 0, x1, EQ_curve_height);
+				cairo_move_to (EQ_cr, x1, 0); 
+				cairo_line_to (EQ_cr, x1, EQ_curve_height);
+				cairo_stroke (EQ_cr);
+
           }
         i = inc * 10;
         inc *= 10;
@@ -982,50 +981,56 @@ void draw_EQ_curve ()
       {
         if (!(i % inc))
           {
-            gain2ypix ((float) i, &y1);
+				gain2ypix ((float) i, &y1);
 
-            gdk_draw_line (hdeq_pixmap, EQ_gc, 0, y1, EQ_curve_width, y1);
+				cairo_move_to (EQ_cr, 0, y1); 
+				cairo_line_to (EQ_cr, EQ_curve_width, y1);
+				cairo_stroke (EQ_cr);
           }
       }
 
 
     /*  Add the crossover bars.  */
 
-    gdk_gc_set_line_attributes (EQ_gc, 2, GDK_LINE_SOLID, GDK_CAP_BUTT,
-        GDK_JOIN_MITER);
+ //   gdk_gc_set_line_attributes (EQ_gc, 2, GDK_LINE_SOLID, GDK_CAP_BUTT,
+ //       GDK_JOIN_MITER);
 
-    gdk_gc_set_foreground (EQ_gc, get_color (LOW_BAND_COLOR));
+
+    color = get_color (LOW_BAND_COLOR);
+	cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue); 
+	
     freq2xpix (process_get_low2mid_xover (), &x1);
-    gdk_draw_line (hdeq_pixmap, EQ_gc, x1, 0, x1, EQ_curve_height);
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, TRUE, x1 - XOVER_HANDLE_HALF_SIZE,
-        0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, TRUE, x1 - XOVER_HANDLE_HALF_SIZE, 
-        EQ_curve_height - XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE, 
-        XOVER_HANDLE_SIZE);
-    gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, FALSE, x1 - XOVER_HANDLE_HALF_SIZE,
-        0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, FALSE, x1 - XOVER_HANDLE_HALF_SIZE,
-        EQ_curve_height - XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE, 
-        XOVER_HANDLE_SIZE);
+    
 
+		cairo_move_to (EQ_cr, x1, 0); 
+		cairo_line_to (EQ_cr, x1, EQ_curve_height);
+		cairo_stroke (EQ_cr);
+ 
+		cairo_rectangle (EQ_cr, x1 - XOVER_HANDLE_HALF_SIZE, 0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
+		cairo_fill (EQ_cr);  
+ 
+ 		cairo_rectangle (EQ_cr, x1 - XOVER_HANDLE_HALF_SIZE, EQ_curve_height - XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
+		cairo_fill (EQ_cr);
+
+		
     xover_handle_l2m = x1;
 
 
-    gdk_gc_set_foreground (EQ_gc, get_color (HIGH_BAND_COLOR));
+ 
+    color = get_color (HIGH_BAND_COLOR);
+	cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);  
     freq2xpix (process_get_mid2high_xover (), &x1);
-    gdk_draw_line (hdeq_pixmap, EQ_gc, x1, 0, x1, EQ_curve_height);
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, TRUE, x1 - XOVER_HANDLE_HALF_SIZE,
-        0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, TRUE, x1 - XOVER_HANDLE_HALF_SIZE,
-        EQ_curve_height - XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE, 
-        XOVER_HANDLE_SIZE);
-    gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, FALSE, x1 - XOVER_HANDLE_HALF_SIZE,
-        0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
-    gdk_draw_rectangle (hdeq_pixmap, EQ_gc, FALSE, x1 - XOVER_HANDLE_HALF_SIZE,
-        EQ_curve_height - XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE, 
-        XOVER_HANDLE_SIZE);
+ 
+  		cairo_move_to (EQ_cr, x1, 0); 
+  		cairo_line_to (EQ_cr, x1, EQ_curve_height);
+		cairo_stroke (EQ_cr);
+
+  		cairo_rectangle (EQ_cr, x1 - XOVER_HANDLE_HALF_SIZE, 0, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
+		cairo_fill (EQ_cr); 
+
+ 		cairo_rectangle (EQ_cr, x1 - XOVER_HANDLE_HALF_SIZE, EQ_curve_height - XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE, XOVER_HANDLE_SIZE);
+		cairo_fill (EQ_cr); 
+
 
     xover_handle_m2h = x1;
 
@@ -1085,37 +1090,48 @@ void draw_EQ_curve ()
 
         for (i = 0 ; i < NOTCHES ; i++)
           {
-	    s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Reset notch %d", i));
+			s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Reset notch %d", i));
             s_set_value_ns (S_NOTCH_GAIN (i), EQ_notch_gain[i]);
             s_set_value_ns (S_NOTCH_Q (i), (float) EQ_notch_width[i]);
             s_set_value_ns (S_NOTCH_FREQ (i), powf (10.0f, EQ_x_notched[EQ_notch_index[i]]));
             s_set_value_ns (S_NOTCH_FLAG (i), (float) EQ_notch_flag[i]);
           }
+           
       }
 
 
     /*  Plot the curve.  Note that we're plotting the "notched" arrays not
         the interp arrays.  */
 
-    gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_CURVE_COLOR));
+	color = get_color (HDEQ_CURVE_COLOR);
+	cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);    
+	
+	
     for (i = 0 ; i < EQ_length - 1 ; i++)
       {
         logfreq2xpix (EQ_x_notched[i], &x1);
         loggain2ypix (EQ_y_notched[i], &y1);
 
-        if (i) gdk_draw_line (hdeq_pixmap, EQ_gc, x0, y0, x1, y1);
-
+		if (i){
+			
+				cairo_move_to (EQ_cr, x0, y0); 
+				cairo_line_to (EQ_cr, x1, y1);
+				cairo_stroke (EQ_cr);
+		}
         x0 = x1;
         y0 = y1;
       }
 
 
     /*  Add the notch handles.  */
-
+	//printf("adding notches \n");
+	
     for (i = 0 ; i < NOTCHES ; i++)
       {
-        gdk_gc_set_foreground (EQ_gc, get_color (HANDLE_COLOR));
-
+	//	printf("adding notches %i \n", i);
+		color = get_color (HANDLE_COLOR);
+		cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+		
         logfreq2xpix (EQ_x_notched[EQ_notch_index[i]], &x1);
 
 
@@ -1131,13 +1147,15 @@ void draw_EQ_curve ()
             loggain2ypix (EQ_y_notched[EQ_notch_index[i]], &y1);
           }
 
-        gdk_draw_rectangle (hdeq_pixmap, EQ_gc, TRUE, 
-            x1 - NOTCH_HANDLE_HALF_WIDTH, y1 - NOTCH_CENTER_HALF_HEIGHT, 
-            NOTCH_HANDLE_WIDTH, NOTCH_CENTER_HEIGHT);
-        gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-        gdk_draw_rectangle (hdeq_pixmap, EQ_gc, FALSE, 
-            x1 - NOTCH_HANDLE_HALF_WIDTH, y1 - NOTCH_CENTER_HALF_HEIGHT, 
-            NOTCH_HANDLE_WIDTH, NOTCH_CENTER_HEIGHT);
+	//	printf("adding notches %i %i %i \n", i, x1, y1);
+		cairo_arc (EQ_cr, x1, y1, NOTCH_HANDLE_WIDTH/2, 0, 2 * M_PI);
+		cairo_fill_preserve (EQ_cr);
+
+		color = get_color (HIGH_BAND_COLOR);
+		cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);  
+		cairo_set_line_width (EQ_cr, 1.0);
+		cairo_stroke (EQ_cr);
+
 
         EQ_notch_handle[0][0][i] = EQ_notch_handle[0][1][i] = 
             EQ_notch_handle[0][2][i]= x1;
@@ -1157,8 +1175,10 @@ void draw_EQ_curve ()
 
         if (i && i < NOTCHES - 1)
           {
-            gdk_gc_set_foreground (EQ_gc, get_color (HANDLE_COLOR));
 
+			color = get_color (HANDLE_COLOR);
+			cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+			
             x0 = EQ_notch_index[i] - EQ_notch_width[i];
 
             logfreq2xpix (EQ_x_notched[x0], &x1);
@@ -1166,21 +1186,20 @@ void draw_EQ_curve ()
 
             if (EQ_notch_handle[0][1][i] - x1 < NOTCH_HANDLE_HALF_WIDTH) 
                 x1 = EQ_notch_handle[0][1][i] - NOTCH_HANDLE_WIDTH;
-
-            gdk_draw_arc (hdeq_pixmap, EQ_gc, TRUE, 
-                x1 - NOTCH_HANDLE_WIDTH, y1 - NOTCH_HANDLE_HALF_HEIGHT, 
-                NOTCH_HANDLE_WIDTH * 2, NOTCH_HANDLE_HEIGHT, 5760, 11520);
-            gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-            gdk_draw_arc (hdeq_pixmap, EQ_gc, FALSE, 
-                x1 - NOTCH_HANDLE_WIDTH, y1 - NOTCH_HANDLE_HALF_HEIGHT, 
-                NOTCH_HANDLE_WIDTH * 2, NOTCH_HANDLE_HEIGHT, 5760, 11520);
-
+			cairo_rectangle (EQ_cr, x1 - NOTCH_HANDLE_HALF_WIDTH/2, y1 - NOTCH_CENTER_HALF_HEIGHT/3, NOTCH_HANDLE_WIDTH/2, NOTCH_CENTER_HEIGHT/3);
+			cairo_fill_preserve (EQ_cr); 
+			color = get_color (HIGH_BAND_COLOR);
+			cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);  
+			cairo_set_line_width (EQ_cr, 1.0);
+			cairo_stroke (EQ_cr);
+	
             EQ_notch_handle[0][0][i] = x1;
             EQ_notch_handle[1][0][i] = y1;
 
 
-            gdk_gc_set_foreground (EQ_gc, get_color (HANDLE_COLOR));
-
+			color = get_color (HANDLE_COLOR);
+			cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+			
             x0 = EQ_notch_index[i] + EQ_notch_width[i];
 
             logfreq2xpix (EQ_x_notched[x0], &x1);
@@ -1189,62 +1208,88 @@ void draw_EQ_curve ()
             if (x1 - EQ_notch_handle[0][1][i] < NOTCH_HANDLE_HALF_WIDTH) 
                 x1 = EQ_notch_handle[0][1][i] + NOTCH_HANDLE_WIDTH;
 
-            gdk_draw_arc (hdeq_pixmap, EQ_gc, TRUE, 
-                x1 - NOTCH_HANDLE_WIDTH, y1 - NOTCH_HANDLE_HALF_HEIGHT, 
-                NOTCH_HANDLE_WIDTH * 2, NOTCH_HANDLE_HEIGHT, 17280, 11520);
-            gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-            gdk_draw_arc (hdeq_pixmap, EQ_gc, FALSE, 
-                x1 - NOTCH_HANDLE_WIDTH, y1 - NOTCH_HANDLE_HALF_HEIGHT, 
-                NOTCH_HANDLE_WIDTH * 2, NOTCH_HANDLE_HEIGHT, 17280, 11520);
+			cairo_rectangle (EQ_cr, x1 - NOTCH_HANDLE_HALF_WIDTH/2, y1 - NOTCH_CENTER_HALF_HEIGHT/3, NOTCH_HANDLE_WIDTH/2, NOTCH_CENTER_HEIGHT/3);
 
+			cairo_fill_preserve (EQ_cr);
+			color = get_color (HIGH_BAND_COLOR);
+			cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);  
+			cairo_set_line_width (EQ_cr, 1.0);
+			cairo_stroke (EQ_cr);		
+				
             EQ_notch_handle[0][2][i] = x1;
             EQ_notch_handle[1][2][i] = y1;
           }
       }
 
-    gdk_gc_set_line_attributes (EQ_gc, 1, GDK_LINE_SOLID, GDK_CAP_BUTT,
-        GDK_JOIN_MITER);
+//    gdk_gc_set_line_attributes (EQ_gc, 1, GDK_LINE_SOLID, GDK_CAP_BUTT,
+//        GDK_JOIN_MITER);
 
 
     EQ_mod = 0;
 
+/* Draw EQ Spectrum Curve */
+		color = get_color (HDEQ_SPECTRUM_COLOR);
+		cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+		cairo_move_to (EQ_cr, spectrum_x[0], spectrum_y[0]); 
+		for (i = 0 ; i < EQ_INTERP ; i++)
+		{
+			if (i) {
+						
+				cairo_line_to (EQ_cr, spectrum_x[i], spectrum_y[i]);			
+			    
+			}
+		}	
+		cairo_stroke (EQ_cr);
 
-    /*  Blast the background pixmap to the widget.  */
+	/* Draw hand drawn curve */	
+/*	if (EQ_drawing){
+		
+        color = get_color (HDEQ_CURVE_COLOR);
+		cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+		cairo_move_to (EQ_cr, EQ_xinput[0], EQ_yinput[0]);
+		for (i = 0 ; i < EQ_input_points ; i++)
+        {
+		
+			//cairo_move_to (EQ_cr, EQ_xinput[i], EQ_yinput[i]);
+			cairo_line_to (EQ_cr,  EQ_xinput[i], EQ_yinput[i]);
+        }                                              
+ //                   gdk_draw_line (hdeq_pixmap, EQ_gc, 
+ //                                  NINT (EQ_xinput[EQ_input_points - 1]), 
+ //                                  NINT (EQ_yinput[EQ_input_points - 1]), x, y);
+	}
+*/
 
-    gdk_draw_pixmap (EQ_drawable, EQ_gc, hdeq_pixmap, 0, 0, 0, 0, EQ_curve_width + 1,
-                     EQ_curve_height + 1);
 }
 
 
 /*  Whenever the curve is exposed, which will happen on a resize, we need to
     get the current dimensions and redraw the curve.  */
 
-void hdeq_curve_exposed (GtkWidget *widget, GdkEventExpose *event)
+void hdeq_curve_draw (GtkWidget *widget, cairo_t *cr, gpointer data)
 {
     /*  We're using the upper and lower ranges of the crossovers to get the
         X range.  */
 
     l_low2mid_adj = gtk_range_get_adjustment ((GtkRange *) l_low2mid);
-    EQ_curve_range_x = l_low2mid_adj->upper - l_low2mid_adj->lower;
+    EQ_curve_range_x = gtk_adjustment_get_upper (l_low2mid_adj) - gtk_adjustment_get_lower (l_low2mid_adj);
 
+//	printf("%f, %f\n", gtk_adjustment_get_upper (l_low2mid_adj), gtk_adjustment_get_lower (l_low2mid_adj));
+	
     EQ_curve_range_y = EQ_gain_upper - EQ_gain_lower;
 
 
     /*  Since allocation width and height are inclusive we need to decrement
         for calculations.  */
+    
+    GtkAllocation *allocation = g_new0 (GtkAllocation, 1);
 
-    EQ_curve_width = widget->allocation.width - 1;
-    EQ_curve_height = widget->allocation.height - 1;
+	gtk_widget_get_allocation(GTK_WIDGET(widget), allocation);
 
-
-    /*  Resize the EQ pixmap.  I think this just deletes the old one and reallocates but
-        I'm not positive.  */
-
-    hdeq_pixmap = gdk_pixmap_new (EQ_drawable, EQ_curve_width + 1, EQ_curve_height + 1, -1);
-
-
-    draw_EQ_curve ();
-
+    EQ_curve_width = allocation->width - 1;
+    EQ_curve_height = allocation->height - 1;
+	g_free (allocation);
+	
+    draw_EQ_curve (cr);
 
     /*  Window is ready for motion events.  */
 
@@ -1257,16 +1302,6 @@ void hdeq_curve_exposed (GtkWidget *widget, GdkEventExpose *event)
 
 void hdeq_curve_init (GtkWidget *widget)
 {
-    EQ_drawable = widget->window;
-
-
-    /*  Make the background pixmap so we'll have something to draw on at startup.  This will
-        probably get remade in the expose event above but we get a bunch of warnings if it
-        isn't made here.  */
-
-    hdeq_pixmap = gdk_pixmap_new (EQ_drawable, widget->allocation.width, widget->allocation.height, -1);
-
-    EQ_gc = widget->style->fg_gc[GTK_WIDGET_STATE (widget)];
 
     EQ_pc = gtk_widget_get_pango_context (widget);
 
@@ -1280,10 +1315,17 @@ void hdeq_curve_init (GtkWidget *widget)
     /*  Setting a callback based on notch gain changes.  */
 
     s_set_callback (S_NOTCH_GAIN(0), set_EQ_curve_values);
-
+	
     EQ_realized = 1;
+
 }
 
+void hdeq_curve_update()
+{
+	
+		gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
+	
+}
 
 /*  Don't let the notches overlap.  */
 
@@ -1416,7 +1458,7 @@ void hdeq_curve_motion (GdkEventMotion *event)
         /*  Set the "caption" for the window.  We're tracking the cursor in
             relation to frequency, EQ gain, and spectrum curve gain.  */
 
-        freq = pow (10.0, (l_low2mid_adj->lower + (((double) x / 
+        freq = pow (10.0, (gtk_adjustment_get_lower (l_low2mid_adj) + (((double) x / 
             (double) EQ_curve_width) * EQ_curve_range_x)));
 
         gain = ((((double) EQ_curve_height - (double) y) / 
@@ -1462,12 +1504,17 @@ void hdeq_curve_motion (GdkEventMotion *event)
                 if ((EQ_draw_dir == 1 && x > EQ_xinput[EQ_input_points - 1]) ||
                     (EQ_draw_dir == -1 && x < EQ_xinput[EQ_input_points - 1]))
                   {
-                    gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_CURVE_COLOR));
-                    gdk_draw_line (hdeq_pixmap, EQ_gc, 
-                                   NINT (EQ_xinput[EQ_input_points - 1]), 
-                                   NINT (EQ_yinput[EQ_input_points - 1]), x, y);
-                    gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-
+ //                   gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_CURVE_COLOR));
+              //      color = get_color (HDEQ_CURVE_COLOR);
+				//	cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+                                                      
+ //                   gdk_draw_line (hdeq_pixmap, EQ_gc, 
+ //                                  NINT (EQ_xinput[EQ_input_points - 1]), 
+ //                                  NINT (EQ_yinput[EQ_input_points - 1]), x, y);
+ //                   gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
+			//		color = get_color (TEXT_COLOR);
+			//		cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+					
                     size = (EQ_input_points + 1) * sizeof (float);
                     EQ_xinput = (float *) realloc (EQ_xinput, size);
                     EQ_yinput = (float *) realloc (EQ_yinput, size);
@@ -1551,7 +1598,7 @@ void hdeq_curve_motion (GdkEventMotion *event)
 
                             /*  Save state.  */
 
-			    s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Move notch %d", i));
+							s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Move notch %d", i));
                             s_set_value_ns (S_NOTCH_GAIN (i), EQ_notch_gain[i]);
                             s_set_value_ns (S_NOTCH_FREQ (i), freq);
                             s_set_value_ns (S_NOTCH_FLAG (i), (float) EQ_notch_flag[i]);
@@ -1588,7 +1635,7 @@ void hdeq_curve_motion (GdkEventMotion *event)
 
                                 /*  Save state.  */
 
-			        s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Move notch %d", i));
+								s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Move notch %d", i));
                                 s_set_value_ns (S_NOTCH_GAIN (i), EQ_notch_gain[i]);
                                 s_set_value_ns (S_NOTCH_FREQ (i), freq);
                                 s_set_value_ns (S_NOTCH_FLAG (i), (float) EQ_notch_flag[i]);
@@ -1630,7 +1677,7 @@ void hdeq_curve_motion (GdkEventMotion *event)
 
                             /*  Save state.  */
 
-			    s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Move notch %d", i));
+							s_set_description (S_NOTCH_GAIN (i), g_strdup_printf("Move notch %d", i));
                             s_set_value_ns (S_NOTCH_GAIN (i), EQ_notch_gain[i]);
                             s_set_value_ns (S_NOTCH_FREQ (i), freq);
                             s_set_value_ns (S_NOTCH_FLAG (i), (float) EQ_notch_flag[i]);
@@ -1650,7 +1697,7 @@ void hdeq_curve_motion (GdkEventMotion *event)
 
                 insert_notch ();
                 set_EQ ();
-                draw_EQ_curve ();
+            //    draw_EQ_curve ();
 
 
                 /*  Set the modified flag.  */
@@ -1776,7 +1823,7 @@ void hdeq_curve_motion (GdkEventMotion *event)
                 if (current_cursor != cursor)
                   {
                     current_cursor = cursor;
-                    gdk_window_set_cursor (EQ_drawable, gdk_cursor_new (cursor));
+  //                  gdk_window_set_cursor (EQ_drawable, gdk_cursor_new (cursor));
                   }
               }
 
@@ -1811,27 +1858,32 @@ void hdeq_curve_motion (GdkEventMotion *event)
 
         if (modified)
           {
-            gdk_draw_pixmap (EQ_drawable, EQ_gc, hdeq_pixmap, 0, 0, 0, 0,
-                             EQ_curve_width + 1, EQ_curve_height + 1);
+          //  gdk_draw_pixmap (EQ_drawable, EQ_gc, hdeq_pixmap, 0, 0, 0, 0,
+          //                   EQ_curve_width + 1, EQ_curve_height + 1);
+			
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
-
-            if (get_spectrum_freq ())
-              {
+ //           if (get_spectrum_freq ())
+ //             {
                 /*  Set the foreground color for drawing the spectrum curve.  */
 
-                gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
+ //               gdk_gc_set_foreground (EQ_gc, get_color (HDEQ_SPECTRUM_COLOR));
+ //               color = get_color (HDEQ_SPECTRUM_COLOR);
+//				cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
 
-                for (i = 0 ; i < EQ_INTERP ; i++)
-                  {
-                    if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
-                                          spectrum_x[i], spectrum_y[i]);
-                  }
+ //               for (i = 0 ; i < EQ_INTERP ; i++)
+  //                {
+  //                  if (i) gdk_draw_line (EQ_drawable, EQ_gc, spectrum_x[i - 1], spectrum_y[i - 1],
+  //                                        spectrum_x[i], spectrum_y[i]);
+  //                }
 
 
                 /*  Reset the foreground color to the text color.  */
 
-                gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
-              }
+//                gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
+ //               color = get_color (TEXT_COLOR);
+//				cairo_set_source_rgb (EQ_cr,color->red,color->green, color->blue);
+ //             }
           }
       }
 }
@@ -1950,7 +2002,8 @@ void hdeq_curve_button_press (GdkEventButton *event)
 
                             insert_notch ();
                             set_EQ ();
-                            draw_EQ_curve ();
+                   //         draw_EQ_curve ();
+							gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
                           }
                         else
                           {
@@ -2081,7 +2134,7 @@ void hdeq_curve_button_press (GdkEventButton *event)
 
             for (i = 0 ; i < EQ_input_points ; i++)
               {
-                EQ_xinput[i] = l_low2mid_adj->lower + (((double) EQ_xinput[i] /
+                EQ_xinput[i] = gtk_adjustment_get_lower (l_low2mid_adj) + (((double) EQ_xinput[i] /
                     (double) EQ_curve_width) * EQ_curve_range_x);
 
 
@@ -2211,7 +2264,8 @@ void hdeq_curve_button_press (GdkEventButton *event)
 
             /*  Redraw the curve.  */
 
-            draw_EQ_curve ();
+     //       draw_EQ_curve ();
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
           }
         break;
 
@@ -2261,7 +2315,7 @@ void hdeq_curve_button_release (GdkEventButton  *event)
         /*  Set the graphic EQ sliders based on the hand-drawn curve.  */
 
         geq_set_sliders (EQ_length, EQ_freq_xinterp, EQ_freq_yinterp);
-
+	//	gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve));
         EQ_mod = 0;
 
         break;
@@ -2278,7 +2332,8 @@ void hdeq_curve_button_release (GdkEventButton  *event)
 
             EQ_input_points = 0;
 
-            draw_EQ_curve ();
+     //       draw_EQ_curve ();
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
           }
         break;
       }
@@ -2374,7 +2429,8 @@ void hdeq_popup (int action)
 
 
         set_EQ ();
-        draw_EQ_curve ();
+  //      draw_EQ_curve ();
+		gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
 
         /*  Set the scene warning button so that people will know to save it.  */
@@ -2395,7 +2451,8 @@ void hdeq_popup (int action)
 
             EQ_input_points = 0;
 
-            draw_EQ_curve ();
+   //         draw_EQ_curve ();
+			gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
           }
         break;
       }
@@ -2441,16 +2498,18 @@ void set_EQ_curve_values (int id, float value)
 
 
     /*  Set the GEQ coefs and faders.  */
-
-    set_EQ ();
-
-
-    EQ_mod = 0;
-
+	if(gui_mode == 0){ // default
+	//	set_EQ ();
+		EQ_mod = 1;
+	} else {
+		EQ_mod = 0;
+	}
+	
 
     /*  Redraw the curve.  */
 
-    draw_EQ_curve ();
+ //   draw_EQ_curve ();
+	gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 }
 
 
@@ -2463,6 +2522,7 @@ void hdeq_set_xover ()
     process_set_mid2high_xover ((float) pow (10.0, 
                                              s_get_value (S_XOVER_FREQ(1))));
     
+	printf("%f %f \n", 	s_get_value (S_XOVER_FREQ(0)), s_get_value (S_XOVER_FREQ(1)));
     hdeq_low2mid_init ();
     hdeq_mid2high_init ();
 }
@@ -2475,11 +2535,12 @@ void hdeq_set_lower_gain (float gain)
   EQ_gain_lower = gain;
 
   l_low2mid_adj = gtk_range_get_adjustment ((GtkRange *) l_low2mid);
-  EQ_curve_range_x = l_low2mid_adj->upper - l_low2mid_adj->lower;
+  EQ_curve_range_x = gtk_adjustment_get_upper (l_low2mid_adj) - gtk_adjustment_get_lower (l_low2mid_adj);
 
   EQ_curve_range_y = EQ_gain_upper - EQ_gain_lower;
 
-  draw_EQ_curve ();
+// draw_EQ_curve ();
+  gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
   set_scene_warning_button ();
 }
@@ -2492,11 +2553,12 @@ void hdeq_set_upper_gain (float gain)
   EQ_gain_upper = gain;
 
   l_low2mid_adj = gtk_range_get_adjustment ((GtkRange *) l_low2mid);
-  EQ_curve_range_x = l_low2mid_adj->upper - l_low2mid_adj->lower;
+  EQ_curve_range_x = gtk_adjustment_get_lower (l_low2mid_adj) - gtk_adjustment_get_lower (l_low2mid_adj);
 
   EQ_curve_range_y = EQ_gain_upper - EQ_gain_lower;
 
-  draw_EQ_curve ();
+ // draw_EQ_curve ();
+  gtk_widget_queue_draw(GTK_WIDGET(l_EQ_curve)); 
 
   set_scene_warning_button ();
 }
@@ -2529,21 +2591,28 @@ static void comp_write_annotation (int i, char *string)
     pango_layout_set_text (pl, "-99 , -99", -1);
     pango_layout_get_pixel_extents (pl, &ink_rect, NULL);
 
-    gdk_window_clear_area (comp_drawable[i], 3, 3, ink_rect.width + 5,
-		    ink_rect.height + 5);
-    gdk_gc_set_foreground (comp_gc[i], get_color (TEXT_COLOR));
+//    gdk_window_clear_area (comp_drawable[i], 3, 3, ink_rect.width + 5,
+//		    ink_rect.height + 5);
+//    gdk_gc_set_foreground (comp_gc[i], get_color (TEXT_COLOR));
 
     pl = pango_layout_new (comp_pc[i]);  
     pango_layout_set_text (pl, string, -1);
 
 
-    gdk_draw_layout (comp_drawable[i], comp_gc[i], 5, 5, pl);
+ //   gdk_draw_layout (comp_drawable[i], comp_gc[i], 5, 5, pl);
 }
 
 
+void comp_curve_update(int i)
+{
+	
+		gtk_widget_queue_draw(GTK_WIDGET(l_comp_curve[i])); 
+	
+}
+
 /*  Draw the compressor curve (0-2).  */
 
-void draw_comp_curve (int i)
+void draw_comp_curve (int i, cairo_t *cr)
 {
     int              j, x0, y0 = 0.0, x1 = 0.0, y1 = 0.0;
     float            x, y;
@@ -2555,10 +2624,10 @@ void draw_comp_curve (int i)
 
     /*  Clear the curve drawing area.  */
 
-    gdk_window_clear_area (comp_drawable[i], 0, 0, comp_curve_width[i], 
-        comp_curve_height[i]);
-    gdk_gc_set_line_attributes (comp_gc[i], 1, GDK_LINE_SOLID, GDK_CAP_BUTT, 
-        GDK_JOIN_MITER);
+//    gdk_window_clear_area (comp_drawable[i], 0, 0, comp_curve_width[i], 
+//        comp_curve_height[i]);
+//    gdk_gc_set_line_attributes (comp_gc[i], 1, GDK_LINE_SOLID, GDK_CAP_BUTT, 
+//        GDK_JOIN_MITER);
 
 
     /*  Plot the grid lines.  */
@@ -2570,8 +2639,11 @@ void draw_comp_curve (int i)
             x1 = NINT (((float) (j - comp_start_x[i]) / 
                 comp_curve_range_x[i]) * comp_curve_width[i]);
 
-            gdk_draw_line (comp_drawable[i], comp_gc[i], x1, 0, x1, 
-                comp_curve_height[i]);
+//            gdk_draw_line (comp_drawable[i], comp_gc[i], x1, 0, x1, 
+//                comp_curve_height[i]);
+				cairo_move_to (cr, x1, 0); 
+				cairo_line_to (cr, x1, comp_curve_height[i]);
+				cairo_stroke (cr);
           }
       }
 
@@ -2581,31 +2653,38 @@ void draw_comp_curve (int i)
           {
             if (!j)
               {
-                gdk_gc_set_line_attributes (comp_gc[i], 2, GDK_LINE_SOLID, 
-                    GDK_CAP_BUTT, GDK_JOIN_MITER);
+ //               gdk_gc_set_line_attributes (comp_gc[i], 2, GDK_LINE_SOLID, 
+ //                   GDK_CAP_BUTT, GDK_JOIN_MITER);
+					cairo_set_line_width (cr, 2.0);
               }
             else
               {
-                gdk_gc_set_line_attributes (comp_gc[i], 1, GDK_LINE_SOLID, 
-                    GDK_CAP_BUTT, GDK_JOIN_MITER);
+ //               gdk_gc_set_line_attributes (comp_gc[i], 1, GDK_LINE_SOLID, 
+ //                   GDK_CAP_BUTT, GDK_JOIN_MITER);
+					cairo_set_line_width (cr, 1.0);
               }
 
             y1 = comp_curve_height[i] - NINT (((float) (j - comp_start_y[i]) / 
                 comp_curve_range_y[i]) * comp_curve_height[i]);
 
-            gdk_draw_line (comp_drawable[i], comp_gc[i], 0, y1, 
-                comp_curve_width[i], y1);
+ //           gdk_draw_line (comp_drawable[i], comp_gc[i], 0, y1, 
+ //               comp_curve_width[i], y1);
+				cairo_move_to (cr, 0, y1); 
+				cairo_line_to (cr, comp_curve_width[i], y1);
+				cairo_stroke (cr);
           }
       }
 
 
     /*  Plot the curves.  */
 
-    gdk_gc_set_line_attributes (comp_gc[i], 2, GDK_LINE_SOLID, GDK_CAP_BUTT,
-        GDK_JOIN_MITER);
-    gdk_gc_set_foreground (comp_gc[i], get_color (LOW_BAND_COLOR + i));
+//    gdk_gc_set_line_attributes (comp_gc[i], 2, GDK_LINE_SOLID, GDK_CAP_BUTT,
+//        GDK_JOIN_MITER);
+//    gdk_gc_set_foreground (comp_gc[i], get_color (LOW_BAND_COLOR + i));
 
-
+	color = get_color (LOW_BAND_COLOR + i);
+    cairo_set_source_rgb (cr,color->red,color->green, color->blue);
+    
     comp = comp_get_settings (i);
 
     x0 = 999.0;
@@ -2620,29 +2699,38 @@ void draw_comp_curve (int i)
         y1 = comp_curve_height[i] - NINT (((y - comp_start_y[i]) / 
             comp_curve_range_y[i]) * comp_curve_height[i]);
 
-        if (x0 != 999.0) 
-            gdk_draw_line (comp_drawable[i], comp_gc[i], x0, y0, x1, y1);
+        if (x0 != 999.0) {
+ //           gdk_draw_line (comp_drawable[i], comp_gc[i], x0, y0, x1, y1);
+ 
+			cairo_move_to (cr, x0, y0); 
+			cairo_line_to (cr, x1, y1);
+			cairo_stroke (cr);
+			
+		}	
 
         x0 = x1;
         y0 = y1;
       }
-    gdk_gc_set_line_attributes (comp_gc[i], 1, GDK_LINE_SOLID, GDK_CAP_BUTT,
-        GDK_JOIN_MITER);
-    gdk_gc_set_foreground (comp_gc[i], get_color (TEXT_COLOR));
+//    gdk_gc_set_line_attributes (comp_gc[i], 1, GDK_LINE_SOLID, GDK_CAP_BUTT,
+//        GDK_JOIN_MITER);
+//    gdk_gc_set_foreground (comp_gc[i], get_color (TEXT_COLOR));
 }
 
 
 /*  The compressor curve expose/resize callback (0-2).  */
 
-void comp_curve_expose (GtkWidget *widget, int i)
+void comp_curve_draw (GtkWidget *widget, cairo_t *cr, int i)
 {
     /*  Since we're doing inclusive plots on the compressor curves we'll
         not decrement the width and height.  */
-
-    comp_curve_width[i] = widget->allocation.width;
-    comp_curve_height[i] = widget->allocation.height;
-
-    draw_comp_curve (i);
+	GtkAllocation *allocation = g_new0 (GtkAllocation, 1);
+	gtk_widget_get_allocation(GTK_WIDGET(widget), allocation);
+	
+    comp_curve_width[i] = allocation->width;
+    comp_curve_height[i] = allocation->height;
+	g_free(allocation);	
+	
+    draw_comp_curve (i, cr);
 }
 
 
@@ -2650,7 +2738,7 @@ void comp_curve_expose (GtkWidget *widget, int i)
 
 void comp_curve_realize (GtkWidget *widget, int i)
 {
-    comp_drawable[i] = widget->window;
+//    comp_drawable[i] = widget->window;
 
     comp_start_x[i] = -60.0;
     comp_end_x[i] = 0.0;
@@ -2660,7 +2748,7 @@ void comp_curve_realize (GtkWidget *widget, int i)
     comp_curve_range_x[i] = comp_end_x[i] - comp_start_x[i];
     comp_curve_range_y[i] = comp_end_y[i] - comp_start_y[i];
 
-    comp_gc[i] = widget->style->fg_gc[GTK_WIDGET_STATE (widget)];
+//    comp_gc[i] = widget->style->fg_gc[GTK_WIDGET_STATE (widget)];
 
 
     comp_pc[i] = gtk_widget_get_pango_context (widget);

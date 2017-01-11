@@ -43,7 +43,7 @@
 #include "compressor-ui.h"
 #include "state.h"
 #include "spectrum.h"
-#include "gtkmeter.h"
+//#include "gtkmeter.h"
 
 
 static char color_help[] = {
@@ -54,7 +54,8 @@ the color you want (fuschia, puce, chartreuse, whatever) just press OK.\n"
 
 
 static GtkWidget         *pref_dialog, *color_dialog, *colorsel;
-static GdkColormap       *colormap = NULL;
+static GdkVisual 		 *visual = NULL; 
+//static GdkColormap       *colormap = NULL;
 static GdkColor          color[COLORS];
 static int               color_id;
 static GtkComboBox       *l_limiter_combo, *l_SpectrumComboBox, *l_ColorsComboBox;
@@ -137,24 +138,28 @@ void preferences_init()
 
   color_dialog = create_colorselectiondialog1 ();
 
-  colorsel = GTK_COLOR_SELECTION_DIALOG (color_dialog)->colorsel;
+ /* gtk_widget_get_property(color_dialog,'color-selection',&colorsel);
 
+  GtkWidget *ok_button1;
+  GtkWidget *cancel_button1;
+  GtkWidget *help_button1;
 
-  g_signal_connect (GTK_OBJECT 
-                    (GTK_COLOR_SELECTION_DIALOG (color_dialog)->ok_button),
+  g_signal_connect ( gtk_widget_get_property(color_dialog,'ok-button',&ok_button1),
                     "clicked", G_CALLBACK (color_ok_callback), color_dialog);
 
-  g_signal_connect (GTK_OBJECT 
-                    (GTK_COLOR_SELECTION_DIALOG (color_dialog)->cancel_button),
+  g_signal_connect ( gtk_widget_get_property(color_dialog,'cancel-button',&cancel_button1),
                     "clicked", G_CALLBACK (color_cancel_callback), color_dialog);
 
-  g_signal_connect (GTK_OBJECT 
-                    (GTK_COLOR_SELECTION_DIALOG (color_dialog)->help_button),
+  g_signal_connect ( gtk_widget_get_property(color_dialog,'help-button',&help_button1),
                     "clicked", G_CALLBACK (color_help_callback), color_dialog);
 
+*/
 
-  colormap = gdk_colormap_get_system ();
 
+
+
+ // colormap = gdk_colormap_get_system ();
+	visual = gdk_visual_get_system ();
 
   /*  Set all of the colors to the defaults in case someone has edited the
       ~/.jamin/jamin-defaults file and removed (or hosed) one or more of the
@@ -286,8 +291,8 @@ void preferences_init()
 
 void pref_set_all_values ()
 {
-  gtk_spin_button_set_value (l_hdeq_lower_gain, hdeq_get_lower_gain ());
-  gtk_spin_button_set_value (l_hdeq_upper_gain, hdeq_get_upper_gain ());
+ // gtk_spin_button_set_value (l_hdeq_lower_gain, hdeq_get_lower_gain ());
+ // gtk_spin_button_set_value (l_hdeq_upper_gain, hdeq_get_upper_gain ());
   gtk_spin_button_set_value (l_crossfade_time, s_get_crossfade_time ());
   gtk_spin_button_set_value (l_inmeter_warn, intrim_inmeter_get_warn ());
   gtk_spin_button_set_value (l_spectrum_freq, get_spectrum_freq ());
@@ -336,7 +341,8 @@ void set_color (GdkColor *color, unsigned short red, unsigned short green,
   color->green = green;
   color->blue = blue;
 
-  gdk_colormap_alloc_color (colormap, color, FALSE, TRUE);
+ // gdk_colormap_alloc_color (colormap, color, FALSE, TRUE);
+//  gtk_widget_modify_bg(visual, , &color);
 }
 
 
@@ -391,33 +397,37 @@ void pref_force_color_change ()
 
 
   repaint_gang_labels ();
-  draw_EQ_curve ();
+ // draw_EQ_curve ();
 
 
   /*  Force all compressor curves.  */
 
-  draw_comp_curve (0);
-  draw_comp_curve (1);
-  draw_comp_curve (2);
+ // draw_comp_curve (0);
+ // draw_comp_curve (1);
+ // draw_comp_curve (2);
 
 
   /*  Force all meter redraws.  */
 
-  gtk_meter_set_color (METER_NORMAL_COLOR);
-  gtk_meter_set_color (METER_WARNING_COLOR);
-  gtk_meter_set_color (METER_OVER_COLOR);
-  gtk_meter_set_color (METER_PEAK_COLOR);
+ // gtk_meter_set_color (METER_NORMAL_COLOR);
+ // gtk_meter_set_color (METER_WARNING_COLOR);
+ // gtk_meter_set_color (METER_OVER_COLOR);
+ // gtk_meter_set_color (METER_PEAK_COLOR);
 
 
   /*  Force an expose to change the text color.  */
-
-  rect.x = main_window->allocation.x;
-  rect.y = main_window->allocation.y;
-  rect.width = main_window->allocation.width;
-  rect.height = main_window->allocation.height;
-
-  gdk_window_invalidate_rect (main_window->window, &rect, TRUE);
-  gdk_window_process_updates (main_window->window, TRUE);
+  GtkAllocation *allocation = g_new0 (GtkAllocation, 1);
+  gtk_widget_get_allocation(GTK_WIDGET(main_window), allocation);
+  
+  rect.x = allocation->x;
+  rect.y = allocation->y;
+  rect.width = allocation->width;
+  rect.height = allocation->height;
+  
+  g_free (allocation);
+  
+  gdk_window_invalidate_rect (gtk_widget_get_window(main_window), &rect, TRUE);
+  gdk_window_process_updates (gtk_widget_get_window(main_window), TRUE);
 }
 
 

@@ -213,7 +213,7 @@ void s_set_value_block(float *values, int base, int count)
 	s_value[base + i] = values[i];
     }
     last_changed = base;
-    //s_set_events(base, values[i]);
+    s_set_events(base, values[i]);
 }
 
 void s_set_value_no_history(int id, float value)
@@ -236,7 +236,7 @@ void s_clear_history()
     history = NULL;
     s_history_add("Initial state");
     undo_pos = history->next;
-    //s_restore_state((s_state *)history->data);
+    s_restore_state((s_state *)history->data);
     last_changed = S_LOAD;
 }
 
@@ -453,7 +453,7 @@ void s_crossfade_to_state(s_state *state, float time)
 	 * the endpoint */
 	s_target[i] = state->value[i];
 	s_duration[i] = duration;
-	//s_set_events(i, state->value[i]);
+	s_set_events(i, state->value[i]);
     }
     suppress_feedback--;
 }
@@ -759,9 +759,9 @@ void s_load_session (const gchar *fname)
     process_set_spec_mode (gp.mode);
     set_spectrum_freq (gp.freq);
     hdeq_set_upper_gain (gp.hgain);
-    geq_set_range (geq_get_adjustment(0)->lower, gp.hgain);
+    geq_set_range (gtk_adjustment_get_lower(geq_get_adjustment(0)), gp.hgain);
     hdeq_set_lower_gain (gp.lgain);
-    geq_set_range (gp.lgain, geq_get_adjustment(0)->upper);
+    geq_set_range (gp.lgain, gtk_adjustment_get_upper(geq_get_adjustment(0)));
     s_set_crossfade_time (gp.ct);
     intrim_inmeter_set_warn (gp.inwl);
     intrim_outmeter_set_warn (gp.outwl);
@@ -832,8 +832,8 @@ void s_load_session (const gchar *fname)
     if (!override_limiter_default) process_set_limiter_plugin (gp.limiter_plugin);
     override_limiter_default = FALSE;
 
-
-    hdeq_set_xover ();
+	if(gui_mode == 0) // Default mode
+		hdeq_set_xover ();
     set_EQ_curve_values (0, 0.0);
 
     s_clear_history();
