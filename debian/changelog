@@ -1,8 +1,34 @@
-jamin (0.98.9~git20170111~199091~repack1-1) UNRELEASED; urgency=medium
+jamin (0.98.9~git20170111~199091~repack1-1) unstable; urgency=medium
 
-  * 
+  * Team upload.
 
- -- IOhannes m zmölnig (Debian/GNU) <umlaeute@debian.org>  Wed, 11 Jan 2017 16:21:29 +0100
+  * New upstream version 0.98.9~git20170111~199091~repack1
+    (Closes: #848672)
+
+  [ Alessio Treglia ]
+  * Replace negated list of architectures with linux-any (Closes: #634375)
+
+  [ IOhannes m zmölnig (Debian/GNU) ]
+  * ACK NMU (Bug#818390)
+    Thanks to Helmut Grohne <helmut@subdivi.de>
+  * Refreshed patches
+  * Fixed typos
+  * Patched in missing files
+  * Added keywords to .desktop file
+  * Wrapper-script for starting jamin via desktop file
+  * Fixed locale ID for Czech (It's 'cs')
+
+  * Switched B-D from gtk2 to gtk3/clutter
+  * Used CDBS' autoreconf.mk (Closes: #829866)
+  * Unconditionally include CDBS's utils.mk
+  * Canonical Vcs-* stanzas
+  * Update d/copyright(_hints) (and use copyright-format 1.0)
+  * Dropped .menu file (Following Tech-CTTE decision on #741573)
+
+  * Bumped dh-compat level to 9
+  * Bumped standards-version to 3.9.8
+
+ -- IOhannes m zmölnig (Debian/GNU) <umlaeute@debian.org>  Wed, 11 Jan 2017 21:31:55 +0100
 
 jamin (0.97.14~cvs~81203-4.1) unstable; urgency=medium
 
