@@ -8,7 +8,7 @@ Forwarded: no
 
 --- jamin.orig/configure.in
 +++ jamin/configure.in
-@@ -97,13 +97,6 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GE
+@@ -100,13 +100,6 @@
  AM_GLIB_GNU_GETTEXT
  
  libnn=lib
