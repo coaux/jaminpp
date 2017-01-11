@@ -1,3 +1,0 @@
-?package(jamin):needs="X11" section="Applications/Sound"\
-  hints="Professional,JACK,LADSPA" \
-  title="jamin" command="/usr/bin/jamin"
