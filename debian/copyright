@@ -1,4 +1,4 @@
-Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Name: JAMin
 Maintainer: Steve Harris <steve@plugin.org.uk>
 Source: http://jamin.sourceforge.net
