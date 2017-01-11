@@ -5,9 +5,7 @@ Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alio
 Uploaders:
  Jonas Smedegaard <dr@jones.dk>,
 Build-Depends: cdbs,
- libtool,
- autoconf,
- automake,
+ dh-autoreconf,
  debhelper,
  dh-buildinfo,
  docbook-to-man,
