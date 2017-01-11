@@ -7,7 +7,7 @@ Forwarded: no
 
 --- jamin.orig/data/jamin.desktop.in
 +++ jamin/data/jamin.desktop.in
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,9 @@
  [Desktop Entry]
 -Encoding=UTF-8
  _Name=JAMin
@@ -15,6 +15,7 @@ Forwarded: no
  _Comment=JACK Audio Mastering interface
 -Categories=Application;AudioVideo;
 +Categories=AudioVideo;Audio;
++Keywords=audio;sound;mastering;ladspa
  Exec=jamin
  Icon=jamin.svg
  MimeType=application/x-jamin;
