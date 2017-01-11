@@ -42,7 +42,7 @@ void kn_changed(int id, float value);
 void ma_changed(int id, float value);
 
 void calc_auto_gain(int i);
-void draw_comp_curve (int i);
+void draw_comp_curve (int i, cairo_t * cr);
 
 static GtkWidget *ma[XO_BANDS];
 static GtkAdjustment *adj_at[XO_BANDS];
@@ -103,16 +103,16 @@ static gboolean suspend_gang = FALSE;
 	snprintf(name, 255, "comp_" # sym "_%d", i+1); \
 	scale = lookup_widget(main_window, name); \
 	adj_##sym[i] = gtk_range_get_adjustment(GTK_RANGE(scale)); \
-        range_##sym[0][i] = adj_##sym[i]->lower; \
-        range_##sym[1][i] = adj_##sym[i]->upper; \
-        prev_value_##sym[i] = adj_##sym[i]->value; \
+        range_##sym[0][i] = gtk_adjustment_get_lower(adj_##sym[i]); \
+        range_##sym[1][i] = gtk_adjustment_get_upper(adj_##sym[i]); \
+        prev_value_##sym[i] = gtk_adjustment_get_value(adj_##sym[i]); \
         s_set_callback(state_id, sym##_changed); \
 	s_set_adjustment(state_id, adj_##sym[i]); \
 	s_set_value(state_id, compressors[i].member, 0); \
 	sig_hand_##sym[i] = g_signal_connect(G_OBJECT(adj_##sym[i]), "value-changed", G_CALLBACK(adj_cb), GINT_TO_POINTER (state_id)); 
 
-	//g_signal_connect(G_OBJECT(adj_##sym[i]), "value-changed", G_CALLBACK(sym##_changed), (gpointer)i); 
-	//gtk_adjustment_set_value(adj_##sym[i], compressors[i].member);
+//	g_signal_connect(G_OBJECT(adj_##sym[i]), "value-changed", G_CALLBACK(sym##_changed), (gpointer)i); 
+//	gtk_adjustment_set_value(adj_##sym[i], compressors[i].member);
 
 void bind_compressors()
 {
@@ -144,7 +144,7 @@ void bind_compressors()
 
 gboolean adj_cb(GtkAdjustment *adj, gpointer p)
 {
-    s_set_value_ui(GPOINTER_TO_INT (p), adj->value);
+    s_set_value_ui(GPOINTER_TO_INT (p), gtk_adjustment_get_value(adj));
 
     return FALSE;
 }
@@ -177,7 +177,7 @@ void at_changed(int id, float value)
 
                   g_signal_handler_unblock (adj_at[j], sig_hand_at[j]);
                 }
-              draw_comp_curve(j);
+				comp_curve_update(j);
             }
         }
     }
@@ -186,7 +186,7 @@ void at_changed(int id, float value)
 
 
   compressors[i].attack = value;
-  draw_comp_curve(i);
+  comp_curve_update(i);
 }
 
 void re_changed(int id, float value)
@@ -217,7 +217,7 @@ void re_changed(int id, float value)
 
                   g_signal_handler_unblock (adj_re[j], sig_hand_re[j]);
                 }
-              draw_comp_curve(j);
+				comp_curve_update(j);
             }
         }
     }
@@ -226,7 +226,7 @@ void re_changed(int id, float value)
 
 
   compressors[i].release = value;
-  draw_comp_curve(i);
+  comp_curve_update;
 }
 
 void th_changed(int id, float value)
@@ -260,7 +260,7 @@ void th_changed(int id, float value)
               if (auto_gain[j]) {
                 calc_auto_gain(j);
               } else {
-                draw_comp_curve(j);
+				comp_curve_update(j);
               }
               gtk_meter_set_warn_point(le_meter[j], new_value);
             }
@@ -274,7 +274,7 @@ void th_changed(int id, float value)
   if (auto_gain[i]) {
     calc_auto_gain(i);
   } else {
-    draw_comp_curve(i);
+	comp_curve_update(i);
   }
   gtk_meter_set_warn_point(le_meter[i], value);
 }
@@ -310,7 +310,7 @@ void ra_changed(int id, float value)
               if (auto_gain[j]) {
                 calc_auto_gain(j);
               } else {
-                draw_comp_curve(j);
+				comp_curve_update(j);
               }
               gtk_meter_set_warn_point(le_meter[j], new_value);
             }
@@ -324,7 +324,7 @@ void ra_changed(int id, float value)
   if (auto_gain[i]) {
     calc_auto_gain(i);
   } else {
-    draw_comp_curve(i);
+	comp_curve_update(i);
   }
   gtk_meter_set_warn_point(le_meter[i], value);
 }
@@ -357,7 +357,7 @@ void kn_changed(int id, float value)
 
                   g_signal_handler_unblock (adj_kn[j], sig_hand_kn[j]);
                 }
-              draw_comp_curve(j);
+				comp_curve_update(j);
             }
         }
     }
@@ -366,7 +366,7 @@ void kn_changed(int id, float value)
 
 
   compressors[i].knee = value * 10.0f;
-  draw_comp_curve(i);
+  comp_curve_update(i);
 }
 
 void ma_changed(int id, float value)
@@ -403,7 +403,7 @@ void ma_changed(int id, float value)
 		  gtk_button_set_label (GTK_BUTTON(autobutton[j]), val);
 		  free (val);
                 }
-              draw_comp_curve(j);
+              comp_curve_update(j);
             }
 
         }
@@ -418,14 +418,14 @@ void ma_changed(int id, float value)
   gtk_button_set_label (GTK_BUTTON(autobutton[i]), val);
   free (val);
 
-  draw_comp_curve(i);
+  comp_curve_update(i);
 }
 
 void calc_auto_gain(int i)
 {
     if (adj_ma[i] && adj_th[i] && adj_ra[i]) {
-	s_set_value_no_history(S_COMP_MAKEUP(i), (adj_th[i]->value / adj_ra[i]->value - adj_th[i]->value) * MUG_CORR_FACT);
-	//gtk_adjustment_set_value(adj_ma[i], adj_th[i]->value / adj_ra[i]->value - adj_th[i]->value);
+	s_set_value_no_history(S_COMP_MAKEUP(i), (gtk_adjustment_get_value(adj_th[i]) / gtk_adjustment_get_value(adj_ra[i]) - gtk_adjustment_get_value(adj_th[i])) * MUG_CORR_FACT);
+	gtk_adjustment_set_value(adj_ma[i], gtk_adjustment_get_value(adj_th[i]) / gtk_adjustment_get_value(adj_ra[i]) - gtk_adjustment_get_value(adj_th[i]));
     }
 }
 
@@ -434,8 +434,8 @@ void compressor_meters_update()
     int i;
 
     for (i=0; i<XO_BANDS; i++) {
-	gtk_adjustment_set_value(le_meter_adj[i], compressors[i].amplitude);
-	gtk_adjustment_set_value(ga_meter_adj[i], compressors[i].gain_red);
+	 gtk_adjustment_set_value(le_meter_adj[i], compressors[i].amplitude);
+	 gtk_adjustment_set_value(ga_meter_adj[i], compressors[i].gain_red);
     }
 }
 

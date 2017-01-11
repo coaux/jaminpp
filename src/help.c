@@ -51,9 +51,9 @@ void message (GtkMessageType type, char *string)
                                           type, GTK_BUTTONS_CLOSE,
                                           "%s", string);
 
-    g_signal_connect_swapped (GTK_OBJECT (message_dialog), "response",
+    g_signal_connect_swapped (message_dialog, "response",
                            G_CALLBACK (gtk_widget_destroy),
-                           GTK_OBJECT (message_dialog));
+                           &message_dialog);
 
 
     /*  This little callback goody is what sets message_dialog to NULL when it
@@ -61,7 +61,7 @@ void message (GtkMessageType type, char *string)
         messages it will destroy any that are already up.  We'll only get the
         last message.  */
 
-    g_signal_connect (GTK_OBJECT (message_dialog), "destroy",
+    g_signal_connect (message_dialog, "destroy",
                       G_CALLBACK (gtk_widget_destroyed),
                       &message_dialog);
 

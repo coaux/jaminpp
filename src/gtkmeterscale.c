@@ -16,8 +16,8 @@
 
 #include <math.h>
 #include <stdio.h>
-#include <gtk/gtkmain.h>
-#include <gtk/gtksignal.h>
+//#include <gtk/gtkmain.h>
+//#include <gtk/gtksignal.h>
 
 #include "gtkmeterscale.h"
 
@@ -27,7 +27,7 @@
 
 static void gtk_meterscale_class_init          (GtkMeterScaleClass    *klass);
 static void gtk_meterscale_init                (GtkMeterScale         *meterscale);
-static void gtk_meterscale_destroy             (GtkObject        *object);
+static void gtk_meterscale_destroy             (GObject        *object);
 static void gtk_meterscale_realize             (GtkWidget        *widget);
 static void gtk_meterscale_size_request        (GtkWidget      *widget,
 					        GtkRequisition *requisition);

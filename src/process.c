@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: process.c,v 1.79 2008/12/03 03:22:03 kotau Exp $
+ *  $Id: process.c,v 1.84 2013/02/09 15:47:30 kotau Exp $
  */
 
 #include <math.h>
@@ -117,8 +117,8 @@ static float ws_boost_a = 1.0f;
 
 static unsigned int latcorbuf_pos;
 static unsigned int latcorbuf_len;
-static float *latcorbuf[NCHANNELS];
-static float *latcorbuf_postcomp[NCHANNELS];
+static float *latcorbuf[BCHANNELS];
+static float *latcorbuf_postcomp[BCHANNELS];
 
 static int spectrum_mode = SPEC_POST_EQ;
 
@@ -129,7 +129,8 @@ static int limiter_bypass = FALSE;
 static int limiter_bypass_pending = FALSE;
 static int rms_time_slice;
 
-volatile int global_gui = 0;		/* updated from GUI thread */
+volatile int global_main_gui = 0;		/* updated from GUI thread */
+volatile int global_multiout_gui = 0;		/* updated from GUI thread */
 
 /* Data for plugins */
 plugin *comp_plugin, *lim_plugin[2];
@@ -156,55 +157,54 @@ float ft_rez_hp_b_val = 1.2;
 void run_eq(unsigned int port, unsigned int in_pos);
 void run_eq_iir(unsigned int port, unsigned int in_pos);
 void run_width(int xo_band, float *left, float *right, int nframes);
+static void k_window_init(int alpha, float *window, int n, int iter);
+static void kbd_window_init(int alpha, float *window, int n, int iter);
 
 void process_init(float fs)
 {
     float centre = 25.0f;
     unsigned int i, j, band;
 
-
     sample_rate = fs;
 
-
     for (i = 0; i < BANDS; i++) {
-	band_f[i] = centre;
-	//printf("band %d = %fHz\n", i, centre);
-	centre *= 1.25992105f;		/* up a third of an octave */
-	gain_fix[i] = 0.0f;
+		band_f[i] = centre;
+		//printf("band %d = %fHz\n", i, centre);
+		centre *= 1.25992105f;		/* up a third of an octave */
+		gain_fix[i] = 0.0f;
     }
 
     band = 0;
     for (i = 0; i < BINS / 2; i++) {
-	const float binfreq =
-	    sample_rate * 0.5f * (i + 0.5f) / (float) BINS;
+		const float binfreq = sample_rate * 0.5f * (i + 0.5f) / (float) BINS;
 
-	while (binfreq > (band_f[band] + band_f[band + 1]) * 0.5f) {
-	    band++;
-	    if (band >= BANDS - 1) {
-		band = BANDS - 1;
-		break;
-	    }
-	}
-	bands[i] = band;
-	gain_fix[band]++;
-	//printf("bin %d (%f) -> band %d (%f) #%d\n", i, binfreq, band, band_f[band], (int)gain_fix[band]);
-    }
-
-    for (i = 0; i < BANDS; i++) {
-	if (gain_fix[i] != 0.0f) {
-	    gain_fix[i] = 1.0f / gain_fix[i];
-	} else {
-	    /* There are no bins for this band, reassign a nearby one */
-	    for (j = 0; j < BINS / 2; j++) {
-		if (bands[j] > i) {
-		    gain_fix[bands[j]]--;
-		    bands[j] = i;
-		    gain_fix[i] = 1.0f;
-		    break;
+		while (binfreq > (band_f[band] + band_f[band + 1]) * 0.5f) {
+			band++;
+			if (band >= BANDS - 1) {
+				band = BANDS - 1;
+				break;
+			}
 		}
-	    }
+		bands[i] = band;
+		gain_fix[band]++;
+		//printf("bin %d (%f) -> band %d (%f) #%d\n", i, binfreq, band, band_f[band], (int)gain_fix[band]);
 	}
-    }
+
+	for (i = 0; i < BANDS; i++) {
+		if (gain_fix[i] != 0.0f) {
+			gain_fix[i] = 1.0f / gain_fix[i];
+		} else {
+			/* There are no bins for this band, reassign a nearby one */
+			for (j = 0; j < BINS / 2; j++) {
+				if (bands[j] > i) {
+					gain_fix[bands[j]]--;
+					bands[j] = i;
+					gain_fix[i] = 1.0f;
+					break;
+				}
+			}
+		}
+	}
 
     /* Allocate space for FFT data */
     real = fftwf_malloc(sizeof(fft_data) * BINS);
@@ -214,15 +214,19 @@ void process_init(float fs)
     plan_rc = fftwf_plan_r2r_1d(BINS, real, comp, FFTW_R2HC, FFTW_MEASURE);
     plan_cr = fftwf_plan_r2r_1d(BINS, comp_tmp, real, FFTW_HC2R, FFTW_MEASURE);
 
-    /* Calculate root raised cosine window */
-    for (i = 0; i < BINS; i++) {
-       window[i] = -0.5f * cosf(2.0f * M_PI * (float) i /
-                                (float) BINS) + 0.5f;
+
+	/*	Use Kaiser-Bessel window for best results - Code taken from mplayer */
+		kbd_window_init(5.0, &window, BINS, 50);
+		
+    /* Calculate window*/
+//   for (i = 0; i < BINS; i++) {
+
+//     window[i] = -0.5f * cosf(2.0f * M_PI * (float) i / (float) BINS) + 0.5f; 
 /* root raised cosine window - aparently sounds worse ...
 	window[i] = sqrtf(0.5f + -0.5 * cosf(2.0f * M_PI * (float) i /
 			  (float) BINS));
 */
-    }
+//   }
 
     plugin_init();
     comp_plugin = plugin_load("sc4_1882.so");
@@ -285,13 +289,58 @@ void process_init(float fs)
     /* Allocate at least 1 second of latency correction buffer */
     for (latcorbuf_len = 256; latcorbuf_len < fs * 1.0f; latcorbuf_len *= 2);
     latcorbuf_pos = 0;
-    for (i=0; i < NCHANNELS; i++) {
+    for (i=0; i < BCHANNELS; i++) {
 	latcorbuf[i] = calloc(latcorbuf_len, sizeof(float));
 	latcorbuf_postcomp[i] = calloc(latcorbuf_len, sizeof(float));
     }
 
     /* Clear the crossover filters state */
     memset(xo_filt, 0, sizeof(xo_filt));
+}
+
+
+/**
+ * Generate a Kaiser Window.
+ */
+static void k_window_init(int alpha, float *window, int n, int iter)
+{
+    int j, k;
+    float a, x;
+    a = alpha * M_PI / n;
+    a = a*a;
+    for(k=0; k<n; k++) {
+        x = k * (n - k) * a;
+        window[k] = 1.0;
+        for(j=iter; j>0; j--) {
+            window[k] = (window[k] * x / (j*j)) + 1.0;
+        }
+    }
+}
+
+/**
+ * Generate a Kaiser-Bessel Derived Window.
+ * @param alpha  determines window shape
+ * @param window array to fill with window values
+ * @param n      length of the window
+ * @param iter   number of iterations to use in BesselI0
+ */
+static void
+kbd_window_init(int alpha, float *window, int n, int iter)
+{
+    int k, n2;
+    float *kwindow;
+
+    n2 = n >> 1;
+    kwindow = &window[n2];
+    k_window_init(alpha, kwindow, n2, iter);
+    window[0] = kwindow[0];
+    for(k=1; k<n2; k++) {
+        window[k] = window[k-1] + kwindow[k];
+    }
+    for(k=0; k<n2; k++) {
+        window[k] = sqrt(window[k] / (window[n2-1]+1));
+        window[n-1-k] = window[k];
+    }
 }
 
 void run_eq(unsigned int port, unsigned int in_ptr)
@@ -452,12 +501,13 @@ float bin_peak_read_and_clear(int bin)
 
 int process_signal(jack_nframes_t nframes,
 		   int nchannels,
+		   int bchannels,
 		   jack_default_audio_sample_t *in[],
 		   jack_default_audio_sample_t *out[])
 {
     unsigned int pos, port, band;
     const unsigned int latency = BINS - dsp_block_size;
-    static unsigned int in_ptr = 0, dpos[2] = {0, 0};
+    static unsigned int in_ptr = 0, dpos[8] = {0,0,0,0,0,0,0,0};
     static unsigned int n_calc_pt = BINS - (BINS / OVER_SAMP);
 
 
@@ -594,7 +644,7 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 
     //printf("run compressors...\n");
 
-    for (port = 0; port < nchannels; port++) {
+    for (port = 0; port < bchannels; port++) {
 	for (pos = 0; pos < nframes; pos++) {
 
           /*  Original (no delay) code.
@@ -603,21 +653,59 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 		out_tmp[port][XO_HIGH][pos];
           */
 
+          
+          
+		/* original  2 channel output */
 
-          delay_buf[port][XO_LOW][dpos[port] & delay_mask] = out_tmp[port][XO_LOW][pos];
+		/* copy out_tmp[] to delay_buf[] */
+		/*
+		  delay_buf[port][XO_LOW][dpos[port] & delay_mask] = out_tmp[port][XO_LOW][pos];
           delay_buf[port][XO_MID][dpos[port] & delay_mask] = out_tmp[port][XO_MID][pos];
           delay_buf[port][XO_HIGH][dpos[port] & delay_mask] = out_tmp[port][XO_HIGH][pos];
+		 * 
+		  out[port][pos] = delay_buf[port % 2][XO_LOW][(dpos[port % 2] - delay[XO_LOW]) & delay_mask] +
+					delay_buf[port % 2][XO_MID][(dpos[port % 2] - delay[XO_MID]) & delay_mask] +
+					delay_buf[port % 2][XO_HIGH][(dpos[port % 2] - delay[XO_HIGH]) & delay_mask];
+		 * 
+		 */		
+		
 
-          out[port][pos] = delay_buf[port][XO_LOW][(dpos[port] - delay[XO_LOW]) & delay_mask] +
-            delay_buf[port][XO_MID][(dpos[port] - delay[XO_MID]) & delay_mask] +
-            delay_buf[port][XO_HIGH][(dpos[port] - delay[XO_HIGH]) & delay_mask];
-
+		/* copy out_tmp[] to delay_buf[] */
+		delay_buf[port % 2][XO_LOW][dpos[port % 2] & delay_mask] = out_tmp[port % 2][XO_LOW][pos];
+		delay_buf[port % 2][XO_MID][dpos[port % 2] & delay_mask] = out_tmp[port % 2][XO_MID][pos];
+		delay_buf[port % 2][XO_HIGH][dpos[port % 2] & delay_mask] = out_tmp[port % 2][XO_HIGH][pos];
+		
+		/* multi channel output */				
+		switch (port){
+			case 0:
+			case 1:
+					
+				out[port][pos] = delay_buf[port][XO_LOW][(dpos[port] - delay[XO_LOW]) & delay_mask]
+					 + delay_buf[port][XO_MID][(dpos[port] - delay[XO_MID]) & delay_mask]
+					 + delay_buf[port][XO_HIGH][(dpos[port] - delay[XO_HIGH]) & delay_mask];
+			break;	
+			case 2:
+			case 3:
+				out[port][pos] = delay_buf[port % 2][XO_LOW][(dpos[port % 2] - delay[XO_LOW]) & delay_mask];
+			break;
+			case 4:
+			case 5:
+				out[port][pos] = delay_buf[port % 2][XO_MID][(dpos[port % 2] - delay[XO_MID]) & delay_mask];
+			break;
+			case 6:
+			case 7:
+				out[port][pos] = delay_buf[port % 2][XO_HIGH][(dpos[port % 2] - delay[XO_HIGH]) & delay_mask];
+			break;			
+		}
+	
+		
+		
           dpos[port]++;
 
-
-          /* Keep buffer of compressor outputs incase we need it for
-           * limiter bypass */
-          latcorbuf_postcomp[port][(latcorbuf_pos + pos) & (latcorbuf_len - 1)] = out[port][pos];
+			/* Keep buffer of compressor outputs incase we need it for
+			* limiter bypass */
+			latcorbuf_postcomp[port][(latcorbuf_pos + pos) & (latcorbuf_len - 1)] = out[port][pos];		
+          
 	}
     }
 
@@ -629,9 +717,11 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
 	    out[port][pos] *= limiter_gain;
 
 	    /* Check for peaks */
-	    if (out[port][pos] > lim_peak[LIM_PEAK_IN]) {
-		lim_peak[LIM_PEAK_IN] = out[port][pos];
-	    }
+	    if ( port < 2 ){
+			if (out[port][pos] > lim_peak[LIM_PEAK_IN]) {
+			lim_peak[LIM_PEAK_IN] = out[port][pos];
+			}
+		}
 	}
     }
 
@@ -648,10 +738,11 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
     plugin_run(lim_plugin[limiter_plugin], limiter[limiter_plugin].handle, nframes);
 
     /* Keep a buffer of old input data, in case we need it for bypass */
-    for (port = 0; port < nchannels; port++) {
+    for (port = 0; port < bchannels; port++) {
 	for (pos = 0; pos < nframes; pos++) {
 	    latcorbuf[port][(latcorbuf_pos + pos) & (latcorbuf_len - 1)] =
-		in[port][pos];
+		in[port % 2][pos];
+	//	g_print("port %i - %i\n", port, port % 2);
 	}
     }
 
@@ -660,7 +751,7 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
     if (limiter_bypass) {
 	const unsigned int limiter_latency = (unsigned int)limiter[limiter_plugin].latency;
 
-	for (port = 0; port < nchannels; port++) {
+	for (port = 0; port < bchannels; port++) {
 	    for (pos = 0; pos < nframes; pos++) {
 		out[port][pos] = latcorbuf_postcomp[port][(latcorbuf_pos +
 			pos - limiter_latency - nframes) & (latcorbuf_len - 1)];
@@ -670,7 +761,7 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
     if (global_bypass) {
 	const unsigned int limiter_latency = (unsigned int)limiter[limiter_plugin].latency;
 
-	for (port = 0; port < nchannels; port++) {
+	for (port = 0; port < bchannels; port++) {
 	    for (pos = 0; pos < nframes; pos++) {
 		out[port][pos] = latcorbuf[port][(latcorbuf_pos +
 			pos - limiter_latency - nframes) & (latcorbuf_len - 1)];
@@ -704,7 +795,7 @@ printf("WARNING: wierd input: %f\n", in_buf[port][in_ptr]);
       }
 
 
-    /* We've got the the end of the processing, so update the actions */
+    /* We've got to the end of the processing, so update the actions */
 
     for (band = 0; band < XO_NBANDS; band++) {
 	xo_band_action[band] = xo_band_action_pending[band];

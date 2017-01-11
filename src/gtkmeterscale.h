@@ -19,8 +19,8 @@
 
 
 #include <gdk/gdk.h>
-#include <gtk/gtkadjustment.h>
-#include <gtk/gtkwidget.h>
+#include <gtk/gtk.h>
+//#include <gtk/gtkwidget.h>
 
 
 #ifdef __cplusplus

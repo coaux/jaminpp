@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2003 Steve Harris
+ *  Copyright (C) 2009 Patrick Shirkey
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: presets-ui.c,v 1.1 2008/12/03 03:22:03 kotau Exp $
+ *  $Id: presets-ui.c,v 1.5 2013/02/09 15:47:30 kotau Exp $
  */
 
 #include <stdio.h>
@@ -21,7 +21,8 @@
 #include "process.h"
 #include "support.h"
 #include "main.h"
-#include "gtkmeter.h"
+#include "multiout-ui.h"
+//#include "gtkmeter.h"
 #include "state.h"
 #include "db.h"
 
@@ -30,22 +31,44 @@
 static GtkButton *tButton;
 
 
-void presets_ui_update ()
+void presets_ui_show_main (GtkButton *tButton)
 {
 	
-	tButton = GTK_BUTTON(lookup_widget(presets_window, "eButton1"));
-	
-	if(global_gui){
+	if(global_main_gui){
 		gtk_widget_show(main_window);
-		gtk_button_set_label(tButton, "hide");
+	//	gtk_button_set_label(tButton, "hide");
+		gui_mode = 0;
 			
 	}else {
 		gtk_widget_hide(main_window);
-		gtk_button_set_label(tButton, "show");
+	//	gtk_button_set_label(tButton, "show");
+		gui_mode = 1;
 		
 	}
 	//g_print("clicked");
 		
 }
+
+
+
+void presets_ui_show_multiout (GtkButton *tButton)
+{
+	
+	if(global_multiout_gui){
+		multiout_ui_build(multiout_window);
+		gtk_widget_show(multiout_window);
+	//	gtk_button_set_label(tButton, "hide");
+		gui_mode = 3;
+			
+	}else {
+		gtk_widget_hide(multiout_window);
+	//	gtk_button_set_label(tButton, "show");
+		gui_mode = 0;
+		
+	}
+	//g_print("clicked");
+		
+}
+
 
 /* vi:set ts=8 sts=4 sw=4: */

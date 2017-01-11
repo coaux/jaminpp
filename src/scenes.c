@@ -68,7 +68,7 @@ void bind_scenes ()
     char            *name;
 
 
-    GtkTooltips *tooltips = gtk_tooltips_new();
+ //   GtkTooltips *tooltips = gtk_tooltips_new();
 
     name = malloc(sizeof(char) * 32);
 
@@ -111,9 +111,9 @@ void bind_scenes ()
         scene_state[i].value[S_NOTCH_FREQ(4)] = 16903.0;
 
 
-        gtk_tooltips_set_tip (tooltips, GTK_WIDGET (l_scene_eventbox[i]), 
+        gtk_widget_set_tooltip_text ( GTK_WIDGET (l_scene_eventbox[i]), 
                               g_strdup_printf 
-                              ("Scene %d, right click for menu", i + 1), NULL);
+                              ("Scene %d, right click for menu", i + 1));
       }
 
     free(name);
@@ -192,7 +192,7 @@ void select_scene (int number, int button)
                             if (scene_state[i].value[(S_NOTCH_FREQ(j))] == 0.0)
                               {
                                 scene_state[i].value[S_NOTCH_FREQ(j)] = 
-                                  hdeq_get_notch_default_freq (j);
+         //                         hdeq_get_notch_default_freq (j);
 
                                 scene_state[i].value[S_NOTCH_Q(j)] = 5.0;
                                 scene_state[i].value[S_NOTCH_GAIN(j)] = 0.0;
@@ -207,7 +207,7 @@ void select_scene (int number, int button)
 
                         s_crossfade_to_state (&scene_state[i], -1.0f);
 
-                        set_EQ_curve_values (0, 0.0);
+        //                set_EQ_curve_values (0, 0.0);
 
                         s_history_add_state (scene_state[i]);
 
@@ -288,7 +288,7 @@ void set_scene (int scene_num)
 {
     int         i;
 
-    GtkTooltips *tooltips = gtk_tooltips_new();
+ //   GtkTooltips *tooltips = gtk_tooltips_new();
 
 
 
@@ -348,8 +348,8 @@ void set_scene (int scene_num)
 
     /*  Set the tooltip to the full name.  */
 
-    gtk_tooltips_set_tip (tooltips, GTK_WIDGET (l_scene_eventbox[menu_scene]), 
-                          scene_state[menu_scene].description, NULL);
+    gtk_widget_set_tooltip_text ( GTK_WIDGET (l_scene_eventbox[menu_scene]), 
+                          scene_state[menu_scene].description );
 }
 
 
@@ -373,7 +373,7 @@ const char *get_scene_name (int number)
 
 void set_scene_name (int number, const char *scene_name)
 {
-    GtkTooltips *tooltips = gtk_tooltips_new();
+  //  GtkTooltips *tooltips = gtk_tooltips_new();
     int         i;
 
 
@@ -398,8 +398,8 @@ void set_scene_name (int number, const char *scene_name)
 
     /*  Set the tooltip to the name.  */
 
-    gtk_tooltips_set_tip (tooltips, GTK_WIDGET (l_scene_eventbox[menu_scene]), 
-                          scene_state[menu_scene].description, NULL);
+    gtk_widget_set_tooltip_text ( GTK_WIDGET (l_scene_eventbox[menu_scene]), 
+                          scene_state[menu_scene].description );
 }
 
 
@@ -411,7 +411,7 @@ void clear_scene (int scene_num)
     int         i;
 
 
-    GtkTooltips *tooltips = gtk_tooltips_new();
+ //   GtkTooltips *tooltips = gtk_tooltips_new();
 
 
     /*  Strip off the warning if set.  */
@@ -422,9 +422,9 @@ void clear_scene (int scene_num)
     if (i >= 0) menu_scene = i;
 
 
-    gtk_tooltips_set_tip (tooltips, GTK_WIDGET (l_scene_eventbox[menu_scene]), 
+    gtk_widget_set_tooltip_text ( GTK_WIDGET (l_scene_eventbox[menu_scene]), 
                           g_strdup_printf ("Scene %d, right click for menu", 
-                                           menu_scene + 1), NULL);
+                                           menu_scene + 1) );
 
 
     /*  Set the button to red.  */

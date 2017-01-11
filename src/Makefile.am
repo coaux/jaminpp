@@ -28,7 +28,6 @@ jamin_SOURCES = \
 	ladspa.h \
 	geq.c geq.h \
 	gtkmeter.c gtkmeter.h \
-	gtkmeterscale.c gtkmeterscale.h \
 	hdeq.c hdeq.h \
 	intrim.c intrim.h \
 	io.c io.h \
@@ -38,6 +37,7 @@ jamin_SOURCES = \
 	limiter-ui.c limiter-ui.h \
 	presets-ui.c presets-ui.h \
 	main.c main.h \
+	multiout-ui.c multiout-ui.h \	
 	plugin.c plugin.h \
 	process.c process.h \
 	resource.c resource.h \
