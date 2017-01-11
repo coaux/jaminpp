@@ -2,7 +2,7 @@ Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
 Name: JAMin
 Maintainer: Steve Harris <steve@plugin.org.uk>
 Source: http://jamin.sourceforge.net
-	:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jamin
+        git://git.code.sf.net/p/jamin/code
 
 Copyright: 2003-2004,2006, Steve Harris
 License: GPL-2+
@@ -77,6 +77,14 @@ Copyright: 2007, Raphaël Doursenaud <rdoursenaud@free.fr>
 	2008, Emmanuel Saracco <esaracco@free.fr>
 License: GPL-2+
 
+Files: ./po/cz.po
+Copyright: 2011, Pavel Fric <pavelfric@seznam.cz>
+License: GPL-2+
+
+Files: ./po/ru.po
+Copyright: 2005, Alexandre Prokoudine <avp@lrn.ru>
+License: GPL-2+
+
 Files: ./src/main.c
 	./jam-ui.glade
 	./src/callbacks_help.h
@@ -119,6 +127,8 @@ License: other-MIT
 Files: ./debian/*
 Copyright: 2003-2005, Robert Jordens <rjo@gmx.de>
 	2010, Jonas Smedegaard <dr@jones.dk>
+        2010-2011, Alessio Treglia <alessio@debian.org>
+        2017, IOhannes m zmölnig <umlaeute@debian.org>
 License: GPL-2+
 
 License: GPL-2+
