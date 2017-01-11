@@ -19,8 +19,8 @@ Build-Depends: @cdbs@,
  swh-plugins,
 Homepage: http://jamin.sourceforge.net/
 Standards-Version: 3.9.2
-Vcs-Git: git://git.debian.org/git/pkg-multimedia/jamin.git
-Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/jamin.git;a=summary
+Vcs-Git: https://anonscm.debian.org/git/pkg-multimedia/jamin.git
+Vcs-Browser: https://anonscm.debian.org/git/pkg-multimedia/jamin.git
 
 Package: jamin
 Architecture: any
