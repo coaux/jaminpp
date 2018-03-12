@@ -128,7 +128,7 @@ jamin (0.97.14~cvs~81203-1) unstable; urgency=low
 jamin (0.95.0-4) unstable; urgency=low
 
   * Porter NMU.
-  * Don't depends on libasound2-dev on non-linux architectures. closes: 
+  * Don't depends on libasound2-dev on non-linux architectures. closes:
     #327647.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 10 Dec 2006 21:24:20 +0100
@@ -189,7 +189,7 @@ jamin (0.9.0-6) unstable; urgency=high
 jamin (0.9.0-5) unstable; urgency=medium
 
   * urgency medium because this fixes an RC bug
-  * controller/Makefile*: _compile_ with -fPIC, not link; really 
+  * controller/Makefile*: _compile_ with -fPIC, not link; really
     closes: Bug#269781
 
  -- Robert Jordens <jordens@debian.org>  Fri,  3 Sep 2004 16:06:25 +0200
@@ -254,7 +254,7 @@ jamin (0.5.17+cvs030927-1) experimental; urgency=low
 
 jamin (0.5.14+cvs030914-2) unstable; urgency=low
 
-  * debian/control: add the missing comma between ${shlibs:Depends} 
+  * debian/control: add the missing comma between ${shlibs:Depends}
     and ${misc:Depends}; closes: Bug#211453
 
  -- Robert Jordens <jordens@debian.org>  Wed, 17 Sep 2003 23:51:17 +0200
