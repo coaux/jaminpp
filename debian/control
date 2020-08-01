@@ -2,8 +2,6 @@ Source: jamin
 Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
-Uploaders:
- Jonas Smedegaard <dr@jones.dk>,
 Build-Depends: cdbs,
  dh-autoreconf,
  debhelper,
