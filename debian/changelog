@@ -1,3 +1,39 @@
+jamin (0.98.9~git20170111~199091~repack1-2) unstable; urgency=medium
+
+  * Team Upload.
+  [ Ondřej Nový ]
+  * d/copyright: Use https protocol in Format field
+  * d/control: Set Vcs-* to salsa.debian.org
+  * d/changelog: Remove trailing whitespaces
+
+  [ Felipe Sateler ]
+  * Change maintainer address to debian-multimedia@lists.debian.org
+
+  [ Ondřej Nový ]
+  * d/watch: Use https protocol
+
+  [ Jonas Smedegaard ]
+  * Remove myself from Uploaders
+
+  [ Bas Couwenberg ]
+  * Build depend on libfftw3-dev, fftw3-dev no longer provided.
+   (closes: #1025309)
+
+  [ Nilesh Patra ]
+  * d/compat: Bump compat to 10
+  * Add d/clean
+  * Remove useless files in debian/ dir
+  * Add patch to Skip a couple of potiles
+  * Un-mess d/copyright
+  * d/control:
+    + Prune B-D on cdbs
+    + Remove useless B-D on dh_autoreconf
+  * d/rules: 
+    + Propagate debug flag into CFLAGS
+    + Switch from cdbs to debhelper (Closes: #997327)
+
+ -- Nilesh Patra <nilesh@debian.org>  Mon, 19 Dec 2022 00:29:43 +0530
+
 jamin (0.98.9~git20170111~199091~repack1-1) unstable; urgency=medium
 
   * Team upload.
