@@ -3,7 +3,6 @@ Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Build-Depends:
- dh-autoreconf,
  debhelper,
  dh-buildinfo,
  docbook-to-man,
