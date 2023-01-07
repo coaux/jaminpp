@@ -1,3 +1,11 @@
+jamin (0.98.9~git20170111~199091~repack1-3) UNRELEASED; urgency=medium
+
+  * Apply patch from Chris Lamb that makes builds reproducible by exporting
+    CFLAGS from dpkg-buildflags(1), thus ensuring that -fdebug-prefix-map (and
+    similar) are passed to the underlying build system (Closes: #1026876).
+
+ -- Nicholas D Steeves <sten@debian.org>  Mon, 26 Dec 2022 11:56:33 -0500
+
 jamin (0.98.9~git20170111~199091~repack1-2) unstable; urgency=medium
 
   * Team Upload.
