@@ -3,7 +3,7 @@ Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Build-Depends:
- debhelper,
+ debhelper-compat (= 10),
  docbook-to-man,
  libfftw3-dev,
  indent,
