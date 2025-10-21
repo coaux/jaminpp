@@ -6,3 +6,4 @@
 NEWS.patch
 fix_typos.patch
 add-potfiles.patch
+gcc15.patch

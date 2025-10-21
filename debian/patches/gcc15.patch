@@ -1,0 +1,22 @@
+--- a/src/callbacks.c
++++ b/src/callbacks.c
+@@ -1815,7 +1815,7 @@
+ on_jack_ports_activate                 (GtkMenuItem     *menuitem,
+                                         gpointer         user_data)
+ {
+-  iomenu_pull_down_ports(menuitem);
++  iomenu_pull_down_ports();
+ }
+ 
+ 
+--- a/src/state.c
++++ b/src/state.c
+@@ -422,7 +422,7 @@
+               }
+             else
+               {
+-                set_scene_warning_button (scene);
++                set_scene_warning_button ();
+               }
+           }
+         set_EQ_curve_values (0, 0.0);

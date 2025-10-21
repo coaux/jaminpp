@@ -1,10 +1,17 @@
-jamin (0.98.9~git20170111~199091~repack1-3) UNRELEASED; urgency=medium
+jamin (0.98.9~git20170111~199091~repack1-3) unstable; urgency=medium
 
+  * Team Upload.
+  * Replace dependency on libclutter-gtk-1.0-dev
+    with lesser dependency on libgtk-3-dev (Closes: #1060451)
+  * Remove obsolete dh-buildinfo build dependency
+  * Fix FTBFS with GCC 14/15 (Closes: #1075099)
+
+  [ Nicholas D Steeves ]
   * Apply patch from Chris Lamb that makes builds reproducible by exporting
     CFLAGS from dpkg-buildflags(1), thus ensuring that -fdebug-prefix-map (and
     similar) are passed to the underlying build system (Closes: #1026876).
 
- -- Nicholas D Steeves <sten@debian.org>  Mon, 26 Dec 2022 11:56:33 -0500
+ -- Alexandre Detiste <tchet@debian.org>  Tue, 21 Oct 2025 21:11:38 +0200
 
 jamin (0.98.9~git20170111~199091~repack1-2) unstable; urgency=medium
 
@@ -36,7 +43,7 @@ jamin (0.98.9~git20170111~199091~repack1-2) unstable; urgency=medium
   * d/control:
     + Prune B-D on cdbs
     + Remove useless B-D on dh_autoreconf
-  * d/rules: 
+  * d/rules:
     + Propagate debug flag into CFLAGS
     + Switch from cdbs to debhelper (Closes: #997327)
 
@@ -322,4 +329,3 @@ jamin (0.5.12+cvs030908-1) unstable; urgency=low
   * src/plugin.c: adjusted plugin_path to /usr/lib/ladspa
 
  -- Robert Jordens <jordens@debian.org>  Mon,  8 Sep 2003 10:23:43 +0200
-
