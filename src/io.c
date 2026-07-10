@@ -76,6 +76,9 @@
 #ifdef HAVE_JACK_CREATE_THREAD
 #include <jack/thread.h>
 #endif
+#ifdef HAVE_POSIX_SCHED
+#include <glib/gprintf.h>
+#endif
 
 #include "ringbuffer.h"		/* uses <jack/ringbuffer.h>, if available */
 #include "process.h"
@@ -1103,7 +1106,7 @@ int io_create_dsp_thread()
 	    _("%s: not permitted to create realtime DSP thread.\n"
 	      "\tYou must run as root or use JACK capabilities.\n"
 	      "\tContinuing operation, but with -t option.\n"), PACKAGE);
-        g_print(stderr, "%s\n", errstr);
+        g_fprintf(stderr, "%s\n", errstr);
         message (GTK_MESSAGE_WARNING, errstr);
         free (errstr);
 
