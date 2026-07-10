@@ -280,7 +280,7 @@ gtk_meter_new (GtkAdjustment *adjustment, gint direction, gint sides, gfloat min
 	priv->iec_lower = iec_scale(min);
 	priv->iec_upper = iec_scale(max);
 				
-	return newObject;
+	return (GtkWidget*)meter;
 }
 
 GtkAdjustment*

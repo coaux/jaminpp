@@ -427,7 +427,7 @@ void s_redo()
               }
             else
               {
-                set_scene_warning_button (scene);
+                set_scene_warning_button ();
               }
           }
         set_EQ_curve_values (0, 0.0);
