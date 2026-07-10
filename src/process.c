@@ -211,12 +211,12 @@ void process_init(float fs)
     comp = fftwf_malloc(sizeof(fft_data) * BINS);
     comp_tmp = fftwf_malloc(sizeof(fft_data) * BINS);
 
-    plan_rc = fftwf_plan_r2r_1d(BINS, real, comp, FFTW_R2HC, FFTW_MEASURE);
-    plan_cr = fftwf_plan_r2r_1d(BINS, comp_tmp, real, FFTW_HC2R, FFTW_MEASURE);
+    plan_rc = fftwf_plan_r2r_1d(BINS, (float*)real, (float*)comp, FFTW_R2HC, FFTW_MEASURE);
+    plan_cr = fftwf_plan_r2r_1d(BINS, (float*)comp_tmp, (float*)real, FFTW_HC2R, FFTW_MEASURE);
 
 
 	/*	Use Kaiser-Bessel window for best results - Code taken from mplayer */
-		kbd_window_init(5.0, &window, BINS, 50);
+		kbd_window_init(5.0,(float*) &window, BINS, 50);
 		
     /* Calculate window*/
 //   for (i = 0; i < BINS; i++) {

@@ -1815,7 +1815,7 @@ void
 on_jack_ports_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  iomenu_pull_down_ports(menuitem);
+  iomenu_pull_down_ports();
 }
 
 
@@ -2847,12 +2847,12 @@ on_global_bypass_toggled               (GtkToggleButton *togglebutton,
 
   process_set_global_bypass (state);
 
-  if ( togglebutton == lookup_widget(presets_window, "checkbutton1")) 
+  if ( togglebutton == (GtkButton*) lookup_widget(presets_window, "checkbutton1")) 
   {
-	  togglebutton1 = lookup_widget(main_window, "global_bypass");
+	  togglebutton1 = (GtkToggleButton*) lookup_widget(main_window, "global_bypass");
 	  
   } else {
-	  togglebutton1 = lookup_widget(presets_window, "checkbutton1");
+	  togglebutton1 = (GtkToggleButton*) lookup_widget(presets_window, "checkbutton1");
 	  
   }
 
@@ -3306,7 +3306,7 @@ on_eButton1_button_press_event         (GtkWidget       *widget,
 		global_main_gui = 1;
 	
 //	g_print("cllbk: clicked");
-	presets_ui_show_main (widget);
+	presets_ui_show_main ((GtkButton*)widget);
 	
   return FALSE;
 }
@@ -3324,7 +3324,7 @@ on_eButton2_button_press_event         (GtkWidget       *widget,
 		global_multiout_gui = 1;
 	
 //	g_print("cllbk: clicked");
-	presets_ui_show_multiout (widget);
+	presets_ui_show_multiout ((GtkButton*)widget);
 	
   return FALSE;
 }
