@@ -1,4 +1,25 @@
 /.pc
+*~
+*.log
+*.bak
+.#*
+*#
+/build*
+compile_commands.json
+# generated files (autotools)
+config.status
+.deps/
+libtool
+config.h
+po/Makefile.in
+po/POTFILES
+po/stamp-it
+stamp-h1
+Makefile
+autom4te.cache/
+# patch files
+*.orig
+*.rej
 # Prerequisites
 *.d
 
