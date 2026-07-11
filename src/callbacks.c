@@ -72,6 +72,7 @@ static GtkWidget        *scene_name_dialog, *about_dialog;
 static GtkEntry         *l_scene_name_entry;
 static GdkColor         l_main_color, l_eq_color, l_comp_color[XO_NBANDS], l_limiter_color;
 
+GtkNotebook *l_notebook1;
 
 void
 on_low2mid_value_changed               (GtkRange        *range,
