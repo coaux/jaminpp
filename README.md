@@ -1,7 +1,6 @@
-
 # JAMin README
 
-[JAMin](http://jamin.sourceforge.net) is a JACK Audio Mastering interface.
+[JAMin][jamin] is a JACK Audio Mastering interface.
 
 JAMin runs under the [JACK Audio Connection Kit][jack], a low-latency audio
 server, which can connect a number of different applications to an
@@ -53,4 +52,33 @@ double precision FFTW library:
 ```
 This is untested. You have been warned.
 
+----
+
+# jaminpp
+
+[jaminpp][jaminpp] is an _unofficial fork_ of [jamin].
+
+## Project Goals
+
+### Immediate Goals
+
+- Migrate the build system to [CMake](https://cmake.org/)
+- Update the UI for GTK Builder (GNOME 3)
+- Migrate `main` and the Jamin UI for gtkmm, glibmm, and related components in C++
+- Add unit tests ([catch2](https://github.com/catchorg/Catch2/) version 3)
+
+### Intermediate Goals
+
+- Update packaging (Debian packaging) for distribution as jaminpp
+- Provide packaging (spec file, testing) for latest Fedora releases
+
+### Long-Term Goals (Tentative)
+
+- Test for distribution on Microsoft Window platforms (Windows 7 to latest. clang, vcpkg, etc. ASIO?)
+- Test for distribution both as a free/open source stand-alone application and 
+  as a free/open source plugin using the [VST SDK](https://www.steinberg.net/developers/vstsdk/)
+
+
+[jamin]: http://jamin.sourceforge.net
 [jack]: https://jackaudio.org
+[jaminpp]: https://github.com/coaux/jaminpp
