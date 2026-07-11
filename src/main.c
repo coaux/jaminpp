@@ -55,7 +55,12 @@
 #include "preferences.h"
 #include "callbacks.h"
 
-
+#ifdef HAVE_OSC
+#  include <lo/lo_types.h>
+#  include <lo/lo_osc_types.h>
+#  include <lo/lo_lowlevel.h>
+#  include <lo/lo_serverthread.h>
+#endif
 
 GtkWidget *main_window, *presets_window, *multiout_window;
 char *jamin_dir = NULL;
@@ -147,7 +152,7 @@ int main(int argc, char *argv[])
 #ifdef HAVE_OSC
     st = lo_server_thread_new(OSC_PORT, error);
     if (st) {
-	lo_server_thread_add_method(st, OSC_PATH, "i", scene_handler, NULL);
+	lo_server_thread_add_method(st, OSC_PATH, "i", (void*)scene_handler, NULL);
 	lo_server_thread_start(st);
 	urlstr = lo_server_thread_get_url (st);
 	fprintf(stderr, "Started OSC server thread at %s\n", urlstr);
