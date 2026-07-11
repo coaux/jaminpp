@@ -20,7 +20,7 @@ You will need:
 
 ### Tools
 
-- gcc >= 2.95
+- gcc >= 2.95 (or clang)
 - autoconf >= 2.52
 - automake >= 1.4
 - libtool >= 1.4.2
