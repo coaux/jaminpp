@@ -1,0 +1,20 @@
+{
+  "name": "jaminpp",
+  "version": "1.0.0",
+  "dependencies": [
+    {
+      "name": "fftw3",
+      "features": [
+        "avx2"
+      ]
+    },
+    "gtkmm",
+    {
+      "name": "libxml2",
+      "features": [
+        "legacy"
+      ]
+    },
+    "liblo"
+  ]
+}
