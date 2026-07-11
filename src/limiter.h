@@ -17,8 +17,9 @@
 #ifndef LIMITER_H
 #define LIMITER_H
 
-#include <process.h>
 
+#include "ladspa.h"
+#include "plugin.h"
 #define LIM_INGAIN        0
 #define LIM_LIMIT         1
 #define LIM_RELEASE       2

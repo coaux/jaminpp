@@ -17,7 +17,8 @@
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
-#include <process.h>
+#include "ladspa.h"
+#include "plugin.h"
 
 #define COMP_RMS_PEAK                   0
 #define COMP_ATTACK                     1
