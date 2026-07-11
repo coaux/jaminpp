@@ -47,9 +47,10 @@ requirement.
 	  scene changes over OSC and a commandline tool will be built
 
 When compiling, you can request that JAMin links with the (default)
-double precision FFTW library (using `./configure --enable-double-fft`),
-but this is unlikely to result in a JAMin that will run in realtime,
-and is untested. You have been warned.
+double precision FFTW library:
+```bash
+./configure --enable-double-fft
+```
+This is untested. You have been warned.
 
 [jack]: https://jackaudio.org
-
