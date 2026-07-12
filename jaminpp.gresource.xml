@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/io/github/coaux/jaminpp/ui">
+    <file preprocess="xml-stripblanks">src/jam.ui</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/JAMin_icon.xpm</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/LED_green_off.xpm</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/LED_green_on.xpm</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/LED_red.xpm</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/LED_yellow.xpm</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/about_image.png</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/brushed-steel.png</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/pause1.png</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/play1.png</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/thai-gold-knobs.png</file>
+  </gresource>
+  <gresource prefix="/io/github/coaux/jaminpp">
+    <file>pixmaps/thai-gold.png</file>
+  </gresource>
+</gresources>

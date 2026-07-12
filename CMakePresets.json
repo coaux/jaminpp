@@ -1,0 +1,115 @@
+{
+    "version": 5,
+    "cmakeMinimumRequired": {
+        "major": 4,
+        "minor": 2,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "_ninja-build",
+            "hidden": true,
+            "generator": "Ninja"
+        },
+        {
+            "name": "_vcpkg",
+            "hidden": true,
+            "environment": {
+                "VCPKG_ROOT": "${sourceDir}/vendor/vcpkg",
+                "VCPKG_BINARY_SOURCES": "clear;files,${sourceDir}/build/cache,readwrite"
+            },
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+            }
+        },
+        {
+            "name": "_debug",
+            "hidden": true,
+            "inherits": [
+                "_ninja-build"
+            ],
+            "binaryDir": "${sourceDir}/build/debug",
+            "environment": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/prefix_debug"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true
+            }
+        },
+        {
+            "name": "debug-gcc",
+            "inherits": [
+                "_debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-pipe -Wall -O0 -ggdb",
+                "CMAKE_CXX_FLAGS": "-pipe -Wall -O0 -ggdb"
+            }
+        },
+        {
+            "name": "debug-gcc-vcpkg",
+            "inherits": [
+                "debug-gcc",
+                "_vcpkg"
+            ]
+        },
+        {
+            "name": "_release",
+            "hidden": true,
+            "inherits": [
+                "_ninja-build"
+            ],
+            "binaryDir": "${sourceDir}/build/release",
+            "environment": {},
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "release-gcc",
+            "inherits": [
+                "_release"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-pipe -Wall -O3 -ffast-math -DNO_DEBUG",
+                "CMAKE_CXX_FLAGS": "-pipe -Wall -O3 -ffast-math -DNO_DEBUG"
+            }
+        },
+        {
+            "name": "release-gcc-vcpkg",
+            "inherits": [
+                "release-gcc",
+                "_vcpkg"
+            ]
+        },
+        {
+            "name": "_release-debug",
+            "hidden": true,
+            "inherits": [
+                "_release"
+            ],
+            "binaryDir": "${sourceDir}/build/release-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "release-debug-gcc",
+            "inherits": [
+                "_release-debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-pipe -Wall -O3 -ffast-math",
+                "CMAKE_CXX_FLAGS": "-pipe -Wall -O3 -ffast-math"
+            }
+        },
+        {
+            "name": "release-debug-gcc-vcpkg",
+            "inherits": [
+                "release-debug-gcc",
+                "_vcpkg"
+            ]
+        }
+    ]
+}
