@@ -1,0 +1,31 @@
+
+#pragma once
+
+#cmakedefine ENABLE_NLS
+
+#define GETTEXT_PACKAGE "@CMAKE_PROJECT_NAME@"
+
+#define PACKAGE "@CMAKE_PROJECT_NAME@"
+
+#define VERSION "@CMAKE_PROJECT_VERSION@"
+
+#define FFTW_TYPE @JAMINPP_FFTW_TYPE@
+
+#cmakedefine HAVE_JACK_CLIENT_CREATE_THREAD
+
+#cmakedefine HAVE_JACK_CREATE_THREAD
+
+#cmakedefine HAVE_JACK_RINGBUFFER
+
+#cmakedefine HAVE_JACK_CLIENT_NAME_SIZE
+
+#cmakedefine HAVE_JACK_CLIENT_OPEN
+
+#cmakedefine HAVE_OSC
+
+#cmakedefine HAVE_POSIX_SCHED
+
+
+
+
+
