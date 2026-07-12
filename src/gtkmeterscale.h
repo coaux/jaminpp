@@ -28,9 +28,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-#define GTK_METERSCALE(obj)          GTK_CHECK_CAST (obj, gtk_meterscale_get_type (), GtkMeterScale)
-#define GTK_METERSCALE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, gtk_meterscale_get_type (), GtkMeterScaleClass)
-#define GTK_IS_METERSCALE(obj)       GTK_CHECK_TYPE (obj, gtk_meterscale_get_type ())
+#define GTK_METERSCALE(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, gtk_meterscale_get_type (), GtkMeterScale)
+#define GTK_METERSCALE_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, gtk_meterscale_get_type (), GtkMeterScaleClass)
+#define GTK_IS_METERSCALE(obj)       G_TYPE_CHECK_CLASS_TYPE (obj, gtk_meterscale_get_type ())
 
 #define GTK_METERSCALE_LEFT    1
 #define GTK_METERSCALE_RIGHT   2
