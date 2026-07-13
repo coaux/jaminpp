@@ -1,0 +1,15 @@
+#ifndef USING_GTK_HPP
+#define USING_GTK_HPP
+
+#include <gtk/gtk.h>
+
+#define _DEREF_VERSION(...) __VA_ARGS__
+
+#define _USING_GTK4_EVAL(VV) _DEREF_VERSION VV == 4
+#define _USING_GTK3_EVAL(VV) _DEREF_VERSION VV == 3
+
+#define USING_GTK4 (_USING_GTK4_EVAL(GTK_MAJOR_VERSION))
+#define USING_GTK3 (_USING_GTK3_EVAL(GTK_MAJOR_VERSION))
+
+
+#endif  // USING_GTK_HPP

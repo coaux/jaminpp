@@ -4,6 +4,7 @@
 #include <catch2/catch_session.hpp>
 #include <giomm/application.h>
 #include <glibmm/main.h>
+#include <jam/lib/using_gtk.hpp>
 
 /// @brief Test harness for a Gio::Application
 ///
@@ -30,7 +31,7 @@ public:
         : Base()
         , ses(ses)
         , rs(-1) {
-#if GTK_MAJOR_VERSION < 4
+#if USING_GTK3
         Base::set_flags(Gio::APPLICATION_HANDLES_COMMAND_LINE
                         | Gio::APPLICATION_HANDLES_OPEN
                         | Gio::APPLICATION_SEND_ENVIRONMENT

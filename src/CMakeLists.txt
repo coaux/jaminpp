@@ -1,6 +1,7 @@
 
 include(${${CMAKE_PROJECT_NAME}_SOURCE_DIR}/cmake/gresource.cmake)
 
+
 # build dependency (Fedora 44): one of
 # - pipewire-jack-audio-connection-kit-devel
 # - jack-audio-connection-kit-devel
@@ -76,7 +77,7 @@ check_symbol_exists(jack_client_open ${_JACK_H} HAVE_JACK_CLIENT_OPEN)
 # generate config.h
 configure_file(config.h.in gen/config.h @ONLY)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/gen)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/gen)
 
 # using GNUInstallDirs
 add_compile_definitions(
