@@ -6,8 +6,8 @@ project(jaminpp
     LANGUAGES C CXX
 )
 
-set(C_STANDARD 90)
-set(CXX_STANDARD 20)
+set(CMAKE_C_STANDARD 90)
+set(CMAKE_CXX_STANDARD 20)
 
 option(JAMINPP_FFT_DOUBLE "Enable double precision fourier transform" OFF)
 
@@ -18,6 +18,8 @@ option(JAMINPP_LANG "Build with translations" ON)
 option(JAMINPP_INSTALL "Build for Jamin++ installation" ON)
 
 option(JAMINPP_GTK4 "Build for Gtk4 (else Gtk3)" OFF)
+
+option(BUILD_TESTING "Build tests" ON)
 
 if(JAMINPP_GTK4)
     set(CACHE{JAMINPP_GTKMM_MODULE} TYPE INTERNAL VALUE gtkmm-4.0)
@@ -81,4 +83,21 @@ add_subdirectory(examples)
 ## language files (gettext)
 if(JAMINPP_LANG)
     add_subdirectory(po)
+endif()
+
+if(BUILD_TESTING)
+    find_package(Catch2 3 CONFIG QUIET)
+    if(NOT Catch2_FOUND)
+        message(STATUS "BUILD_TESTING is defined but Catch2 version 3 was not found. Adding dependency with FetchContent")
+        include(FetchContent)
+        FetchContent_Declare(Catch2
+            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+            GIT_TAG        v3.15.2
+        )
+        FetchContent_MakeAvailable(Catch2)
+    endif()
+    include(Catch)
+
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/add_catch_test.cmake)
+    add_subdirectory(test/src)
 endif()
