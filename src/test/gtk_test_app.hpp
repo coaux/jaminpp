@@ -1,36 +1,14 @@
+#pragma once
 
-#include <giomm/application.h>
 #include <iostream>
 #include <gtkmm.h>
 #include <catch2/catch_session.hpp>
+#include <test/gtest_harness.hpp>
 
-class GtkTestApp final : public Gtk::Application {
-
-    Catch::Session* ses;
-
+class GtkTestApp final : public GTestHarness<Gtk::Application> {
 public:
     GtkTestApp(Catch::Session* ses)
-        : Gtk::Application()
-        , ses(ses) {
-#if GTK_MAJOR_VERSION == 3
-        set_flags(Gio::APPLICATION_HANDLES_COMMAND_LINE
-                  | Gio::APPLICATION_HANDLES_OPEN
-                  | Gio::APPLICATION_SEND_ENVIRONMENT
-                  | Gio::APPLICATION_NON_UNIQUE);
-#else
-        set_flags(Gio::Application::Flags::HANDLES_COMMAND_LINE
-                  | Gio::Application::Flags::HANDLES_OPEN
-                  | Gio::Application::Flags::SEND_ENVIRONMENT
-                  | Gio::Application::Flags::NON_UNIQUE);
-#endif
-    };
-
-    int run(int argc, char** argv) {
-        int rs = ses->run();
-        if (rs) { return rs; }
-        Gtk::Application::run(argc, argv);
-        return rs;
-    }
+        : GTestHarness<Gtk::Application>(ses) {}
 };
 
 // NOLINTNEXTLINE(misc-definitions-in-headers)
@@ -42,8 +20,14 @@ int main(int argc, char* argv[]) {
 
     if ((rs = ses.applyCommandLine(argc, argv))) { return rs; }
 
+    if (ses.config().listTests() || ses.config().listTags()
+        || ses.config().listListeners() || ses.config().listReporters()) {
+        return ses.run();
+    }
+
     GtkTestApp app(&ses);
     app.register_application();
-
-    return app.run(argc, argv);
+    app.activate();
+    app.run(argc, argv);
+    return app.getReturn();
 }
