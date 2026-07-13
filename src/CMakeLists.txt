@@ -93,9 +93,9 @@ add_compile_definitions(
 #
 
 add_library(jamui
-    ${CMAKE_CURRENT_BINARY_DIR}/../${CMAKE_PROJECT_NAME}_resource.c
     gtkmeter.c
     gtkmeterscale.c
+   ${JAMINPP_RESOURCE_C}
     jamui.cpp
 )
 target_link_libraries(jamui PUBLIC

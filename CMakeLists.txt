@@ -53,7 +53,11 @@ endif() # JAMINPP_INSTALL
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/module_chk.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/gresource.cmake)
 
+set(CACHE{JAMINPP_RESOURCE_C} TYPE INTERNAL
+  VALUE ${CMAKE_CURRENT_BINARY_DIR}/src/gen/${CMAKE_PROJECT_NAME}_resource.c)
+
 add_resource_file(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_resource
+    ${JAMINPP_RESOURCE_C}
     src/jam.ui
     pixmaps/about_image.png
     pixmaps/brushed-steel.png
