@@ -5,6 +5,14 @@
 #include <giomm/application.h>
 #include <glibmm/main.h>
 
+/// @brief Test harness for a Gio::Application
+///
+/// @tparm Base Implementing type for the Gio::Application
+///
+/// The caller is assumed to have both registered and activated the
+/// application, after construction of the test harness and before
+/// calling `run()` on the instance.
+///
 template <typename Base>
 class GTestHarness : public Base {
 
@@ -12,6 +20,12 @@ class GTestHarness : public Base {
     int             rs;
 
 public:
+    /// @brief initialize the application and store the `Catch::Session`
+    /// pointer. The caller is assumed to retain ownership of the pointer.
+    ///
+    /// The application will be run as a Gio service. For certain `Base`
+    /// types, this may require the availability of Gdk display.
+    ///
     GTestHarness(Catch::Session* ses)
         : Base()
         , ses(ses)
@@ -31,8 +45,12 @@ public:
 #endif
     };
 
+    /// @brief return any value stored for the test session, or `-1`
+    /// if no value was stored.
     int          getReturn() const { return rs; }
 
+    /// @brief ensure that the test session will run within the event
+    /// loop for the default Glib::MainContext
     virtual void on_activate() override {
         auto ctx = Glib::MainContext::get_default();
         ctx->signal_idle().connect_once([this] {
