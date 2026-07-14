@@ -39,6 +39,6 @@ int main(int argc, char* argv[]) {
     GtkTestApp app(&ses);
     app.register_application();
     app.activate();
-    app.run(argc, argv);
+    app.run();
     return app.getReturn();
 }
