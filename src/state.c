@@ -234,6 +234,7 @@ void s_clear_history()
     }
     g_list_free(history);
     history = NULL;
+    undo_pos = NULL;
     s_history_add("Initial state");
     undo_pos = history->next;
     s_restore_state((s_state *)history->data);
