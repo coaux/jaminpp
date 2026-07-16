@@ -1038,5 +1038,5 @@ void gtk_meter_set_warn_point(GtkMeter *meter, gfloat pt)
 		(priv->iec_upper - priv->iec_lower);
     }
 
-    gtk_widget_draw(GTK_WIDGET(meter), NULL);
+    gtk_widget_queue_draw(GTK_WIDGET(meter));
 }
