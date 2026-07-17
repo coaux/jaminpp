@@ -49,6 +49,10 @@
  * epsilon+delta */
 #define MIN_CHANGE (FLT_EPSILON + FLT_EPSILON)
 
+#ifndef XC
+#    define XC (xmlChar*)
+#endif
+
 float                   s_value[S_SIZE];
 static float            s_target[S_SIZE];
 static int              s_duration[S_SIZE];
@@ -293,7 +297,7 @@ static unsigned int compute_state_crc (s_state *state)
 {
     unsigned int        checksum, i;
     unsigned char       *buf;
-    unsigned int        crc_table[256] = 
+    unsigned int        crc_table[256] =
       {0x00000000,0x77073096,0xEE0E612C,0x990951BA,0x076DC419,0x706AF48F,
        0xE963A535,0x9E6495A3,0x0EDB8832,0x79DCB8A4,0xE0D5E91E,0x97D2D988,
        0x09B64C2B,0x7EB17CBD,0xE7B82D07,0x90BF1D91,0x1DB71064,0x6AB020F2,
@@ -343,7 +347,7 @@ static unsigned int compute_state_crc (s_state *state)
 
     buf = (unsigned char *) state->value;
 
-    for (i = 0 ; i < S_SIZE * sizeof (float) ; i++) 
+    for (i = 0 ; i < S_SIZE * sizeof (float) ; i++)
       checksum = crc_table[(checksum ^ buf[i]) & 0xff] ^ (checksum >> 8);
 
     checksum ^= ~0;
@@ -352,7 +356,7 @@ static unsigned int compute_state_crc (s_state *state)
     return (checksum);
 }
 
-void s_undo() 
+void s_undo()
 {
     GList *undo_next;
     int       scene, crc[2];
@@ -385,7 +389,7 @@ void s_undo()
     last_changed = S_LOAD;
 }
 
-void s_redo() 
+void s_redo()
 {
     gboolean  restore;
     int       scene, crc[2];
@@ -417,7 +421,7 @@ void s_redo()
             crc[0] = compute_state_crc (st[0]);
             crc[1] = compute_state_crc (st[1]);
 
-            if (crc[0] == crc[1]) 
+            if (crc[0] == crc[1])
               {
                 set_scene_button (scene);
               }
@@ -501,7 +505,7 @@ void s_save_session_from_ui (GtkWidget *w, gpointer user_data)
 
 #endif
 }
-    
+
 void s_save_session (const gchar *fname)
 {
     xmlDocPtr doc;
@@ -531,11 +535,11 @@ void s_save_session (const gchar *fname)
     curr_scene = get_current_scene ();
 
     xmlSetCompressMode(5);
-    doc = xmlNewDoc("1.0");
-    rootnode = xmlNewDocRawNode(doc, NULL, "jam-param-list", NULL);
-    xmlSetProp(rootnode, "version", VERSION);
+    doc = xmlNewDoc(XC("1.0"));
+    rootnode = xmlNewDocRawNode(doc, NULL, XC("jam-param-list"), NULL);
+    xmlSetProp(rootnode, XC("version"), XC(VERSION));
     xmlDocSetRootElement(doc, rootnode);
-    node = xmlNewText("\n");
+    node = xmlNewText(XC("\n"));
     xmlAddChild(rootnode, node);
 
 
@@ -583,12 +587,12 @@ void s_save_session (const gchar *fname)
     /* Save current active state */
 
     for (i=0; i<S_SIZE; i++) {
-	node = xmlNewDocRawNode(doc, NULL, "parameter", NULL);
+	node = xmlNewDocRawNode(doc, NULL, XC("parameter"), NULL);
 	snprintf(tmp, 255, "%g", s_value[i]);
-	xmlSetProp(node, "name", s_symbol[i]);
-	xmlSetProp(node, "value", tmp);
+	xmlSetProp(node, XC("name"), XC(s_symbol[i]));
+	xmlSetProp(node, XC("value"), XC(tmp));
 	xmlAddChild(rootnode, node);
-	node = xmlNewText("\n");
+	node = xmlNewText(XC("\n"));
 	xmlAddChild(rootnode, node);
     }
 
@@ -597,36 +601,36 @@ void s_save_session (const gchar *fname)
 
     for (j=0; j<NUM_SCENES; j++) {
 	s_state *st = get_scene(j);
-	sc_node = xmlNewDocRawNode(doc, NULL, "scene", NULL);
+	sc_node = xmlNewDocRawNode(doc, NULL, XC("scene"), NULL);
 	snprintf(tmp, 255, "%d", j);
-	xmlSetProp(sc_node, "number", tmp);
+	xmlSetProp(sc_node, XC("number"), XC(tmp));
 	if (!st) {
 	    xmlAddChild(rootnode, sc_node);
-	    node = xmlNewText("\n");
+	    node = xmlNewText(XC("\n"));
 	    xmlAddChild(rootnode, node);
 	    continue;
 	}
-	xmlSetProp(sc_node, "name", get_scene_name(j));
+	xmlSetProp(sc_node, XC("name"), XC(get_scene_name(j)));
 	if (curr_scene == j) {
-	    xmlSetProp(sc_node, "active", "true");
-	    xmlSetProp(sc_node, "changed", "false");
+	    xmlSetProp(sc_node, XC("active"), XC("true"));
+	    xmlSetProp(sc_node, XC("changed"), XC("false"));
 	} else if (curr_scene == changed_scene_no(j)) {
-	    xmlSetProp(sc_node, "active", "true");
-	    xmlSetProp(sc_node, "changed", "true");
+	    xmlSetProp(sc_node, XC("active"), XC("true"));
+	    xmlSetProp(sc_node, XC("changed"), XC("true"));
 	}
-	node = xmlNewText("\n");
+	node = xmlNewText(XC("\n"));
 	xmlAddChild(sc_node, node);
 	xmlAddChild(rootnode, sc_node);
-	node = xmlNewText("\n");
+	node = xmlNewText(XC("\n"));
 	xmlAddChild(rootnode, node);
 
 	for (i=0; i<S_SIZE; i++) {
-	    node = xmlNewDocRawNode(doc, NULL, "parameter", NULL);
+	    node = xmlNewDocRawNode(doc, NULL, XC("parameter"), NULL);
 	    snprintf(tmp, 255, "%g", st->value[i]);
-	    xmlSetProp(node, "name", s_symbol[i]);
-	    xmlSetProp(node, "value", tmp);
+	    xmlSetProp(node, XC("name"), XC(s_symbol[i]));
+	    xmlSetProp(node, XC("value"), XC(tmp));
 	    xmlAddChild(sc_node, node);
-	    node = xmlNewText("\n");
+	    node = xmlNewText(XC("\n"));
 	    xmlAddChild(sc_node, node);
 	}
     }
@@ -663,7 +667,7 @@ void s_load_session_from_ui (GtkWidget *w, gpointer user_data)
 
 #endif
 }
-    
+
 void s_load_session (const gchar *fname)
 {
     xmlSAXHandlerPtr handler;
@@ -738,7 +742,7 @@ void s_load_session (const gchar *fname)
     }
 
 
-    /* run the SAX parser */    
+    /* run the SAX parser */
     scene_init();
     xmlSAXUserParseFile(handler, &gp, (const char *) session_filename);
 
@@ -850,21 +854,21 @@ void s_startElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     int active = 0;
     int changed = 0;
 
-    if (!strcmp(name, "jam-param-list")) {
+    if (!xmlStrcmp(name, XC("jam-param-list"))) {
 	return;
     }
 
-    if (!strcmp(name, "scene")) {
+    if (!xmlStrcmp(name, XC("scene"))) {
 	const char *sname = NULL;
 
 	for (p=attrs; p && *p; p+=2) {
-	    if (!strcmp(*p, "name")) {
+	    if (!xmlStrcmp(*p, XC("name"))) {
 		sname = *(p+1);
-	    } else if (!strcmp(*p, "number")) {
+	    } else if (!xmlStrcmp(*p, XC("number"))) {
 		gp->scene = atoi(*(p+1));
-	    } else if (!strcmp(*p, "active") && !strcmp(*(p+1), "true")) {
+	    } else if (!xmlStrcmp(*p, XC("active")) && !xmlStrcmp(*(p+1), XC("true"))) {
 		active = 1;
-	    } else if (!strcmp(*p, "changed") && !strcmp(*(p+1), "true")) {
+	    } else if (!xmlStrcmp(*p, XC("changed")) && !xmlStrcmp(*(p+1), XC("true"))) {
 		changed = 1;
 	    }
 	}
@@ -891,14 +895,14 @@ void s_startElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     }
 
     /* if its a global setting */
-    if (!strcmp(name, "global")) {
+    if (!xmlStrcmp(name, XC("global"))) {
 	/* find the name, value and index attributes */
 	for (p=attrs; p && *p; p+=2) {
-	    if (!strcmp(*p, "name")) {
+	    if (!xmlStrcmp(*p, XC("name"))) {
 		symbol = *(p+1);
-	    } else if (!strcmp(*p, "value")) {
+	    } else if (!xmlStrcmp(*p, XC("value"))) {
 		value = *(p+1);
-	    } else if (!strcmp(*p, "index")) {
+	    } else if (!xmlStrcmp(*p, XC("index"))) {
 		index = *(p+1);
 	    }
 	}
@@ -983,7 +987,7 @@ void s_startElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     }
 
     /* Check its a parameter element */
-    if (strcmp(name, "parameter")) {
+    if (xmlStrcmp(name, XC("parameter"))) {
 	errstr = g_strdup_printf("Unhandled element: %s\n", name);
 	message (GTK_MESSAGE_WARNING, errstr);
 	free(errstr);
@@ -991,9 +995,9 @@ void s_startElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 
     /* Find the name and value attributes */
     for (p=attrs; p && *p; p+=2) {
-	if (!strcmp(*p, "name")) {
+	if (!xmlStrcmp(*p, XC("name"))) {
 	    symbol = *(p+1);
-	} else if (!strcmp(*p, "value")) {
+	} else if (!xmlStrcmp(*p, XC("value"))) {
 	    value = *(p+1);
 	}
     }
@@ -1109,7 +1113,7 @@ gchar *s_get_session_filename()
 
 void s_update_title()
 {
-    char *title; 
+    char *title;
     char *base;
     gchar *tmp;
 
@@ -1153,45 +1157,45 @@ float s_get_crossfade_time()
 void s_save_global_int(xmlDocPtr doc, char *symbol, int value)
 {
     xmlNodePtr root = xmlDocGetRootElement(doc);
-    xmlNodePtr node = xmlNewDocRawNode(doc, NULL, "global", NULL);
+    xmlNodePtr node = xmlNewDocRawNode(doc, NULL, XC("global"), NULL);
     char tmp[256];
 
     snprintf(tmp, 255, "%d", value);
-    xmlSetProp(node, "name", symbol);
-    xmlSetProp(node, "value", tmp);
+    xmlSetProp(node, XC("name"), XC(symbol));
+    xmlSetProp(node, XC("value"), XC(tmp));
     xmlAddChild(root, node);
-    node = xmlNewText("\n");
+    node = xmlNewText(XC("\n"));
     xmlAddChild(root, node);
 }
 
 void s_save_global_float(xmlDocPtr doc, char *symbol, float value)
 {
     xmlNodePtr root = xmlDocGetRootElement(doc);
-    xmlNodePtr node = xmlNewDocRawNode(doc, NULL, "global", NULL);
+    xmlNodePtr node = xmlNewDocRawNode(doc, NULL, XC("global"), NULL);
     char tmp[256];
 
     snprintf(tmp, 255, "%f", value);
-    xmlSetProp(node, "name", symbol);
-    xmlSetProp(node, "value", tmp);
+    xmlSetProp(node, XC("name"), XC(symbol));
+    xmlSetProp(node, XC("value"), XC(tmp));
     xmlAddChild(root, node);
-    node = xmlNewText("\n");
+    node = xmlNewText(XC("\n"));
     xmlAddChild(root, node);
 }
 
 void s_save_global_gang(xmlDocPtr doc, char *p, int band, gboolean value)
 {
     xmlNodePtr root = xmlDocGetRootElement(doc);
-    xmlNodePtr node = xmlNewDocRawNode(doc, NULL, "global", NULL);
+    xmlNodePtr node = xmlNewDocRawNode(doc, NULL, XC("global"), NULL);
     char tmp[256];
 
     snprintf(tmp, 255, "gang_%s", p);
-    xmlSetProp(node, "name", tmp);
+    xmlSetProp(node, XC("name"), XC(tmp));
     snprintf(tmp, 255, "%d", band);
-    xmlSetProp(node, "index", tmp);
+    xmlSetProp(node, XC("index"), XC(tmp));
     snprintf(tmp, 255, "%d", value);
-    xmlSetProp(node, "value", tmp);
+    xmlSetProp(node, XC("value"), XC(tmp));
     xmlAddChild(root, node);
-    node = xmlNewText("\n");
+    node = xmlNewText(XC("\n"));
     xmlAddChild(root, node);
 }
 
