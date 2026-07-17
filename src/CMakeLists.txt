@@ -123,71 +123,71 @@ if(JAMINPP_ADW)
 endif()
 
 
-if(JAMINPP_GTK2TO3)
-    add_library(hnopt interface.c) # interface.h
-    target_link_libraries(hnopt PUBLIC PkgConfig::GTKMM)
+add_library(hnopt STATIC
+    ## from libnopt_a_SOURCES, Makefile.am
+    interface.c # interface.h
+)
 
-    add_executable(jamin
-        callbacks.c # callbacks.h callbacks_help.h
-        # compressor.h
-        compressor-ui.c # compressor-ui.h
-        # constants.h
-        # db.h
-        # debug.h
-        # ladspa.h
-        geq.c # geq.h
-        gtkmeter.c # gtkmeter.h
-        hdeq.c # hdeq.h
-        intrim.c # intrim.h
-        io.c # io.h
-        io-menu.c # io-menu.h
-        # jackstatus.h
-        # limiter.h
-        limiter-ui.c # limiter-ui.h
-        presets-ui.c # presets-ui.h
-        main.c # main.h
-        multiout-ui.c # multiout-ui.h
-        plugin.c # plugin.h
-        process.c # process.h
-        resource.c # resource.h
-        ringbuffer.c # ringbuffer.h
-        rms.c # rms.h
-        spectrum.c # spectrum.h
-        spline.c
-        state.c # state.h
-        status-ui.c # status-ui.h
-        stereo.c # stereo.h
-        support.c # support.h
-        transport.c # transport.h
-        scenes.c # scenes.h
+target_link_libraries(hnopt PUBLIC PkgConfig::GTKMM)
 
-        preferences.c # preferences.h
-        help.c # help.h
-        # denormal-kill.h
-        # biquad.h
+add_executable(jamin
+    ## from jamin_SOURCES, Makefile.am
+    callbacks.c # callbacks.h callbacks_help.h
+    # compressor.h
+    compressor-ui.c # compressor-ui.h
+    # constants.h
+    # db.h
+    # debug.h
+    # ladspa.h
+    geq.c # geq.h
+    gtkmeter.c # gtkmeter.h
+    hdeq.c # hdeq.h
+    intrim.c # intrim.h
+    io.c # io.h
+    io-menu.c # io-menu.h
+    # jackstatus.h
+    # limiter.h
+    limiter-ui.c # limiter-ui.h
+    presets-ui.c # presets-ui.h
+    main.c # main.h
+    multiout-ui.c # multiout-ui.h
+    plugin.c # plugin.h
+    process.c # process.h
+    resource.c # resource.h
+    ringbuffer.c # ringbuffer.h
+    rms.c # rms.h
+    spectrum.c # spectrum.h
+    spline.c
+    state.c # state.h
+    status-ui.c # status-ui.h
+    stereo.c # stereo.h
+    support.c # support.h
+    transport.c # transport.h
+    scenes.c # scenes.h
 
-        # FIXME there may be other source files
-    )
+    preferences.c # preferences.h
+    help.c # help.h
+    # denormal-kill.h
+    # biquad.h
+)
 
-    target_link_libraries(jamin PRIVATE
-        hnopt
-        jamui
-        PkgConfig::JACK
-        PkgConfig::FFTW
-        PkgConfig::XML
-        # PkgConfig::GTK
-        PkgConfig::GTKMM
+target_link_libraries(jamin PRIVATE
+    hnopt
+    jamui
+    PkgConfig::JACK
+    PkgConfig::FFTW
+    PkgConfig::XML
+    # PkgConfig::GTK
+    PkgConfig::GTKMM
+)
 
-        # PkgConfig::CLUTTER
-        # PkgConfig::CLUTTER_GTK
-    )
+if(JAMINPP_ADW)
+    target_link_libraries(jamin PRIVATE PkgConfig::ADW)
 endif()
 
 if(JAMINPP_OSC)
     module_chk(OSC liblo>=0.5)
-    if(JAMINPP_GTK2TO3)
-        target_link_libraries(jamin PRIVATE PkgConfig::OSC)
-    endif()
+    target_link_libraries(jamin PRIVATE PkgConfig::OSC)
 
     add_executable(jamin-scene
         jamin-scene.c

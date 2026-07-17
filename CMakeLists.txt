@@ -15,9 +15,8 @@ option(JAMINPP_OSC "Build with Open Sound Control interface" ON)
 
 option(JAMINPP_LANG "Build with translations" ON)
 
-option(JAMINPP_INSTALL "Build for Jamin++ installation" ON)
 
-option(JAMINPP_GTK4 "Build for Gtk4 (else Gtk3)" OFF)
+option(JAMINPP_GTK4 "Build for Gtk4 (Default: Gtk3)" OFF)
 
 option(JAMINPP_ADW "Link with libadwaita (requires JAMINPP_GTK4 on some hosts)" ${JAMINPP_GTK4})
 
@@ -40,17 +39,15 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/xlate.cmake)
 
 ## data files
 
-if(${JAMINPP_INSTALL})
+set(CACHE{JAMINPP_SVG_FILES} TYPE INTERNAL VALUE)
 
-    set(CACHE{JAMINPP_SVG_FILES} TYPE INTERNAL VALUE)
+function(jamin_add_icon svg_file)
+    file(REAL_PATH ${svg_file} rl)
+    list(APPEND JAMINPP_SVG_FILES ${rl})
+endfunction()
 
-    function(jamin_add_icon svg_file)
-        file(REAL_PATH ${svg_file} rl)
-        list(APPEND JAMINPP_SVG_FILES ${rl})
-    endfunction()
+add_subdirectory(data)
 
-    add_subdirectory(data)
-endif() # JAMINPP_INSTALL
 
 ## compiled sources
 
