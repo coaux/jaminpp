@@ -24,6 +24,8 @@ if(JAMINPP_ADW)
 endif()
 # for config.h
 set(HAVE_ADW ${JAMINPP_ADW})
+
+set(FILTER_TUNING ${JAMINPP_FILTER_TUNING})
 #
 # set local variables for config.h
 #
