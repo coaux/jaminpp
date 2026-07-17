@@ -9,7 +9,7 @@ project(jaminpp
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_CXX_STANDARD 20)
 
-option(JAMINPP_FFT_DOUBLE "Enable double precision fourier transform" OFF)
+option(JAMINPP_FFT_DOUBLE "Enable double precision fourier transform" ON)
 
 option(JAMINPP_OSC "Build with Open Sound Control interface" ON)
 

@@ -5,6 +5,8 @@
 
 #define FFTW_TYPE @JAMINPP_FFTW_TYPE@
 
+#cmakedefine HAVE_FFTW_DOUBLE
+
 #cmakedefine HAVE_JACK_CLIENT_CREATE_THREAD
 
 #cmakedefine HAVE_JACK_CREATE_THREAD

@@ -7,7 +7,14 @@ include(${${CMAKE_PROJECT_NAME}_SOURCE_DIR}/cmake/gresource.cmake)
 # - jack-audio-connection-kit-devel
 module_chk(JACK jack>=0.80.0)
 
-module_chk(FFTW fftw3>=3.0)
+if(JAMINPP_FFT_DOUBLE)
+    module_chk(FFTW fftw3>=3.0)
+else()
+    module_chk(FFTW fftw3f>=3.0)
+    set(_FFT_EXECUTE fftwf_execute)
+endif()
+set(HAVE_FFTW_DOUBLE ${JAMINPP_FFT_DOUBLE})
+
 
 module_chk(XML libxml-2.0>=2.0)
 

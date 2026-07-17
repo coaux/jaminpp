@@ -14,6 +14,7 @@
  *  $Id: process.c,v 1.84 2013/02/09 15:47:30 kotau Exp $
  */
 
+#include "config.h"
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -136,7 +137,11 @@ volatile int global_multiout_gui = 0;		/* updated from GUI thread */
 plugin *comp_plugin, *lim_plugin[2];
 
 /* FFTW data */
+#ifdef HAVE_FFTW_DOUBLE
+fftw_plan  plan_rc = NULL, plan_cr = NULL;
+#else
 fftwf_plan plan_rc = NULL, plan_cr = NULL;
+#endif
 
 float sample_rate = 0.0f;
 
@@ -206,6 +211,15 @@ void process_init(float fs)
 		}
 	}
 
+#ifdef HAVE_FFTW_DOUBLE
+    /* Allocate space for FFT data */
+    real = fftw_malloc(sizeof(fft_data) * BINS);
+    comp = fftw_malloc(sizeof(fft_data) * BINS);
+    comp_tmp = fftw_malloc(sizeof(fft_data) * BINS);
+
+    plan_rc = fftw_plan_r2r_1d(BINS, real, comp, FFTW_R2HC, FFTW_MEASURE);
+    plan_cr = fftw_plan_r2r_1d(BINS, comp_tmp, real, FFTW_HC2R, FFTW_MEASURE);
+#else
     /* Allocate space for FFT data */
     real = fftwf_malloc(sizeof(fft_data) * BINS);
     comp = fftwf_malloc(sizeof(fft_data) * BINS);
@@ -213,6 +227,7 @@ void process_init(float fs)
 
     plan_rc = fftwf_plan_r2r_1d(BINS, (float*)real, (float*)comp, FFTW_R2HC, FFTW_MEASURE);
     plan_cr = fftwf_plan_r2r_1d(BINS, (float*)comp_tmp, (float*)real, FFTW_HC2R, FFTW_MEASURE);
+#endif
 
 
 	/*	Use Kaiser-Bessel window for best results - Code taken from mplayer */
@@ -349,13 +364,17 @@ void run_eq(unsigned int port, unsigned int in_ptr)
     float peak;
     unsigned int i, j;
     int targ_bin;
-    float *peak_data;
+    fft_data *peak_data;
 
     for (i = 0; i < BINS; i++) {
 	real[i] = window[i] * in_buf[port][(in_ptr + i) & BUF_MASK];
     }
 
+#ifdef HAVE_FFTW_DOUBLE
+    fftw_execute(plan_rc);
+#else
     fftwf_execute(plan_rc);
+#endif
 
     /* run the EQ + spectrum an. + xover process */
 
@@ -384,7 +403,11 @@ void run_eq(unsigned int port, unsigned int in_ptr)
 	    bin_peak[i] = peak;
 	}
     }
+#ifdef HAVE_FFTW_DOUBLE
+    fftw_execute(plan_cr);
+#else
     fftwf_execute(plan_cr);
+#endif
     for (j = 0; j < BINS; j++) {
 	out_buf[port][XO_LOW][(in_ptr + j) & BUF_MASK] += real[j] * fix *
 	    window[j];
@@ -408,7 +431,11 @@ void run_eq(unsigned int port, unsigned int in_ptr)
 	    bin_peak[i] = peak;
 	}
     }
+#ifdef HAVE_FFTW_DOUBLE
+    fftw_execute(plan_cr);
+#else
     fftwf_execute(plan_cr);
+#endif
     for (j = 0; j < BINS; j++) {
 	out_buf[port][XO_MID][(in_ptr + j) & BUF_MASK] += real[j] * fix *
 	    window[j];
@@ -431,7 +458,11 @@ void run_eq(unsigned int port, unsigned int in_ptr)
 	    bin_peak[i] = peak;
 	}
     }
+#ifdef HAVE_FFTW_DOUBLE
+    fftw_execute(plan_cr);
+#else
     fftwf_execute(plan_cr);
+#endif
     for (j = 0; j < BINS; j++) {
 	out_buf[port][XO_HIGH][(in_ptr + j) & BUF_MASK] += real[j] * fix *
 	    window[j];
@@ -445,15 +476,19 @@ void run_eq_iir(unsigned int port, unsigned int in_ptr)
 {
     const float fix = 2.5f / ((float) BINS * (float) OVER_SAMP);
     float peak;
+    fft_data *peak_data;
     unsigned int i, j;
-    float *peak_data;
     // int targ_bin;
 
     for (i = 0; i < BINS; i++) {
 	real[i] = window[i] * in_buf[port][(in_ptr + i) & BUF_MASK];
     }
 
+#ifdef HAVE_FFTW_DOUBLE
+    fftw_execute(plan_rc);
+#else
     fftwf_execute(plan_rc);
+#endif
 
     /* run the EQ + spectrum an. + xover process */
 
@@ -482,7 +517,11 @@ void run_eq_iir(unsigned int port, unsigned int in_ptr)
 	    bin_peak[i] = peak;
 	}
     }
+#ifdef HAVE_FFTW_DOUBLE
+    fftw_execute(plan_cr);
+#else
     fftwf_execute(plan_cr);
+#endif
     for (j = 0; j < BINS; j++) {
 	mid_buf[port][(in_ptr + j) & BUF_MASK] += real[j] * fix * window[j];
     }
