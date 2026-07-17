@@ -29,8 +29,6 @@ else()
     set(JAMINPP_FFTW_TYPE float)
 endif()
 
-set(ENABLE_NLS ${JAMINPP_LANG})
-
 set(HAVE_OSC ${JAMINPP_OSC})
 
 include(CheckSymbolExists)
@@ -87,6 +85,12 @@ add_compile_definitions(
     VERSION="${CMAKE_PROJECT_VERSION}"
     PACKAGE="${CMAKE_PROJECT_NAME}"
 )
+
+if(JAMINPP_LANG)
+    add_compile_definitions(GETTEXT_PACKAGE=${CMAKE_PROJECT_NAME})
+    # for config.h
+    set(ENABLE_NLS ${JAMINPP_LANG})
+endif()
 
 
 #
