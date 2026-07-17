@@ -19,6 +19,7 @@
 
 #cmakedefine HAVE_POSIX_SCHED
 
+#cmakedefine HAVE_ADW
 
 
 

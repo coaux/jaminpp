@@ -19,6 +19,11 @@ endif()
 # using dependencies for glibmm, glib, gtk, ... via gtkmm
 module_chk(GTKMM ${JAMINPP_GTKMM_MODULE})
 
+if(JAMINPP_ADW)
+    module_chk(ADW libadwaita-1)
+endif()
+# for config.h
+set(HAVE_ADW ${JAMINPP_ADW})
 #
 # set local variables for config.h
 #
@@ -113,6 +118,9 @@ add_executable(jaminpp
 target_link_libraries(jaminpp
     PRIVATE PkgConfig::GTKMM jamui
 )
+if(JAMINPP_ADW)
+    target_link_libraries(jaminpp PRIVATE PkgConfig::ADW)
+endif()
 
 
 if(JAMINPP_GTK2TO3)

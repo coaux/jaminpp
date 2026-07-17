@@ -19,6 +19,8 @@ option(JAMINPP_INSTALL "Build for Jamin++ installation" ON)
 
 option(JAMINPP_GTK4 "Build for Gtk4 (else Gtk3)" OFF)
 
+option(JAMINPP_ADW "Link with libadwaita (requires JAMINPP_GTK4 on some hosts)" ${JAMINPP_GTK4})
+
 option(BUILD_TESTING "Build tests" ON)
 
 if(JAMINPP_GTK4)
