@@ -446,8 +446,8 @@ void run_eq_iir(unsigned int port, unsigned int in_ptr)
     const float fix = 2.5f / ((float) BINS * (float) OVER_SAMP);
     float peak;
     unsigned int i, j;
-    int targ_bin;
     float *peak_data;
+    // int targ_bin;
 
     for (i = 0; i < BINS; i++) {
 	real[i] = window[i] * in_buf[port][(in_ptr + i) & BUF_MASK];
@@ -464,7 +464,7 @@ void run_eq_iir(unsigned int port, unsigned int in_ptr)
     }
 
     memset(comp_tmp, 0, BINS * sizeof(fft_data));
-    targ_bin = xover_fa / sample_rate * ((float)BINS + 0.5f);
+    // targ_bin = xover_fa / sample_rate * ((float)BINS + 0.5f);
 
     comp_tmp[0] = comp[0] * eq_coefs[0];
     if (comp_tmp[0] > bin_peak[0]) bin_peak[0] = comp_tmp[0];
