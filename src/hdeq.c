@@ -2498,8 +2498,8 @@ void set_EQ_curve_values (int id, float value)
 
 
     /*  Set the GEQ coefs and faders.  */
-	if(gui_mode == 0){ // default
 	//	set_EQ ();
+	if(gui_mode == GUI_DEFAULT){
 		EQ_mod = 1;
 	} else {
 		EQ_mod = 0;

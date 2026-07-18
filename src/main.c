@@ -129,8 +129,8 @@ int main(int argc, char *argv[])
 	/* Show Preset or Main window  - commandline toggle "-g" */
 	//g_print(_("11: show_gui = %i\n"), show_gui);
 
-	if(gui_mode != 2){ // Daemon mode
-	    if(gui_mode == 1){ // Presets
+	if(gui_mode != GUI_DAEMON){
+	    if(gui_mode == GUI_PRESETS){
 			gtk_widget_show(presets_window);
 	    }else{ // Default
 			gtk_widget_show(main_window);
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     
     /* only update meters if not in daemon mode */
 
-    if(gui_mode != 2){ 
+    if(gui_mode != GUI_DAEMON){
 	g_timeout_add (40, update_meters, NULL);
     }
 
@@ -244,7 +244,7 @@ static gboolean update_meters(gpointer data)
     out_meter_value(out_peak);
 
     /* Only update these meters if main window is displayed */
-    if(gui_mode == 0){
+    if(gui_mode == GUI_DEFAULT){
 		rms_meter_value(rms_peak);
 		limiter_meters_update();
 		compressor_meters_update();
