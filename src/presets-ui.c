@@ -37,12 +37,12 @@ void presets_ui_show_main (GtkButton *tButton)
 	if(global_main_gui){
 		gtk_widget_show(main_window);
 	//	gtk_button_set_label(tButton, "hide");
-		gui_mode = 0;
+		gui_mode = GUI_DEFAULT;
 			
 	}else {
 		gtk_widget_hide(main_window);
 	//	gtk_button_set_label(tButton, "show");
-		gui_mode = 1;
+		gui_mode = GUI_PRESETS;
 		
 	}
 	//g_print("clicked");
@@ -58,12 +58,12 @@ void presets_ui_show_multiout (GtkButton *tButton)
 		multiout_ui_build(multiout_window);
 		gtk_widget_show(multiout_window);
 	//	gtk_button_set_label(tButton, "hide");
-		gui_mode = 3;
+		gui_mode = GUI_DAEMON;
 			
 	}else {
 		gtk_widget_hide(multiout_window);
 	//	gtk_button_set_label(tButton, "show");
-		gui_mode = 0;
+		gui_mode = GUI_DEFAULT;
 		
 	}
 	//g_print("clicked");

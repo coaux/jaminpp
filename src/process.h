@@ -38,6 +38,11 @@
 #include "compressor.h"
 #include "limiter.h"
 
+/* GUI modes */
+#define GUI_DEFAULT 0
+#define GUI_PRESETS 1
+#define GUI_DAEMON  2
+
 /* number of input and output channels */
 #define NCHANNELS 2
 #define BCHANNELS 8

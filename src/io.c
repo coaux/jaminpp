@@ -99,7 +99,7 @@ int trace_option = 0;			      /* -T option */
 int thread_option = 1;			      /* -t option */
 int debug_level = DBG_OFF;		      /* -v option */
 char session_file[PATH_MAX];		      /* -f option */
-int gui_mode = 0;			      /* -g/-D option : Classic, Presets, Daemon*/
+int gui_mode = GUI_DEFAULT;		      /* -g/-D option : Classic, Presets, Daemon*/
 int limiter_plugin_type;                      /* -l option - 0=Steve's fast, 1=Sampo's foo */
 static char *errstr;
 
@@ -774,7 +774,7 @@ void io_init(int argc, char *argv[])
 
     spectrum_freq = 10;
     crossfade_time = 1.0;
-	gui_mode = 0;
+	gui_mode = GUI_DEFAULT;
 
     /* basename $0 */
     pname = strrchr(argv[0], '/');
@@ -831,11 +831,11 @@ void io_init(int argc, char *argv[])
             process_set_crossover_type (IIR);
 	    break;
 	case 'g':			/* Choose which interface to display */
-		gui_mode = 1;   
+		gui_mode = GUI_PRESETS;
 		//g_print(_("gui_mode = %i\n"), gui_mode);
 		break;	
 	case 'D':			/* Choose which interface to display */
-		gui_mode = 2;   
+		gui_mode = GUI_DAEMON;
 		//g_print(_("gui_mode = %i\n"), gui_mode);
 		break;			
 	case 'l':			/* Select limiter, 0=Steve's fast, 1=Sampo's foo */

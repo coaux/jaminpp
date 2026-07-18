@@ -837,7 +837,7 @@ void s_load_session (const gchar *fname)
     if (!override_limiter_default) process_set_limiter_plugin (gp.limiter_plugin);
     override_limiter_default = FALSE;
 
-	if(gui_mode == 0) // Default mode
+	if(gui_mode == GUI_DEFAULT)
 		hdeq_set_xover ();
     set_EQ_curve_values (0, 0.0);
 
