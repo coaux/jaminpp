@@ -401,7 +401,7 @@ void hdeq_low2mid_set (GtkRange *range)
     gtk_label_set_use_markup (l_comp_lbl[0], TRUE);
     free(label);
 
-
+#ifdef EXTANT_SRC
     /*  Replot the EQ curve (and set a few things at the same time).  */
 
 //    draw_EQ_curve ();
@@ -435,6 +435,7 @@ void hdeq_low2mid_set (GtkRange *range)
 
        // gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
       }
+#endif
 }
 
 
@@ -518,7 +519,7 @@ void hdeq_mid2high_set (GtkRange *range)
     gtk_label_set_use_markup (l_comp_lbl[2], TRUE);
     free(label);
 
-
+#ifdef EXTANT_SRC
     /*  Replot the EQ curve (and set a few things at the same time).  */
 
  //   draw_EQ_curve ();
@@ -544,6 +545,7 @@ void hdeq_mid2high_set (GtkRange *range)
 
      //   gdk_gc_set_foreground (EQ_gc, get_color (TEXT_COLOR));
       }
+#endif
 }
 
 
