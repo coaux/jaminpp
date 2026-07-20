@@ -8,12 +8,13 @@ ColumnLimit: 78
 MaxEmptyLinesToKeep: 2
 SpacesBeforeTrailingComments: 2
 AccessModifierOffset: -4
-AlignAfterOpenBracket: true
+AlignAfterOpenBracket: BlockIndent
 AlignArrayOfStructures: Right
 AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
 AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
 AlignConsecutiveMacros: AcrossEmptyLinesAndComments
-AlignEscapedNewlinesLeft: false
+AlignConsecutiveBitFields: AcrossEmptyLinesAndComments
+AlignEscapedNewlines: Right
 AlignOperands: AlignAfterOperator
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
@@ -35,10 +36,10 @@ BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Custom
 BreakBeforeTemplateCloser: true
 BreakBeforeTernaryOperators: false
-# BreakBeforeConceptDeclaration: Always # ?
 BreakConstructorInitializers: BeforeComma
 BreakTemplateDeclarations: Yes
-PackConstructorInitializers: Never
+PackConstructorInitializers: BinPack
+BinPackArguments: true
 BinPackParameters: true
 CommentPragmas: "^!<"
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -60,14 +61,9 @@ KeepEmptyLinesAtTheStartOfBlocks: true
 NamespaceIndentation: None
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: false
-PenaltyBreakBeforeFirstCallParameter: 19
-PenaltyBreakComment: 200
-PenaltyBreakString: 300
-PenaltyBreakFirstLessLess: 80
-PenaltyExcessCharacter: 1000000
-PenaltyReturnTypeOnItsOwnLine: 100
 PointerAlignment: Left
-QualifierAlignment: Right
+QualifierAlignment: Custom
+QualifierOrder: [volatile, static, const, inline, type]
 RequiresClausePosition: OwnLineWithBrace
 RequiresExpressionIndentation: Keyword
 SeparateDefinitionBlocks: Always
