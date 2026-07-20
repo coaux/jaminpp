@@ -63,7 +63,7 @@ ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: false
 PointerAlignment: Left
 QualifierAlignment: Custom
-QualifierOrder: [volatile, static, const, inline, type]
+QualifierOrder: [volatile, static, inline, const, type]
 RequiresClausePosition: OwnLineWithBrace
 RequiresExpressionIndentation: Keyword
 SeparateDefinitionBlocks: Always
