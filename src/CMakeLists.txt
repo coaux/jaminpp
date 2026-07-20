@@ -88,8 +88,6 @@ check_symbol_exists(jack_client_open ${_JACK_H} HAVE_JACK_CLIENT_OPEN)
 
 # generate config.h
 configure_file(config.h.in gen/config.h @ONLY)
-add_compile_definitions(HAVE_CONFIG_H)
-
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/gen)
 

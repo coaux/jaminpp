@@ -14,10 +14,6 @@
  *  $Id: callbacks.c,v 1.181 2013/02/09 15:47:29 kotau Exp $
  */
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

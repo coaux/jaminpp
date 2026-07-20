@@ -14,10 +14,6 @@
  *  $Id: main.c,v 1.72 2013/02/09 15:47:29 kotau Exp $
  */
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 #ifdef HAVE_OSC
 #include <lo/lo.h>
 #include "constants.h"
