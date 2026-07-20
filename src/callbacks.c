@@ -59,7 +59,7 @@
 /* vi:set ts=8 sts=4 sw=4: */
 
 
-static char             *help_ptr = NULL, scene_name_text[100];
+static char             *help_ptr = NULL, scene_name_text[SCENE_NAME_MAX];
 static gboolean         text_focus = FALSE, force_keypress_help = FALSE;
 static GtkToggleButton  *l_solo_button[XO_NBANDS], *l_bypass_button[XO_NBANDS], 
                         *l_global_bypass, *l_eq_bypass, *l_limiter_bypass,
