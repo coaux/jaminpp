@@ -804,7 +804,7 @@ void s_load_session (const gchar *fname)
 
     /*  This is the active scene.  */
 
-    if (saved_scene < 100)
+    if (saved_scene < SCENE_MODIFIED)
       {
         set_scene (saved_scene);
       }
@@ -882,7 +882,7 @@ void s_startElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 	    set_scene(gp->scene);
 	}
 	if (changed) {
-            saved_scene = gp->scene + 100;
+            saved_scene = gp->scene + SCENE_MODIFIED;
 	    set_num_scene_warning_button(changed_scene_no(gp->scene));
 	}
 
