@@ -25,6 +25,13 @@
 #include "state.h"
 #include "constants.h"
 
+// upper bound for length of a scene name
+#define SCENE_NAME_MAX 100
+
+// numeric offset for the scene number of a modified scene
+#define SCENE_MODIFIED 100
+
+
 void bind_scenes ();
 void select_scene (int number, int button);
 int get_current_scene ();

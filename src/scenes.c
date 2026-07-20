@@ -52,7 +52,7 @@
 static GtkMenu           *scene_menu;
 static GtkImage          *l_scene[NUM_SCENES], *buttons[4];
 static GtkEventBox       *l_scene_eventbox[NUM_SCENES];
-static char              l_scene_name[NUM_SCENES][100];
+static char              l_scene_name[NUM_SCENES][SCENE_NAME_MAX];
 static int               current_scene = -1, menu_scene, prev_scene = -999;
 static gboolean          scene_loaded[NUM_SCENES];
 static s_state           scene_state[NUM_SCENES];
@@ -148,7 +148,7 @@ void select_scene (int number, int button)
     warning = FALSE;
     if (number > 99)
       {
-        number -= 100;
+        number -= SCENE_MODIFIED;
         warning = TRUE;
       }
 
@@ -244,7 +244,7 @@ void select_scene (int number, int button)
         /*  Right button pops up the set/clear menu.  */
 
       case 3:
-        menu_scene = number % 100;
+        menu_scene = number % SCENE_MODIFIED;
         gtk_menu_popup (scene_menu, NULL, NULL, NULL, NULL, button, 
                         gtk_get_current_event_time());
         break;
@@ -267,7 +267,7 @@ s_state *get_scene (int number)
   int       i;
 
 
-  i = number % 100;
+  i = number % SCENE_MODIFIED;
 
   if (!scene_loaded[i]) return (NULL);
 
@@ -360,7 +360,7 @@ const char *get_scene_name (int number)
   int        i;
 
 
-  i = number % 100;
+  i = number % SCENE_MODIFIED;
 
   if (!scene_loaded[i]) return (NULL);
   return (l_scene_name[i]);
@@ -377,7 +377,7 @@ void set_scene_name (int number, const char *scene_name)
     int         i;
 
 
-    i = number % 100;
+    i = number % SCENE_MODIFIED;
 
 
     /*  If we are trying to modify the name without anything loaded, bypass
@@ -416,7 +416,7 @@ void clear_scene (int scene_num)
 
     /*  Strip off the warning if set.  */
 
-    i = scene_num % 100;
+    i = scene_num % SCENE_MODIFIED;
 
 
     if (i >= 0) menu_scene = i;
@@ -477,9 +477,9 @@ void set_scene_warning_button ()
   int        i;
 
 
-  i = current_scene % 100;
+  i = current_scene % SCENE_MODIFIED;
 
-  if (current_scene < 100 && current_scene > -1)
+  if (current_scene < SCENE_MODIFIED && current_scene > -1)
     {
       prev_scene = i;
 
@@ -526,7 +526,7 @@ void set_scene_button (int scene)
 
 int changed_scene_no(int s)
 {
-	return s + 100;
+	return s + SCENE_MODIFIED;
 }
 
 
@@ -535,7 +535,7 @@ int changed_scene_no(int s)
 
 int is_changed_scene(int s)
 {
-	return s >= 100;
+	return s >= SCENE_MODIFIED;
 }
 
 /*  Set a specific scene button to a warning.  Only done on load.  */
@@ -545,7 +545,7 @@ void set_num_scene_warning_button (int scene)
   int        i;
 
 
-  i = scene % 100;
+  i = scene % SCENE_MODIFIED;
 
 
   gtk_image_set_from_pixbuf (l_scene[i], LED_yellow);
