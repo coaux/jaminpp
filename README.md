@@ -32,7 +32,7 @@ You will need:
 Recommended versions, where applicable, are shown under the general
 requirement.
 
-- [JACK][jack] >= 0.80.0
+- [JACK][jack] >= 0.124.0
 - [libxml2](https://gitlab.gnome.org/GNOME/libxml2) >= 2.5
 - [GTK+](https://www.gtk.org) 3.0
 - [Clutter](https://gitlab.gnome.org/Archive/clutter) >= 1.12.0

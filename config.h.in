@@ -39,21 +39,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* newer JACK thread creation */
-#undef HAVE_JACK_CLIENT_CREATE_THREAD
-
-/* JACK returns client name size */
-#undef HAVE_JACK_CLIENT_NAME_SIZE
-
-/* jack_client_open is available */
-#undef HAVE_JACK_CLIENT_OPEN
-
-/* older JACK thread creation support */
-#undef HAVE_JACK_CREATE_THREAD
-
-/* JACK has ringbuffer support */
-#undef HAVE_JACK_RINGBUFFER
-
 /* Define if your <locale.h> file defines LC_MESSAGES. */
 #undef HAVE_LC_MESSAGES
 
@@ -71,9 +56,6 @@
 
 /* Whether liblo OSC library is available */
 #undef HAVE_OSC
-
-/* POSIX scheduler support */
-#undef HAVE_POSIX_SCHED
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

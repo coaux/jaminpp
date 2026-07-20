@@ -5,7 +5,7 @@ include(${${CMAKE_PROJECT_NAME}_SOURCE_DIR}/cmake/gresource.cmake)
 # build dependency (Fedora 44): one of
 # - pipewire-jack-audio-connection-kit-devel
 # - jack-audio-connection-kit-devel
-module_chk(JACK jack>=0.80.0)
+module_chk(JACK jack>=0.124.0)
 
 if(JAMINPP_FFT_DOUBLE)
     module_chk(FFTW fftw3>=3.0)
@@ -44,47 +44,6 @@ else()
 endif()
 
 set(HAVE_OSC ${JAMINPP_OSC})
-
-include(CheckSymbolExists)
-
-check_symbol_exists(sched_getscheduler sched.h HAVE_POSIX_SCHED)
-
-set(CMAKE_REQUIRED_DEFINITIONS ${JACK_CFLAGS})
-set(CMAKE_REQUIRED_INCLUDES ${JACK_INCLUDEDIR})
-set(CMAKE_REQUIRED_LIBRARIES ${JACK_LIBRARIES})
-set(CMAKE_REQUIRED_LINK_DIRECTORIES ${JACK_LIBRARY_DIRS})
-
-set(_JACK_H jack/jack.h)
-set(_JACK_THREAD_H jack/thread.h)
-set(_JACK_RINGBUFFER_H jack/ringbuffer.h)
-set(_JACK_TYPES_H jack/types.h)
-
-message(CONFIGURE_LOG "using jack thread.h ${_JACK_THREAD_H}")
-
-## jack_create_thread is no longer defined in the jack API
-# check_symbol_exists(jack_create_thread ${_JACK_H};${_JACK_TYPES_H};${_JACK_THREAD_H} HAVE_JACK_CREATE_THREAD)
-
-include(CheckSourceCompiles)
-
-# this symbol test should not provide a false negative outcome
-check_source_compiles(C [[
-#include "jack/jack.h"
-#include "jack/thread.h"
-  int main()
-  {
-	
-	jack_client_t *client;
-	jack_native_thread_t thread;
-	jack_client_create_thread(client, &thread, 0, 0, NULL, NULL);
-  }
-]]    HAVE_JACK_CLIENT_CREATE_THREAD)
-
-message(CONFIGURE_LOG "using jack ringbuffer.h ${_JACK_RINGBUFFER_H}")
-check_symbol_exists(jack_ringbuffer_create ${_JACK_RINGBUFFER_H} HAVE_JACK_RINGBUFFER)
-
-message(CONFIGURE_LOG "using jack.h ${_JACK_H}")
-check_symbol_exists(jack_client_name_size ${_JACK_H} HAVE_JACK_CLIENT_NAME_SIZE)
-check_symbol_exists(jack_client_open ${_JACK_H} HAVE_JACK_CLIENT_OPEN)
 
 # generate config.h
 configure_file(config.h.in gen/config.h @ONLY)
@@ -163,7 +122,6 @@ add_executable(jamin
     plugin.c # plugin.h
     process.c # process.h
     resource.c # resource.h
-    ringbuffer.c # ringbuffer.h
     rms.c # rms.h
     spectrum.c # spectrum.h
     spline.c

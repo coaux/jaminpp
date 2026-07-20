@@ -63,9 +63,6 @@ static const char *outgroups[MAXGROUPS];
 static size_t ngroup_names = 0;
 static char *group_names;		/* group name buffer */
 
-#ifndef HAVE_JACK_CLIENT_NAME_SIZE	/* if earlier version of JACK */
-#define jack_client_name_size()		(32 + 1)
-#endif
 
 /* * * * * * * * * * * *   Callbacks   * * * * * * * * * * * * * * */
 

@@ -73,14 +73,9 @@
 #include <errno.h>
 #include <assert.h>
 #include <jack/jack.h>
-#ifdef HAVE_JACK_CREATE_THREAD
+#include <jack/ringbuffer.h>
 #include <jack/thread.h>
-#endif
-#ifdef HAVE_POSIX_SCHED
-#include <glib/gprintf.h>
-#endif
 
-#include "ringbuffer.h"		/* uses <jack/ringbuffer.h>, if available */
 #include "process.h"
 #include "resource.h"
 #include "plugin.h"
@@ -739,7 +734,6 @@ gboolean check_file (char *optarg)
  */
 jack_client_t *io_jack_open()
 {
-#ifdef HAVE_JACK_CLIENT_OPEN
     jack_status_t status;
 
     if (server_name) {
@@ -761,15 +755,6 @@ jack_client_t *io_jack_open()
 	client_name = strdup(jack_get_client_name(client));
 	g_print(_("%s: unique name `%s' assigned\n"), PACKAGE, client_name);
     }
-
-#else /* !HAVE_JACK_CLIENT_OPEN */
-
-    client = jack_client_new(client_name);
-    if (client == NULL) {
-	g_print(_("%s: Cannot contact JACK server, is it running?\n"), PACKAGE);
-    }
-
-#endif /* HAVE_JACK_CLIENT_OPEN */
 
     return client;
 
@@ -965,9 +950,6 @@ int io_create_dsp_thread()
     struct sched_param rt_param;
     pthread_attr_t attributes;
     pthread_attr_init(&attributes);
-#ifndef HAVE_JACK_CREATE_THREAD
-    struct sched_param my_param;
-#endif
 
     /* Set priority and scheduling parameters based on the attributes
      * of the JACK client thread. */
@@ -992,18 +974,8 @@ int io_create_dsp_thread()
     } else
 	IF_DEBUG(DBG_TERSE, io_trace("JACK subsystem not realtime"));
 
-#ifdef HAVE_JACK_CREATE_THREAD		/* JACK thread support */
-#ifdef HAVE_JACK_CLIENT_CREATE_THREAD	/* newer interface */
-
     rc = jack_client_create_thread(client, &dsp_thread, rt_param.sched_priority,
 				   jst.realtime, io_dsp_thread, NULL);
-
-#else  /* older interface */
-
-    rc = jack_create_thread(&dsp_thread, rt_param.sched_priority,
-			    jst.realtime, io_dsp_thread, NULL);
-
-#endif /* HAVE_JACK_CLIENT_CREATE_THREAD */
 
     switch (rc) {
     case 0:
@@ -1015,112 +987,6 @@ int io_create_dsp_thread()
     default:
 	io_errlog(rc, "error creating DSP thread");
     }
-
-#else  /* no JACK thread creation support */
-
-    rc = pthread_attr_setschedpolicy(&attributes, policy);
-    if (rc) {
-	io_errlog(EPERM, "cannot set scheduling policy, rc = %d.", rc);
-	return rc;
-    }
-
-    rc = pthread_attr_setscope(&attributes, PTHREAD_SCOPE_SYSTEM);
-    if (rc) {
-	io_errlog(EPERM, "cannot set RT scheduling scope, rc = %d.", rc);
-	return rc;
-    }
-
-    rc = pthread_attr_setschedparam(&attributes, &rt_param);
-    if (rc) {
-	io_errlog(EPERM, "cannot set RT priority, rc = %d.", rc);
-	return rc;
-    }
-
-    /* this should work, but using capabilities it often doesn't */
-    rc = pthread_create(&dsp_thread, &attributes, io_dsp_thread, NULL);
-    if (rc == 0) {
-	IF_DEBUG(DBG_TERSE, io_trace("DSP thread created"));
-	return 0;
-    }
-
-#ifdef HAVE_POSIX_SCHED
-
-    IF_DEBUG(DBG_TERSE, io_trace("first pthread_create() returns %d\n", rc));
-
-    /* The following comment was copied from jack/libjack/client.c
-     * along with most of this code... */
-
-    /* the version of glibc I've played with has a bug that makes
-       that code fail when running under a non-root user but with the
-       proper realtime capabilities (in short,  pthread_attr_setschedpolicy 
-       does not check for capabilities, only for the uid being
-       zero). Newer versions apparently have this fixed. This
-       workaround temporarily switches the client thread to the
-       proper scheduler and priority, then starts the realtime
-       thread so that it can inherit them and finally switches the
-       client thread back to what it was before. Sigh. For ardour
-       I have to check again and switch the thread explicitly to
-       realtime, don't know why or how to debug - nando
-    */
-
-    /* get current scheduler and parameters of the client process */
-    if ((policy = sched_getscheduler(0)) < 0) {
-	io_errlog(EPERM,
-		  "Cannot get current client scheduler: %s",
-		  strerror(errno));
-	return -1;
-    }
-
-    memset(&my_param, 0, sizeof(my_param));
-    if (sched_getparam(0, &my_param)) {
-	io_errlog(EPERM,
-		  "Cannot get current client scheduler parameters: %s",
-		  strerror(errno));
-	return -1;
-    }
-
-    /* temporarily change the client process to SCHED_FIFO so that
-       the realtime thread can inherit the scheduler and priority
-    */
-    if (sched_setscheduler(0, SCHED_FIFO, &rt_param)) {
-	io_errlog(EPERM, "Cannot temporarily set RT scheduling: %s",
-		  strerror(errno));
-	return -1;
-    }
-
-    /* prepare the attributes for the realtime thread */
-    pthread_attr_init(&attributes);
-    if ((pthread_attr_setscope(&attributes, PTHREAD_SCOPE_SYSTEM)) ||
-	(pthread_attr_setinheritsched(&attributes, PTHREAD_INHERIT_SCHED))) {
-	sched_setscheduler(0, policy, &my_param);
-	io_errlog(EPERM, "Cannot set RT thread attributes");
-	return -1;
-    }
-
-    /* create the RT thread */
-    rc = pthread_create(&dsp_thread, &attributes, io_dsp_thread, NULL);
-    if (rc != 0) {
-	sched_setscheduler(0, policy, &my_param);
-
-        errstr = g_strdup_printf(
-	    _("%s: not permitted to create realtime DSP thread.\n"
-	      "\tYou must run as root or use JACK capabilities.\n"
-	      "\tContinuing operation, but with -t option.\n"), PACKAGE);
-        g_fprintf(stderr, "%s\n", errstr);
-        message (GTK_MESSAGE_WARNING, errstr);
-        free (errstr);
-
-	IF_DEBUG(DBG_TERSE,
-		 io_trace("second pthread_create() returns %d\n", rc));
-	return rc;
-    }
-
-    /* return this thread to the scheduler it used before */
-    sched_setscheduler(0, policy, &my_param);
-    IF_DEBUG(DBG_TERSE, io_trace("DSP thread finally created"));
-    rc = 0;
-#endif /* HAVE_POSIX_SCHED */
-#endif /* HAVE_JACK_CREATE_THREAD */
 
     return rc;
 }
