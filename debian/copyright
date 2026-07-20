@@ -51,12 +51,6 @@ Copyright: 2003, Jack O'Quin
 	2003, Jan C. Depner
 License: GPL-2+
 
-Files: src/ringbuffer.c
-	src/ringbuffer.h
-Copyright: 2000, Paul Davis
-	2003, Rohan Drape
-License: LGPL-2.1+
-
 Files: po/fr.po
 Copyright: 2007, Raphaël Doursenaud <rdoursenaud@free.fr>
 	2008, Emmanuel Saracco <esaracco@free.fr>
