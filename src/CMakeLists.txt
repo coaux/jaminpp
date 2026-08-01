@@ -1,4 +1,3 @@
-
 include(${${CMAKE_PROJECT_NAME}_SOURCE_DIR}/cmake/gresource.cmake)
 
 
@@ -70,26 +69,26 @@ endif()
 # objects
 #
 
-add_library(jamui
-    gtkmeter.c
-    gtkmeterscale.c
-   ${JAMINPP_RESOURCE_C}
-    jamui.cpp
-)
-target_link_libraries(jamui PUBLIC
-    PkgConfig::GTKMM
-)
-
-add_executable(jaminpp
-    main.cpp
-)
-target_link_libraries(jaminpp
-    PRIVATE PkgConfig::GTKMM jamui
-)
-if(JAMINPP_ADW)
-    target_link_libraries(jaminpp PRIVATE PkgConfig::ADW)
-endif()
-
+## initial tests w/ C++
+# add_library(jamui
+#     gtkmeter.c
+#     gtkmeterscale.c
+#    ${JAMINPP_RESOURCE_C}
+#     jamui.cpp
+# )
+# target_link_libraries(jamui PUBLIC
+#     PkgConfig::GTKMM
+# )
+#
+# add_executable(jaminpp
+#     main.cpp
+# )
+# target_link_libraries(jaminpp
+#     PRIVATE PkgConfig::GTKMM jamui
+# )
+# if(JAMINPP_ADW)
+#     target_link_libraries(jaminpp PRIVATE PkgConfig::ADW)
+# endif()
 
 add_library(hnopt STATIC
     ## from libnopt_a_SOURCES, Makefile.am
@@ -139,8 +138,7 @@ add_executable(jamin
 )
 
 target_link_libraries(jamin PRIVATE
-    hnopt
-    jamui
+    m hnopt
     PkgConfig::JACK
     PkgConfig::FFTW
     PkgConfig::XML
